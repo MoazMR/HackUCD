@@ -8,10 +8,13 @@ The aim is for each person to own a vertical slice of the product. Do not make t
 | Sarah | **My Events** and **Profile** views, onboarding, preferences, ID-verification status, endorsements | `apps/web/src/features/auth`, `apps/web/src/features/profile`, `apps/web/src/features/preferences` | `feature/sarah-profile-trust` |
 | Moaz | event/profile APIs, recommendation, attendance, public event chat, reports | `apps/api/src/routes`, `apps/api/src/services`, `apps/api/src/models` | `feature/moaz-api-recommendations` |
 | Cahal | business portal, promotion, Stripe sandbox, deployment integration | `apps/web/src/features/business`, related routes/services, `infra` | `feature/cahal-business-stripe` |
+| Shared integration (Moaz) | app shell, shared API client/contracts, OpenRouter event planner, CI smoke tests | files directly inside `apps/web/src`, `apps/web/src/integration`, `apps/web/src/lib`, `apps/web/src/features/planning`, `packages/shared`, `.github` | `codex/integration-openrouter` |
 
 ## Files that need coordination
 
 Ask the team before editing these: root `package.json`, files directly inside `apps/web/src`, `apps/api/src/server.ts`, `packages/shared`, deployment files, and database migrations. Moaz and Cahal must agree before either changes a shared payment/event API shape.
+
+The shared integration branch records the coordinated changes to the app shell, server bootstrap, root scripts, and shared contracts. Feature owners should merge or rebase it before wiring their screens, rather than creating a second navigation or API-client layer.
 
 ## Definition of done for any task
 

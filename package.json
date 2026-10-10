@@ -7,7 +7,8 @@
     "dev": "concurrently \"npm run dev --workspace @social-outings/web\" \"npm run dev --workspace @social-outings/api\"",
     "build": "npm run build --workspace @social-outings/web && npm run build --workspace @social-outings/api",
     "start": "npm run start --workspace @social-outings/api",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
