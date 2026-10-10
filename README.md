@@ -34,17 +34,8 @@ Every feature must use its assigned branch and a pull request. Never work direct
 2. Bring in the latest shared work before editing: `git pull origin main`.
 3. Change only the folders assigned to you below. Do not overwrite another person's changes.
 4. Run `npm run typecheck` and the relevant local workflow before committing.
-5. Save your work: `git add <the-files-you-changed>` then `git commit -m "feat: describe the feature"`.
-6. Push **your branch** - not `main`: `git push origin feature/kate-discovery-map` (substitute your branch name).
-7. Open GitHub. On the repository page, select **Compare & pull request**, set the base branch to `main`, give the PR a clear title, explain what you tested, then select **Create pull request**.
-8. Do not merge your own PR. A different teammate reviews it and the integration owner merges it only after checks pass.
-
-### What the words mean
-
-- **Pull:** download the latest shared changes from GitHub before you start (`git pull origin main`).
-- **Push:** upload your completed branch to GitHub (`git push origin feature/...`).
-- **Pull request (PR):** a GitHub request to merge that pushed branch into `main`. A PR is created on GitHub after pushing; it is not itself pushed.
-- **Main:** the shared, working version. Only approved PRs are merged into it.
+5. Commit with a clear message, push the branch, and open a PR into `main`.
+6. Merge your own PR into `main` once it is ready.
 
 Never commit secrets, API keys, identity documents, or `.env` files.
 
@@ -59,7 +50,7 @@ You are Kate's coding agent for the ThirdPlace repository. First read README.md 
 
 Build the main user discovery and ordinary-user event experience in apps/web/src/features/discovery, apps/web/src/features/events, and reusable presentational components in apps/web/src/components only when necessary. First read docs/DESIGN.md and create an original responsive UI consistent with it; do not copy Manna, Once Upon, or Deliveroo branding/assets. Implement the For You and Map main views plus the create-event, event-detail, join, and public event-group chat flows. For You is the default recommended event feed with a visibly placed Create Event action. Map shows the user's approximate location and event hotspots, with accessible list fallback. A user interested in poker, football, padel, and tennis should only be recommended matching relevant events, not unrelated knitting events. Include useful loading, empty, and error states. Use the shared event API contract; do not change it yourself.
 
-Use realistic, clearly labelled synthetic local event data if the API is not ready. Keep private user information off event cards. Run npm run typecheck, test the workflow locally, commit, push, and open a PR into main with a screenshot and a short test summary. Do not merge the PR.
+Use realistic, clearly labelled synthetic local event data if the API is not ready. Keep private user information off event cards. Run npm run typecheck, test the workflow locally, commit, push, and open a PR into main with a screenshot and a short test summary. Merge your own PR into main once it is ready.
 ```
 
 ### Sarah - accounts, profiles, trust, and safety UI
@@ -69,7 +60,7 @@ You are Sarah's coding agent for the ThirdPlace repository. First read README.md
 
 Build the user onboarding, Profile, My Events, preferences, and trust experience in apps/web/src/features/auth, apps/web/src/features/profile, and apps/web/src/features/preferences. The My Events main view separates upcoming and past joined/created events, lets users open an event's public group chat, and respects the setting to show or hide previous attendance history. The Profile main view collects age range/age validation, self-described gender (optional), approximate location, interests, and travel radius; it provides photo/name editing, settings, privacy controls, verification status, and trust score. Make clear that only an approximate location is public. Show a public-safe profile with interests, endorsement/trust score, and no private contact details, address, birth date, ID number, or exact location.
 
-Create a mock ID-verification status flow for Irish IDs: verified / pending / failed, with clear consent and an explanation that the prototype never stores or displays ID images or ID numbers. Build the post-event endorsement screen: endorse, do-not-endorse/report, and a clear warning that reports are reviewed; do not automatically ban a person solely in the browser. Private messaging must not exist. Run npm run typecheck, test success and failure states locally, commit, push, and open a PR into main with screenshots and a short test summary. Do not merge the PR.
+Create a mock ID-verification status flow for Irish IDs: verified / pending / failed, with clear consent and an explanation that the prototype never stores or displays ID images or ID numbers. Build the post-event endorsement screen: endorse, do-not-endorse/report, and a clear warning that reports are reviewed; do not automatically ban a person solely in the browser. Private messaging must not exist. Run npm run typecheck, test success and failure states locally, commit, push, and open a PR into main with screenshots and a short test summary. Merge your own PR into main once it is ready.
 ```
 
 ### Moaz - backend, recommendation, moderation, and public event chat
@@ -79,7 +70,7 @@ You are Moaz's coding agent for the ThirdPlace repository. First read README.md 
 
 Build backend routes and services in apps/api/src/routes, apps/api/src/services, and apps/api/src/models. Provide APIs for profiles/preferences, events, search/filtering by type/location/distance/paid status, joining an event, public event-group messages, endorsements, and verification status. Implement a transparent recommendation function: score nearby upcoming events using matching interests, distance within the user's chosen radius, and event category; return an explanation such as 'Matches football and is 2 km away.' Exclude events outside the radius and unrelated categories unless explicitly requested.
 
-Use synthetic data and document assumptions. Ensure no direct-message route or private-message data model exists. Model reports separately from endorsements; a threshold such as three credible reports may flag an account for moderator review, not silently delete it. ID verification must use a mock status/provider boundary only: never collect, log, or persist actual ID document contents in this prototype. Update API documentation if endpoints change, run npm run typecheck, test normal/boundary/failure requests, commit, push, and open a PR into main. Do not merge the PR.
+Use synthetic data and document assumptions. Ensure no direct-message route or private-message data model exists. Model reports separately from endorsements; a threshold such as three credible reports may flag an account for moderator review, not silently delete it. ID verification must use a mock status/provider boundary only: never collect, log, or persist actual ID document contents in this prototype. Update API documentation if endpoints change, run npm run typecheck, test normal/boundary/failure requests, commit, push, and open a PR into main. Merge your own PR into main once it is ready.
 ```
 
 ### Cahal - business portal, promotions, Stripe sandbox, and integration
@@ -89,5 +80,5 @@ You are Cahal's coding agent for the ThirdPlace repository. First read README.md
 
 Build a clearly separate business experience in apps/web/src/features/business and its related backend endpoints under apps/api/src/routes and apps/api/src/services. Businesses can create venue-based events and choose a paid promotion/boost; ordinary users can optionally promote one of their own events. Clearly label paid/promoted events in the map/feed. Add Stripe sandbox Checkout through a server-side route, using environment variables only and no secret keys in the client or repository. After the sandbox success callback/webhook, record a mock order and activate the promotion in the product. Include a pricing screen that says what the payment buys, price, and currency.
 
-Keep payments optional: regular users can browse, join, and create events without paying. Coordinate API shapes with Moaz using docs/API-CONTRACT.md rather than editing his core event route without agreement. Add setup instructions for required Stripe test variables, run npm run typecheck, test cancellation and successful sandbox return locally, commit, push, and open a PR into main with screenshots and a short test summary. Do not merge the PR.
+Keep payments optional: regular users can browse, join, and create events without paying. Coordinate API shapes with Moaz using docs/API-CONTRACT.md rather than editing his core event route without agreement. Add setup instructions for required Stripe test variables, run npm run typecheck, test cancellation and successful sandbox return locally, commit, push, and open a PR into main with screenshots and a short test summary. Merge your own PR into main once it is ready.
 ```
