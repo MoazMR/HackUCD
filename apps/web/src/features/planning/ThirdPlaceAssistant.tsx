@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from "react";
-import type { AssistantMessage, AssistantResponse } from "@social-outings/shared";
+import type { AssistantMessage } from "@social-outings/shared";
 import { api } from "../../lib/api";
 
 const starters = [
@@ -12,7 +12,6 @@ export function ThirdPlaceAssistant({ onBack }: { onBack: () => void }) {
   const conversationId = useRef(`web-${crypto.randomUUID()}`);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [input, setInput] = useState("");
-  const [latest, setLatest] = useState<AssistantResponse>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
 
@@ -25,7 +24,6 @@ export function ThirdPlaceAssistant({ onBack }: { onBack: () => void }) {
     try {
       // Full replies stay visible locally; bound the history sent back to the API.
       const response = await api.askAssistant(next.map((message) => ({ ...message, content: message.content.slice(0, 800) })), conversationId.current);
-      setLatest(response);
       setMessages([...next, { role: "assistant", content: response.reply }]);
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : "The outing guide is unavailable.");
@@ -46,8 +44,7 @@ export function ThirdPlaceAssistant({ onBack }: { onBack: () => void }) {
         {messages.map((message, index) => <div className={`assistant__message assistant__message--${message.role}`} key={`${message.role}-${index}`}>{message.content}</div>)}
         {busy && <div className="assistant__message assistant__message--assistant">Finding a thoughtful match…</div>}
       </div>
-      {latest && <p className="assistant__provider">Response: {latest.provider === "openclaw" ? "OpenClaw agent" : latest.provider === "openrouter" ? "OpenRouter fallback" : "transparent rule-based fallback"}. {latest.notice}</p>}
-      {messages.length > 0 && <button className="button-secondary" type="button" disabled={busy} onClick={() => { setMessages([]); setLatest(undefined); setError(undefined); conversationId.current = `web-${crypto.randomUUID()}`; }}>Clear conversation</button>}
+      {messages.length > 0 && <button className="button-secondary" type="button" disabled={busy} onClick={() => { setMessages([]); setError(undefined); conversationId.current = `web-${crypto.randomUUID()}`; }}>Clear conversation</button>}
       <form className="assistant__composer" onSubmit={(event) => void send(event)}>
         <label htmlFor="assistant-message">Ask about an outing or creating one</label>
         <div><textarea id="assistant-message" rows={3} maxLength={800} value={input} onChange={(event) => setInput(event.target.value)} placeholder="I’ve had a long day and want something social but low-pressure…" /><button type="submit" disabled={busy || !input.trim()}>Ask</button></div>
