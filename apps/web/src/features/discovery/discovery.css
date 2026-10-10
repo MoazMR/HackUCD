@@ -19,6 +19,7 @@
 .tp h2, .tp h3, .tp p { margin: 0; }
 .tp a { color: inherit; }
 .tp :focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; border-radius: .35rem; }
+.tp-top { scroll-margin-top: 5rem; }
 .tp-top:focus { outline: none; }
 .tp-visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tp-muted { color: var(--tp-muted); font-size: .92rem; }
@@ -83,12 +84,23 @@
 .tp-tile__link { text-decoration: none; }
 .tp-tile__link::after { content: ""; position: absolute; inset: 0; border-radius: var(--tp-radius); }
 .tp-tile__reason { color: var(--tp-teal-dark); font-weight: 700; font-size: .9rem; margin-top: .25rem; }
-.tp-tile__where { color: var(--tp-muted); font-size: .88rem; margin-top: .25rem; }
+.tp-tile__time { color: var(--tp-muted); font-size: .92rem; font-weight: 650; margin-top: .25rem; }
+/* Venue + host: a small panel that drops under the card on hover / keyboard focus. No layout shift. */
+.tp-tile__more { position: absolute; left: .9rem; right: .9rem; top: calc(100% - .4rem); z-index: 6; display: grid; gap: .2rem; padding: .85rem 1rem .7rem; background: var(--tp-card); border: 1px solid var(--tp-line); border-radius: 0 0 .9rem .9rem; box-shadow: 0 14px 26px rgba(18, 35, 31, .16); font-size: .88rem; opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .14s, transform .14s; }
+.tp-tile__more span { display: inline-block; min-width: 3.2rem; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--tp-muted); }
+.tp-tile:hover, .tp-tile:focus-within { z-index: 5; }
+.tp-tile:hover .tp-tile__more, .tp-tile:focus-within .tp-tile__more { opacity: 1; transform: none; pointer-events: auto; }
+/* Touch screens have no hover, so show the details inline instead */
+@media (hover: none) {
+  .tp-tile { grid-template-columns: 4.6rem 1fr; }
+  .tp-tile__more { position: static; grid-column: 1 / -1; opacity: 1; transform: none; pointer-events: auto; padding: .6rem 0 0; border: 0; border-top: 1px solid var(--tp-line); border-radius: 0; box-shadow: none; }
+}
 .tp-tile__foot { display: flex; flex-wrap: wrap; gap: .3rem .9rem; margin-top: .6rem; font-size: .85rem; color: var(--tp-muted); }
 .tp-price { font-weight: 800; color: var(--tp-ink); }
 .tp-full { color: #9a1c1c; font-weight: 800; }
 .tp-tile--compact { grid-template-columns: 3.6rem 1fr; padding: .75rem; }
 .tp-tile--compact .tp-tile__date strong { font-size: 1.3rem; }
+.tp-tile--compact .tp-tile__more { left: .6rem; right: .6rem; }
 
 /* states */
 .tp-state { text-align: center; background: var(--tp-card); border: 2px dashed #c4cdc5; border-radius: var(--tp-radius); padding: 2.5rem 1.25rem; display: grid; gap: .6rem; justify-items: center; }
@@ -205,3 +217,11 @@
 .tp-searchpanel__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; border-top: 1px solid var(--tp-line); padding-top: .9rem; }
 .tp-searchpanel__foot .tp-results { margin: 0; }
 @media (max-width: 860px) { .tp-filtergrid { grid-template-columns: 1fr; } }
+
+/* collapsible interests */
+.tp .tp-disclosure { display: inline-flex; align-items: center; gap: .5rem; background: none; border: 0; padding: .2rem 0; font: inherit; font-weight: 700; color: var(--tp-ink); cursor: pointer; }
+.tp .tp-disclosure:hover { color: var(--tp-teal-dark); }
+.tp-disclosure__count { display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 .35rem; border-radius: 999px; background: var(--tp-sun); color: #5a4300; font-size: .78rem; }
+.tp-disclosure svg { transition: transform .15s; }
+.tp-disclosure[aria-expanded="true"] svg { transform: rotate(180deg); }
+.tp-chiprow--panel { margin-top: .5rem; }

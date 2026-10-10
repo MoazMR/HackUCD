@@ -1,4 +1,4 @@
-import { formatDay, formatPrice, formatWhen, spotsLeft } from "./format";
+import { formatDay, formatPrice, formatTime, spotsLeft } from "./format";
 import { CATEGORY_LABELS, type RankedEvent } from "./types";
 
 type Props = { ranked: RankedEvent; joined: boolean; compact?: boolean };
@@ -29,16 +29,19 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
           </a>
         </h3>
         <p className="tp-tile__reason">{reason}</p>
-        <p className="tp-tile__where">
-          {formatWhen(event.startsAt)} · {event.locationName}, {event.area}
-        </p>
+        <p className="tp-tile__time">{formatTime(event.startsAt)}</p>
         <p className="tp-tile__foot">
           <span className="tp-price">{formatPrice(event.priceEur)}</span>
           <span className={full ? "tp-full" : ""}>
             {full ? "Full" : `${left} ${left === 1 ? "spot" : "spots"} left`}
           </span>
-          <span>Hosted by {event.hostName}</span>
         </p>
+      </div>
+      {/* Shown on hover or keyboard focus (always shown on touch screens). It stays in the
+          accessibility tree, so screen readers still get the venue and host. */}
+      <div className="tp-tile__more">
+        <p><span>Where</span> {event.locationName}, {event.area}</p>
+        <p><span>Host</span> {event.hostName}</p>
       </div>
     </article>
   );

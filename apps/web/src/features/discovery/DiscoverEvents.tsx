@@ -77,8 +77,8 @@ export function DiscoverEvents() {
     if (lastRouteKey.current === key) return;
     lastRouteKey.current = key;
     if (route.name === "search") return; // the search box takes focus itself
-    window.scrollTo({ top: topRef.current?.offsetTop ?? 0 });
-    topRef.current?.focus();
+    topRef.current?.scrollIntoView({ block: "start" }); // honours scroll-margin for the pinned top bar
+    topRef.current?.focus({ preventScroll: true });
   }, [route]);
 
   const ranked = useMemo(() => rankEvents(store.events, filters), [store.events, filters]);

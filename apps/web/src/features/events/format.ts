@@ -8,6 +8,10 @@ export function formatWhen(iso: string): string {
   return `${dateFormat.format(date)} · ${timeFormat.format(date)}`;
 }
 
+export function formatTime(iso: string): string {
+  return timeFormat.format(new Date(iso));
+}
+
 export function formatDay(iso: string): { weekday: string; day: string; month: string } {
   const date = new Date(iso);
   return {
