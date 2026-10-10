@@ -56,7 +56,7 @@ export function ProfileView() {
 
       <div className="tp-profile-grid">
         <div className="tp-stack">
-          <section className="tp-panel" aria-labelledby="tp-you">
+          <section className="tp-panel" data-tint="peach" aria-labelledby="tp-you">
             <h2 id="tp-you">Photo and name</h2>
             <PhotoEditor name={profile.displayName} photo={profile.photoDataUrl} onChange={(photoDataUrl) => update({ photoDataUrl })} />
             <div className="tp-field">
@@ -85,7 +85,7 @@ export function ProfileView() {
             </div>
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-where">
+          <section className="tp-panel" data-tint="mint" aria-labelledby="tp-where">
             <h2 id="tp-where">Area and travel radius</h2>
             <p className="tp-callout">Only your approximate area is public. Your exact location is never stored or shown.</p>
             <AreaRadiusPicker areaId={profile.areaId} radiusKm={profile.radiusKm}
@@ -93,13 +93,13 @@ export function ProfileView() {
               onAreaChange={(areaId) => { if (areaId) update({ areaId }); }} onRadiusChange={(radiusKm) => update({ radiusKm })} />
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-likes">
+          <section className="tp-panel" data-tint="blue" aria-labelledby="tp-likes">
             <h2 id="tp-likes">Interests</h2>
             <InterestPicker selected={profile.interests} onChange={(interests) => update({ interests })} legend="Events are recommended from these"
               error={profile.interests.length === 0 ? "With no interests picked, your feed has nothing to recommend." : undefined} />
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-privacy">
+          <section className="tp-panel" data-tint="amber" aria-labelledby="tp-privacy">
             <h2 id="tp-privacy">Privacy</h2>
             <Toggle label="Show past events I attended" hint="Off: only you see your past events, in My Events."
               checked={profile.privacy.showAttendanceHistory} onChange={(value) => setPrivacy({ showAttendanceHistory: value })} />
@@ -112,14 +112,14 @@ export function ProfileView() {
             </div>
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-verification">
+          <section className="tp-panel" data-tint="pink" aria-labelledby="tp-verification">
             <h2 id="tp-verification">ID check</h2>
             <VerificationFlow />
           </section>
         </div>
 
         <aside className="tp-stack tp-sticky" aria-label="Trust">
-          <section className="tp-panel" aria-labelledby="tp-trust">
+          <section className="tp-panel" data-tint="blue" aria-labelledby="tp-trust">
             <h2 id="tp-trust">Trust score</h2>
             <div className="tp-score">
               <strong>{trust.score}</strong><span>of 100</span>

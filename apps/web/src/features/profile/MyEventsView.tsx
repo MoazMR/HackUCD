@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { InterestBadge } from "../preferences/InterestIcon";
+import { interestCategory } from "../preferences/interests";
 import { useProfile } from "./ProfileStore";
 import { sampleMyEvents } from "./sampleData";
 import type { MyEvent } from "./types";
@@ -122,7 +123,7 @@ function EventSummary({ event }: { event: MyEvent }) {
   const date = new Date(event.startsAt);
   return (
     <div className="tp-event-summary">
-      <time className="tp-date" dateTime={event.startsAt}>
+      <time className="tp-date" data-category={event.interestId ? interestCategory(event.interestId) : "other"} dateTime={event.startsAt}>
         <span>{date.toLocaleDateString("en-IE", { month: "short" })}</span>
         <strong>{date.getDate()}</strong>
       </time>
