@@ -71,13 +71,29 @@ export type NewEventDraft = {
 
 export const INTERESTS = [
   "football",
-  "poker",
   "padel",
   "tennis",
+  "run clubs",
+  "hikes",
+  "sea swims",
+  "cycling",
+  "climbing",
+  "yoga",
+  "sauna",
+  "poker",
   "board games",
-  "live music",
+  "pub quiz",
+  "books",
   "knitting",
-  "books"
+  "coding meetups",
+  "live music",
+  "trad sessions",
+  "dance classes",
+  "cooking classes",
+  "coffee",
+  "food markets",
+  "arts and crafts",
+  "film nights"
 ] as const;
 
 export const CATEGORY_LABELS: Record<DiscoveryEvent["category"], string> = {

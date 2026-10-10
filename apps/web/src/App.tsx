@@ -5,7 +5,7 @@ import { setUserOrigin } from "./features/events/geo";
 import { INTERESTS as DISCOVERY_INTERESTS } from "./features/events/types";
 import { useEventsStore } from "./features/events/useEventsStore";
 import { EventPlanner } from "./features/planning/EventPlanner";
-import { AREAS } from "./features/preferences";
+import { AREAS, fromDiscoveryInterest, toDiscoveryInterest } from "./features/preferences";
 import { EndorsementScreen, Logo, MyEventsView, ProfileProvider, ProfileView, sampleMyEvents, useProfile, type MyEvent } from "./features/profile";
 import { ProfileApiSync } from "./integration/ProfileApiSync";
 import { BUSINESS_PORTAL_PATH } from "./features/business/paths";
@@ -26,9 +26,6 @@ function viewFromHash(): View {
   return [...mainViews.map((item) => item.id), "plan", ...discoveryRoutes].includes(first) ? first : "for-you";
 }
 
-/** Profile interest ids that are named differently in the discovery feature. */
-const PROFILE_TO_DISCOVERY_INTEREST: Record<string, string> = { "board-games": "board games", "live-music": "live music", "book-club": "books" };
-const DISCOVERY_TO_PROFILE_INTEREST: Record<string, string> = { "board games": "board-games", "live music": "live-music", books: "book-club" };
 const discoveryInterestNames: readonly string[] = DISCOVERY_INTERESTS;
 
 export function App() {
@@ -47,7 +44,7 @@ function AppContent() {
   const area = AREAS.find((item) => item.id === profile.areaId);
   if (area) setUserOrigin({ name: area.name, lat: area.lat, lng: area.lng });
   const preferences = useMemo(() => ({
-    interests: profile.interests.map((id) => PROFILE_TO_DISCOVERY_INTEREST[id] ?? id).filter((name) => discoveryInterestNames.includes(name)),
+    interests: profile.interests.map(toDiscoveryInterest).filter((name) => discoveryInterestNames.includes(name)),
     radiusKm: profile.radiusKm
   }), [profile.interests, profile.radiusKm]);
 
@@ -60,7 +57,7 @@ function AppContent() {
       startsAt: event.startsAt,
       locationName: `${event.locationName}, ${event.area}`,
       role: event.hostName === "You" ? "hosting" : "going",
-      interestId: DISCOVERY_TO_PROFILE_INTEREST[event.interest] ?? event.interest,
+      interestId: fromDiscoveryInterest(event.interest),
       attendeeCount: event.attendeeCount,
       attendees: []
     })),

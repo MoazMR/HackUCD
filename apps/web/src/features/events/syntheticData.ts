@@ -81,6 +81,54 @@ const seeds: Seed[] = [
     description: "Bring a book you loved, leave with one you will. Blankets on the lawn.",
     category: "other", area: "Donnybrook", locationName: "Herbert Park Lawn",
     priceEur: 0, capacity: 20, attendeeCount: 9, hostName: "Maeve T."
+  },
+  {
+    id: "saturday-run-club", inHours: 20, title: "Saturday run club, 5 km", interest: "run clubs",
+    description: "Easy conversational pace along the canal, with a coffee stop after. Nobody gets left behind.",
+    category: "sport", area: "Portobello", locationName: "Portobello Harbour",
+    priceEur: 0, capacity: 20, attendeeCount: 11, hostName: "Ciara D."
+  },
+  {
+    id: "howth-cliff-hike", inHours: 44, title: "Howth cliff path hike", interest: "hikes",
+    description: "The 6 km loop with sea views. Wear proper shoes and bring a rain jacket.",
+    category: "sport", area: "Howth", locationName: "Howth DART Station",
+    priceEur: 0, capacity: 12, attendeeCount: 7, hostName: "Liam O."
+  },
+  {
+    id: "sunrise-sea-swim", inHours: 19, title: "Sunrise sea swim", interest: "sea swims",
+    description: "A quick dip at high tide, then flasks of tea. Stay within your depth; beginners pair up.",
+    category: "sport", area: "Dún Laoghaire", locationName: "Seapoint bathing area",
+    priceEur: 0, capacity: 15, attendeeCount: 9, hostName: "Orla F."
+  },
+  {
+    id: "sauna-and-plunge", inHours: 30, title: "Sauna and cold plunge social", interest: "sauna",
+    description: "A booked group session in a wood-fired sauna by the water. Bring a towel and flip-flops.",
+    category: "other", area: "Clontarf", locationName: "Clontarf Seafront Sauna",
+    priceEur: 12, capacity: 8, attendeeCount: 5, hostName: "Marta W."
+  },
+  {
+    id: "pasta-cooking-class", inHours: 54, title: "Fresh pasta cooking class", interest: "cooking classes",
+    description: "Make two pasta shapes and a sauce from scratch, then eat together. Ingredients included.",
+    category: "food", area: "Stoneybatter", locationName: "Stoneybatter Community Kitchen",
+    priceEur: 18, capacity: 10, attendeeCount: 6, hostName: "Paolo G."
+  },
+  {
+    id: "slow-coffee-morning", inHours: 26, title: "Slow coffee morning", interest: "coffee",
+    description: "One big table, no laptops. Turn up on your own and chat to whoever sits beside you.",
+    category: "food", area: "Rathmines", locationName: "Rathmines Corner Café",
+    priceEur: 0, capacity: 12, attendeeCount: 4, hostName: "Grace N."
+  },
+  {
+    id: "tuesday-pub-quiz", inHours: 58, title: "Tuesday pub quiz, join a team", interest: "pub quiz",
+    description: "Come solo and we'll put you on a team of four. General knowledge with a music round.",
+    category: "social", area: "Dublin city centre", locationName: "Back room, city centre pub",
+    priceEur: 5, capacity: 24, attendeeCount: 13, hostName: "Fionn T."
+  },
+  {
+    id: "phoenix-park-cycle", inHours: 68, title: "Phoenix Park social cycle", interest: "cycling",
+    description: "A relaxed 20 km loop on quiet roads at chatting pace. Any bike is fine; helmets on.",
+    category: "sport", area: "Stoneybatter", locationName: "Park gate, Stoneybatter side",
+    priceEur: 0, capacity: 14, attendeeCount: 6, hostName: "Ruth A."
   }
 ];
 
