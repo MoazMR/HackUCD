@@ -54,6 +54,9 @@ export function AreaMap({ label, radiusKm, interests = [] }: { label: string; ra
           </li>
         ))}
       </ul>
+      <p className="tp-map-note" aria-hidden="true">somewhere in here-ish
+        <svg viewBox="0 0 50 44"><path d="M6 4c-2 16 8 30 34 32M40 36l-10-2M40 36l-5-9" /></svg>
+      </p>
       <p className="tp-map-place" aria-hidden="true">{label.replace(/ area$/, "")}</p>
       <p className="tp-map-label"><strong>{label}</strong><span>{radiusKm} km travel radius</span></p>
     </div>

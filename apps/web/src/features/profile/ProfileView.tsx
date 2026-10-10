@@ -7,6 +7,7 @@ import { InterestPicker } from "../preferences/InterestPicker";
 import { PhotoEditor } from "./Avatar";
 import { useProfile } from "./ProfileStore";
 import { PublicProfileCard } from "./PublicProfileCard";
+import { Ribbon } from "./Ribbon";
 import { VerificationFlow } from "./VerificationFlow";
 import { sampleMyEvents } from "./sampleData";
 import { toPublicProfile, trustBreakdown } from "./trust";
@@ -42,11 +43,15 @@ export function ProfileView() {
       <header className="tp-hero">
         <AreaMap label={profile.areaId ? `${areaName(profile.areaId)} area` : "No area yet"} radiusKm={profile.radiusKm} interests={profile.interests} />
         <div className="tp-hero-copy">
-          <h1 id="tp-profile-heading" className="tp-title tp-title-big">Seen around, never pinned down.</h1>
+          <Ribbon />
+          <h1 id="tp-profile-heading" className="tp-title tp-title-big">Seen around, <span className="tp-script">never pinned down.</span></h1>
+          <p className="tp-motto">Your area <span aria-hidden="true">·</span> Your interests <span aria-hidden="true">·</span> Your trust</p>
           <p className="tp-lede">This is your profile. People see your area, your interests and how trusted you are. Nothing more.</p>
         </div>
         <div className="tp-hero-card">
-          <p className="tp-tagline">What others see</p>
+          <p className="tp-scribble">this is all anyone sees
+            <svg viewBox="0 0 60 40" aria-hidden="true"><path d="M4 6c18-4 38 4 44 26M48 32l-9-5M48 32l4-10" /></svg>
+          </p>
           <PublicProfileCard profile={publicProfile} />
         </div>
       </header>
@@ -121,10 +126,15 @@ export function ProfileView() {
         <aside className="tp-stack tp-sticky" aria-label="Trust">
           <section className="tp-panel" data-tint="blue" aria-labelledby="tp-trust">
             <h2 id="tp-trust">Trust score</h2>
-            <div className="tp-score">
-              <strong>{trust.score}</strong><span>of 100</span>
+            <div className="tp-sun" role="img" aria-label={`Trust score ${trust.score} out of 100`}>
+              <svg viewBox="0 0 140 140" aria-hidden="true">
+                {Array.from({ length: 12 }, (_, index) => (
+                  <path key={index} d="M70 14v-10" transform={`rotate(${index * 30} 70 70)`} />
+                ))}
+                <circle cx="70" cy="70" r="46" />
+              </svg>
+              <p><strong>{trust.score}</strong><span>of 100</span></p>
             </div>
-            <div className="tp-meter" role="img" aria-label={`Trust score ${trust.score} out of 100`}><span style={{ width: `${trust.score}%` }} /></div>
             <ul className="tp-breakdown">
               {trust.parts.map((part) => (
                 <li key={part.label}><span>{part.label}</span><span>{part.points} of {part.max}</span></li>

@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { AreaRadiusPicker } from "../preferences/AreaRadiusPicker";
 import { InterestPicker } from "../preferences/InterestPicker";
 import { useProfile } from "../profile/ProfileStore";
+import { Ribbon } from "../profile/Ribbon";
 import { AGE_RANGES } from "../profile/types";
 import "../profile/profile.css";
 import { UNDER_18, checkAge, checkDisplayName, type AgeAnswer } from "./ageValidation";
@@ -70,6 +71,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
   return (
     <section className="tp tp-onboarding" aria-labelledby="tp-onboarding-heading">
       <form className="tp-panel tp-panel-narrow" data-tint="mint" onSubmit={submit} noValidate>
+        <Ribbon />
         <ol className="tp-steps" aria-label="Setup progress">
           {STEPS.map((label, index) => (
             <li key={label} aria-current={index === step ? "step" : undefined} data-done={index < step || undefined}>{label}</li>

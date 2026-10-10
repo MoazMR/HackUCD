@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { InterestBadge } from "../preferences/InterestIcon";
 import { interestCategory } from "../preferences/interests";
 import { useProfile } from "./ProfileStore";
+import { Ribbon } from "./Ribbon";
 import { sampleMyEvents } from "./sampleData";
 import type { MyEvent } from "./types";
 import "./profile.css";
@@ -34,7 +35,8 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
   return (
     <section className="tp tp-myevents" aria-labelledby="tp-myevents-heading">
       <header className="tp-page-head">
-        <h1 id="tp-myevents-heading" className="tp-title tp-title-big">{headline(upcoming.length)}</h1>
+        <Ribbon />
+        <h1 id="tp-myevents-heading" className="tp-title tp-title-big">{headline(upcoming.length)[0]} <span className="tp-script">{headline(upcoming.length)[1]}</span></h1>
         <p className="tp-lede">My Events keeps what you've joined or are hosting, and what you've already been to.</p>
         {!events && <p className="tp-sample">Sample events, until the events API is connected.</p>}
       </header>
@@ -103,10 +105,11 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
   );
 }
 
-function headline(count: number): string {
-  if (count === 0) return "Nothing planned. Yet.";
-  if (count === 1) return "One plan on the way.";
-  return `${count} plans on the way.`;
+/** Headline in two parts: the plain half, then the handwritten half. */
+function headline(count: number): [string, string] {
+  if (count === 0) return ["Nothing planned.", "Yet."];
+  if (count === 1) return ["One plan", "on the way."];
+  return [`${count} plans`, "on the way."];
 }
 
 /** "Tomorrow", "In 5 days", "3 days ago". */
