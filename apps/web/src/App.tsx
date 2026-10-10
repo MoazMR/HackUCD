@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Onboarding } from "./features/auth/Onboarding";
 import { DiscoverEvents } from "./features/discovery/DiscoverEvents";
+import { setUserOrigin } from "./features/events/geo";
+import { INTERESTS as DISCOVERY_INTERESTS } from "./features/events/types";
+import { useEventsStore } from "./features/events/useEventsStore";
 import { EventPlanner } from "./features/planning/EventPlanner";
 import { ThirdPlaceAssistant } from "./features/planning/ThirdPlaceAssistant";
-import { EndorsementScreen, MyEventsView, ProfileProvider, ProfileView, sampleMyEvents, useProfile } from "./features/profile";
+import { AREAS, fromDiscoveryInterest, toDiscoveryInterest } from "./features/preferences";
+import { EndorsementScreen, Logo, MyEventsView, ProfileProvider, ProfileView, sampleMyEvents, useProfile, type MyEvent } from "./features/profile";
 import { ProfileApiSync } from "./integration/ProfileApiSync";
 import { BUSINESS_PORTAL_PATH } from "./features/business/paths";
 
@@ -23,6 +27,8 @@ function viewFromHash(): View {
   return [...mainViews.map((item) => item.id), "plan", "assistant", ...discoveryRoutes].includes(first) ? first : "for-you";
 }
 
+const discoveryInterestNames: readonly string[] = DISCOVERY_INTERESTS;
+
 export function App() {
   return <ProfileProvider><AppContent /></ProfileProvider>;
 }
@@ -32,7 +38,36 @@ function AppContent() {
   const [view, setViewState] = useState<View>(viewFromHash);
   const [endorsementEventId, setEndorsementEventId] = useState<string>();
   const [notice, setNotice] = useState<string>();
-  const events = useMemo(() => sampleMyEvents(), []);
+  // One events store for the whole shell, so events joined or created in discovery show up in My Events.
+  const store = useEventsStore();
+
+  // Discovery reads the approximate area, interests and radius chosen in the profile.
+  const area = AREAS.find((item) => item.id === profile.areaId);
+  if (area) setUserOrigin({ name: area.name, lat: area.lat, lng: area.lng });
+  const preferences = useMemo(() => ({
+    interests: profile.interests.map(toDiscoveryInterest).filter((name) => discoveryInterestNames.includes(name)),
+    radiusKm: profile.radiusKm
+  }), [profile.interests, profile.radiusKm]);
+
+  // My Events: upcoming comes from the shared store; past stays sample data so endorsements can be demonstrated.
+  const samplePast = useMemo(() => sampleMyEvents().filter((event) => new Date(event.startsAt).getTime() < Date.now()), []);
+  const events = useMemo<MyEvent[]>(() => [
+    ...store.events.filter((event) => store.joined.has(event.id)).map((event): MyEvent => ({
+      id: event.id,
+      title: event.title,
+      startsAt: event.startsAt,
+      locationName: `${event.locationName}, ${event.area}`,
+      role: event.hostName === "You" ? "hosting" : "going",
+      interestId: fromDiscoveryInterest(event.interest),
+      attendeeCount: event.attendeeCount,
+      attendees: []
+    })),
+    ...samplePast
+  ], [store.events, store.joined, samplePast]);
+  const openEvent = (id: string) => {
+    if (store.events.some((event) => event.id === id)) window.location.hash = `/event/${encodeURIComponent(id)}`;
+    else setNotice("This is a sample past event, so it has no live page or chat.");
+  };
 
   useEffect(() => {
     const onHashChange = () => { setViewState(viewFromHash()); setEndorsementEventId(undefined); };
@@ -54,23 +89,23 @@ function AppContent() {
   return (
     <div className="page-shell">
       <header className="topbar">
-        <button className="brand" type="button" onClick={() => setView("for-you")}>ThirdPlace</button>
-        <nav aria-label="Primary navigation">{mainViews.map((item) => <button type="button" key={item.id} className="nav-link" aria-current={view === item.id ? "page" : undefined} onClick={() => setView(item.id)}>{item.label}</button>)}</nav>
+        <button className="brand" type="button" onClick={() => setView("for-you")}><Logo className="brand-logo" /></button>
         <div className="topbar-actions">
-          <a className="nav-link" href={BUSINESS_PORTAL_PATH}>For businesses</a>
+          <a className="nav-link" href={BUSINESS_PORTAL_PATH}>For Businesses</a>
           <button type="button" className="nav-link" onClick={() => setView("assistant")}>Ask ThirdPlace</button>
           <button type="button" className="nav-link" onClick={() => setView("plan")}>Plan an event</button>
-          <a className="create-action" href="#/create">Create event</a>
+          <a className="create-action" href="#/create">Create Event</a>
+          <button type="button" className="nav-link nav-pill" aria-current={view === "profile" || view === "my-events" ? "page" : undefined} onClick={() => setView("profile")}>Profile</button>
         </div>
       </header>
       <ProfileApiSync />
       <main>
         {notice && <p className="integration-notice" role="status">{notice}</p>}
         {endorsementEvent ? <EndorsementScreen event={endorsementEvent} onDone={() => setEndorsementEventId(undefined)} />
-          : view === "for-you" ? <><section className="hero"><p className="eyebrow">Your city, your people</p><h1>Find something good to do nearby.</h1><p>Recommendations use your interests and travel radius.</p></section><DiscoverEvents /></>
-          : view === "map" || discoveryRoutes.includes(view as DiscoveryRoute) ? <DiscoverEvents />
-          : view === "my-events" ? <MyEventsView events={events} onOpenChat={() => setNotice("Public event-group chat opens from Kate's event detail flow once it is merged.")} onOpenEvent={() => setNotice("Event details open here once Kate's event flow is merged.")} onEndorse={setEndorsementEventId} onFindEvents={() => setView("for-you")} />
-          : view === "profile" ? <ProfileView />
+          : view === "for-you" ? <><section className="hero"><p className="eyebrow">Your city, your people</p><h1>Find something good to do nearby.</h1><p>Recommendations use your interests and travel radius.</p></section><DiscoverEvents store={store} preferences={preferences} /></>
+          : view === "map" || discoveryRoutes.includes(view as DiscoveryRoute) ? <DiscoverEvents store={store} preferences={preferences} />
+          : view === "my-events" ? <MyEventsView events={events} pastAreSample onOpenChat={openEvent} onOpenEvent={openEvent} onEndorse={setEndorsementEventId} onFindEvents={() => setView("for-you")} />
+          : view === "profile" ? <ProfileView onOpenMyEvents={() => setView("my-events")} />
           : view === "assistant" ? <ThirdPlaceAssistant onBack={() => setView("for-you")} />
           : <EventPlanner onBack={() => setView("for-you")} />}
       </main>

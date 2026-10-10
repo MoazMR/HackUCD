@@ -5,6 +5,7 @@ import { rankEvents } from "../events/recommend";
 import {
   DEFAULT_INTERESTS,
   DEFAULT_RADIUS_KM,
+  RADIUS_OPTIONS_KM,
   type DiscoveryFilters
 } from "../events/types";
 import { useEventsStore, type EventsStore } from "../events/useEventsStore";
@@ -28,7 +29,15 @@ function loadInterests(): string[] {
   return DEFAULT_INTERESTS;
 }
 
-const initialFilters = (interests: string[] = loadInterests()): DiscoveryFilters => ({
+/** Interests and travel radius handed in by the app shell from the person's profile. */
+export type DiscoveryPreferences = { interests: string[]; radiusKm: number };
+
+/** Snap any radius to the nearest option the radius picker offers. */
+function nearestRadiusOption(radiusKm: number): number {
+  return RADIUS_OPTIONS_KM.reduce((best, option) => (Math.abs(option - radiusKm) < Math.abs(best - radiusKm) ? option : best));
+}
+
+const initialFilters = (interests: string[] = loadInterests(), radiusKm: number = DEFAULT_RADIUS_KM): DiscoveryFilters => ({
   query: "",
   category: "all",
   date: "any",
@@ -36,7 +45,7 @@ const initialFilters = (interests: string[] = loadInterests()): DiscoveryFilters
   timeOfDay: "any",
   area: "any",
   freeOnly: false,
-  radiusKm: DEFAULT_RADIUS_KM,
+  radiusKm,
   interests
 });
 
@@ -45,10 +54,23 @@ const initialFilters = (interests: string[] = loadInterests()): DiscoveryFilters
  * (detail, join, chat, create). The icon top bar (components/TopBar) links to
  * #/search, #/create and #/profile.
  */
-export function DiscoverEvents() {
-  const route = useHashRoute();
+export function DiscoverEvents({ store, preferences }: { store?: EventsStore; preferences?: DiscoveryPreferences } = {}) {
+  // The app shell can pass one shared store so joined events survive leaving this view (My Events reads it).
+  return store ? <DiscoverEventsView store={store} preferences={preferences} /> : <DiscoverEventsWithOwnStore preferences={preferences} />;
+}
+
+function DiscoverEventsWithOwnStore({ preferences }: { preferences?: DiscoveryPreferences }) {
   const store = useEventsStore();
-  const [filters, setFilters] = useState<DiscoveryFilters>(() => initialFilters());
+  return <DiscoverEventsView store={store} preferences={preferences} />;
+}
+
+function DiscoverEventsView({ store, preferences }: { store: EventsStore; preferences?: DiscoveryPreferences }) {
+  const route = useHashRoute();
+  const [filters, setFilters] = useState<DiscoveryFilters>(() =>
+    preferences && preferences.interests.length > 0
+      ? initialFilters(preferences.interests, nearestRadiusOption(preferences.radiusKm))
+      : initialFilters()
+  );
   const [listView, setListView] = useState<"for-you" | "map">("for-you");
   const topRef = useRef<HTMLDivElement>(null);
   const lastRouteKey = useRef<string | null>(null);
@@ -82,7 +104,7 @@ export function DiscoverEvents() {
   }, [route]);
 
   const ranked = useMemo(() => rankEvents(store.events, filters), [store.events, filters]);
-  const clearFilters = () => setFilters(initialFilters(filters.interests));
+  const clearFilters = () => setFilters(initialFilters(filters.interests, preferences ? nearestRadiusOption(preferences.radiusKm) : DEFAULT_RADIUS_KM));
   const backHref = `#/${listView}`;
   const onList = route.name === "for-you" || route.name === "map";
 
@@ -189,7 +211,7 @@ function Loaded({ store, children }: { store: EventsStore; children: ReactNode }
       <div className="tp-state">
         <h3>No events nearby yet</h3>
         <p>Be the first to start something in your area.</p>
-        <a className="tp-btn tp-btn--primary" href="#/create">Create an event</a>
+        <a className="tp-btn tp-btn--primary" href="#/create">Create Event</a>
       </div>
     );
   }

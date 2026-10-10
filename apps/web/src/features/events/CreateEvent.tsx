@@ -86,7 +86,7 @@ export function CreateEvent({ onCreate, onCreated, backHref }: Props) {
   return (
     <div className="tp-create">
       <a className="tp-back" href={backHref}>← Back to events</a>
-      <h2 className="tp-detail__title">Create an event</h2>
+      <h2 className="tp-detail__title">Create Event</h2>
       <p className="tp-muted">Share a plan and let people nearby join. You'll be added as the host and can chat with everyone who joins.</p>
 
       <form className="tp-form" onSubmit={submit} noValidate>
