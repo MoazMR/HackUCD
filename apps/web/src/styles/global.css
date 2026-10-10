@@ -13,6 +13,8 @@ nav { display: flex; gap: .25rem; }
 .create-action { border-radius: 999px; white-space: nowrap; }
 .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .5rem; }
 .nav-link { white-space: nowrap; }
+.nav-pill, .nav-pill:hover { background: #fbc42f; border-color: #3e072d; color: #3e072d; font-weight: 800; }
+.nav-pill:hover { background: #f5b514; }
 @media (max-width: 900px) { .topbar { flex-wrap: wrap; } .topbar nav { flex: 1 1 100%; order: 3; overflow-x: auto; } }
 a.nav-link { text-decoration: none; font-size: .95rem; white-space: nowrap; }
 a.create-action { display: inline-block; background: #0a5de0; color: #fff6e8; border: 2.5px solid #3e072d; box-shadow: 3px 4px 0 #3e072d; text-decoration: none; font-weight: 800; padding: .6rem 1.1rem; }
