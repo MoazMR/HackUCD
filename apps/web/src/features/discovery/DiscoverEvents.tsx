@@ -51,7 +51,7 @@ export function DiscoverEvents() {
   const [filters, setFilters] = useState<DiscoveryFilters>(() => initialFilters());
   const [listView, setListView] = useState<"for-you" | "map">("for-you");
   const topRef = useRef<HTMLDivElement>(null);
-  const firstRender = useRef(true);
+  const lastRouteKey = useRef<string | null>(null);
 
   useEffect(() => {
     if (route.name === "for-you" || route.name === "map") setListView(route.name);
@@ -66,11 +66,16 @@ export function DiscoverEvents() {
   }, [filters.interests]);
 
   // Move focus to the new view's heading area on navigation (keyboard + screen-reader friendly).
+  // Compare against the previous route (not a "first render" flag) so React StrictMode's
+  // double-invoked effects in dev can't scroll the page down on first load.
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
+    const key = JSON.stringify(route);
+    if (lastRouteKey.current === null) {
+      lastRouteKey.current = key;
       return;
     }
+    if (lastRouteKey.current === key) return;
+    lastRouteKey.current = key;
     if (route.name === "search") return; // the search box takes focus itself
     window.scrollTo({ top: topRef.current?.offsetTop ?? 0 });
     topRef.current?.focus();

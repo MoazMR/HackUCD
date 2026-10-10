@@ -4,17 +4,11 @@
   --tb-line: #dde2d8;
   --tb-teal: #0b5a54;
   --tb-coral: #c2410c;
-  position: sticky;
-  top: 0;
-  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: .75rem 0;
-  background: rgba(247, 247, 242, .94);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid transparent;
 }
 .tp-topbar__brand { color: #145a43; font-size: 1.35rem; font-weight: 800; text-decoration: none; letter-spacing: -.01em; }
 .tp-topbar__actions { display: flex; align-items: center; gap: .6rem; }
@@ -47,4 +41,26 @@
 .tp-iconbtn--photo { padding: 0; border-color: var(--tb-teal); }
 .tp-iconbtn--photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-@media (prefers-reduced-motion: reduce) { .tp-iconbtn { transition: none; } .tp-iconbtn:hover { transform: none; } }
+/* Floating create button: appears bottom right once the top bar has scrolled out of view */
+.tp-fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .9rem 1.4rem;
+  border-radius: 999px;
+  background: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(194, 65, 12, .38);
+  animation: tp-fab-in .22s ease-out;
+}
+.tp-fab:hover { background: #9a3412; }
+.tp-fab:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 3px; }
+@keyframes tp-fab-in { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) { .tp-iconbtn { transition: none; } .tp-iconbtn:hover { transform: none; } .tp-fab { animation: none; } }

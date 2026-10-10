@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./topbar.css";
 
 /**
@@ -71,16 +71,42 @@ function ProfileIcon() {
   );
 }
 
-/** Icon-only primary actions: search (opens filters), create event, and profile. */
+/** True while the given element is on screen; false once the user has scrolled past it. */
+function useInView(ref: { current: Element | null }): boolean {
+  const [inView, setInView] = useState(true);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    if (typeof IntersectionObserver === "undefined") {
+      const onScroll = () => setInView(element.getBoundingClientRect().bottom > 0);
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => window.removeEventListener("scroll", onScroll);
+    }
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+  return inView;
+}
+
+/**
+ * Icon-only primary actions: search (opens filters), create event, and profile.
+ * The bar scrolls away with the page; once it is off-screen a floating
+ * "+ Create event" button appears bottom right so creating is always one tap away.
+ */
 export function TopBar() {
   const hash = useHash();
   const photo = useProfilePhoto();
+  const barRef = useRef<HTMLElement | null>(null);
+  const barVisible = useInView(barRef);
   const onSearch = hash.startsWith("#/search");
   const onCreate = hash.startsWith("#/create");
   const onProfile = hash.startsWith("#/profile");
 
   return (
-    <header className="tp-topbar">
+    <>
+    <header className="tp-topbar" ref={barRef}>
       <a className="tp-topbar__brand" href="#/for-you">ThirdPlace</a>
       <nav className="tp-topbar__actions" aria-label="Primary actions">
         <a
@@ -112,5 +138,12 @@ export function TopBar() {
         </a>
       </nav>
     </header>
+    {!barVisible && !onCreate && (
+      <a className="tp-fab" href="#/create">
+        <PlusIcon />
+        <span>Create event</span>
+      </a>
+    )}
+    </>
   );
 }
