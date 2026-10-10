@@ -4,12 +4,16 @@ export type Route =
   | { name: "for-you" }
   | { name: "map" }
   | { name: "create" }
+  | { name: "search" }
+  | { name: "profile" }
   | { name: "event"; id: string };
 
 export function parseHash(hash: string): Route {
   const [first, second] = hash.replace(/^#\/?/, "").split("/");
   if (first === "map") return { name: "map" };
   if (first === "create") return { name: "create" };
+  if (first === "search") return { name: "search" };
+  if (first === "profile") return { name: "profile" };
   if (first === "event" && second) return { name: "event", id: decodeURIComponent(second) };
   return { name: "for-you" };
 }

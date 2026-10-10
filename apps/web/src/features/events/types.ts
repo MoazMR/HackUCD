@@ -30,10 +30,19 @@ export type ChatMessage = {
 };
 
 export type CategoryFilter = "all" | DiscoveryEvent["category"];
+export type DateFilter = "any" | "today" | "tomorrow" | "weekend" | "custom";
+export type TimeFilter = "any" | "morning" | "afternoon" | "evening";
 
 export type DiscoveryFilters = {
+  /** Keyword search over title, description, category, interest and area. */
   query: string;
   category: CategoryFilter;
+  date: DateFilter;
+  /** Local calendar day as YYYY-MM-DD; only used when `date` is "custom". */
+  customDate: string;
+  timeOfDay: TimeFilter;
+  /** "any" or a neighbourhood name from AREAS. */
+  area: string;
   freeOnly: boolean;
   radiusKm: number;
   interests: string[];
@@ -75,6 +84,21 @@ export const CATEGORY_LABELS: Record<DiscoveryEvent["category"], string> = {
   music: "Music",
   social: "Social",
   other: "Other"
+};
+
+export const DATE_LABELS: Record<DateFilter, string> = {
+  any: "Any date",
+  today: "Today",
+  tomorrow: "Tomorrow",
+  weekend: "This weekend",
+  custom: "Pick a date"
+};
+
+export const TIME_LABELS: Record<TimeFilter, string> = {
+  any: "Any time",
+  morning: "Morning",
+  afternoon: "Afternoon",
+  evening: "Evening"
 };
 
 export const RADIUS_OPTIONS_KM = [2, 5, 10, 15, 25] as const;

@@ -1,16 +1,10 @@
+import { TopBar } from "./components/TopBar";
 import { DiscoverEvents } from "./features/discovery/DiscoverEvents";
 
 export function App() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">ThirdPlace</a>
-        <nav aria-label="Primary navigation">
-          <a href="#discover">Discover</a>
-          <a href="#create">Create an outing</a>
-          <a href="#profile">Profile</a>
-        </nav>
-      </header>
+      <TopBar />
       <section className="hero">
         <p className="eyebrow">Your city, your people</p>
         <h1>Find something good to do nearby.</h1>

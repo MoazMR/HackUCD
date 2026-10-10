@@ -27,7 +27,6 @@
 .tp-header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; }
 .tp-eyebrow { color: var(--tp-teal-dark); font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .tp-h2 { font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.05; letter-spacing: -.02em; margin-top: .2rem; }
-.tp-header__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
 .tp-tabs { display: inline-flex; background: var(--tp-soft); border: 1px solid var(--tp-line); border-radius: 999px; padding: .25rem; }
 .tp-tabs a { padding: .5rem 1.1rem; border-radius: 999px; text-decoration: none; font-weight: 700; color: var(--tp-muted); }
 .tp-tabs a[aria-selected="true"] { background: var(--tp-teal-dark); color: #fff; }
@@ -36,8 +35,6 @@
 .tp .tp-btn, .tp button.tp-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border: 2px solid transparent; border-radius: .8rem; padding: .65rem 1.1rem; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; line-height: 1.2; }
 .tp .tp-btn--primary { background: var(--tp-teal-dark); color: #fff; }
 .tp .tp-btn--primary:hover:not(:disabled) { background: #08403c; }
-.tp .tp-btn--create { background: var(--tp-coral); color: #fff; box-shadow: 0 6px 18px rgba(194, 65, 12, .28); }
-.tp .tp-btn--create:hover { background: var(--tp-coral-dark); }
 .tp .tp-btn--ghost { background: transparent; color: var(--tp-ink); border-color: #b9c4bb; }
 .tp .tp-btn--ghost:hover { background: var(--tp-soft); }
 .tp .tp-btn--lg { padding: .9rem 1.5rem; font-size: 1.05rem; }
@@ -181,10 +178,30 @@
   .tp-mapview, .tp-detail__grid { grid-template-columns: 1fr; }
   .tp-preview { position: static; }
   .tp-form__row, .tp-form__row--3 { grid-template-columns: 1fr; }
-  .tp-header__actions { width: 100%; justify-content: space-between; }
-  /* Create event stays one thumb-tap away on mobile */
-  .tp .tp-btn--create { position: fixed; right: 1rem; bottom: 1rem; z-index: 20; padding: .9rem 1.3rem; }
 }
 @media (max-width: 480px) {
   .tp-tile { grid-template-columns: 3.8rem 1fr; gap: .75rem; padding: .85rem; }
 }
+
+/* location line, active filters, linkbtn */
+.tp-locationline { display: flex; align-items: center; gap: .5rem; font-weight: 700; }
+.tp-locationline small { font-weight: 500; color: var(--tp-muted); }
+.tp-activefilters { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.tp-activefilters a { font-weight: 700; color: var(--tp-teal-dark); }
+.tp .tp-linkbtn { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--tp-coral-dark); text-decoration: underline; cursor: pointer; }
+
+/* search screen */
+.tp-searchpanel { background: var(--tp-card); border: 1px solid var(--tp-line); border-radius: var(--tp-radius); padding: 1.25rem; display: grid; gap: 1.1rem; margin-bottom: 1.5rem; box-shadow: 0 8px 28px rgba(18, 35, 31, .07); }
+.tp-searchpanel__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.tp-search--large input { font-size: 1.1rem; }
+.tp-filtergrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.5rem; }
+.tp-fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: .5rem; align-content: start; }
+.tp-fieldset legend { padding: 0; margin-bottom: .45rem; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--tp-muted); }
+.tp-hint { font-size: .8rem; }
+.tp-locrow { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; }
+.tp-locrow .tp-field { flex: 1 1 150px; }
+.tp-field--inline { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-top: .25rem; }
+.tp-field--inline input { width: auto; }
+.tp-searchpanel__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; border-top: 1px solid var(--tp-line); padding-top: .9rem; }
+.tp-searchpanel__foot .tp-results { margin: 0; }
+@media (max-width: 860px) { .tp-filtergrid { grid-template-columns: 1fr; } }

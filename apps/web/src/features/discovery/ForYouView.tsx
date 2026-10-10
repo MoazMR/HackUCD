@@ -1,4 +1,5 @@
 import { EventTile } from "../events/EventTile";
+import { describeActiveFilters, isExplicitSearch } from "../events/recommend";
 import type { DiscoveryFilters, RankedEvent } from "../events/types";
 
 type Props = {
@@ -9,15 +10,15 @@ type Props = {
 };
 
 export function ForYouView({ ranked, joined, filters, onReset }: Props) {
-  const searching = filters.query.trim().length > 0;
+  const explicit = isExplicitSearch(filters);
 
   if (ranked.length === 0) {
     return (
       <div className="tp-state">
-        <h3>{searching ? `Nothing matches “${filters.query.trim()}”` : "No events match your interests yet"}</h3>
+        <h3>{explicit ? "No events match your search" : "No events match your interests yet"}</h3>
         <p>
-          {searching
-            ? "Try a different word, a wider radius, or clear your filters."
+          {explicit
+            ? "Try different keywords, a wider radius or date, or clear your filters."
             : filters.interests.length === 0
               ? "Pick a few interests above and we'll find events for you."
               : "Try a wider radius, add another interest, or create the first one nearby."}
@@ -33,8 +34,8 @@ export function ForYouView({ ranked, joined, filters, onReset }: Props) {
   return (
     <>
       <p className="tp-results" role="status">
-        {searching
-          ? `${ranked.length} ${ranked.length === 1 ? "result" : "results"} for “${filters.query.trim()}”`
+        {explicit
+          ? `${ranked.length} ${ranked.length === 1 ? "result" : "results"} · ${describeActiveFilters(filters).join(" · ")}`
           : `${ranked.length} ${ranked.length === 1 ? "event" : "events"} picked for ${filters.interests.join(", ")}`}
       </p>
       <ul className="tp-list">
