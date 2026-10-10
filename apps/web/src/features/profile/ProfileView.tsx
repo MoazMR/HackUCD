@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { checkDisplayName } from "../auth/ageValidation";
+import { AreaMap } from "../preferences/AreaMap";
 import { AreaRadiusPicker } from "../preferences/AreaRadiusPicker";
+import { areaName } from "../preferences/areas";
 import { InterestPicker } from "../preferences/InterestPicker";
 import { PhotoEditor } from "./Avatar";
 import { useProfile } from "./ProfileStore";
 import { PublicProfileCard } from "./PublicProfileCard";
+import { Ribbon } from "./Ribbon";
 import { VerificationFlow } from "./VerificationFlow";
 import { sampleMyEvents } from "./sampleData";
 import { toPublicProfile, trustBreakdown } from "./trust";
@@ -37,9 +40,20 @@ export function ProfileView() {
 
   return (
     <section className="tp tp-profile" aria-labelledby="tp-profile-heading">
-      <header className="tp-page-head">
-        <h1 id="tp-profile-heading" className="tp-title">Profile</h1>
-        <p className="tp-lede">Control what you share. The card shows your public profile exactly as others see it.</p>
+      <header className="tp-hero">
+        <AreaMap label={profile.areaId ? `${areaName(profile.areaId)} area` : "No area yet"} radiusKm={profile.radiusKm} interests={profile.interests} />
+        <div className="tp-hero-copy">
+          <Ribbon />
+          <h1 id="tp-profile-heading" className="tp-title tp-title-big">Seen around, <span className="tp-script">never pinned down.</span></h1>
+          <p className="tp-motto">Your area <span aria-hidden="true">·</span> Your interests <span aria-hidden="true">·</span> Your trust</p>
+          <p className="tp-lede">This is your profile. People see your area, your interests and how trusted you are. Nothing more.</p>
+        </div>
+        <div className="tp-hero-card">
+          <p className="tp-scribble">this is all anyone sees
+            <svg viewBox="0 0 60 40" aria-hidden="true"><path d="M4 6c18-4 38 4 44 26M48 32l-9-5M48 32l4-10" /></svg>
+          </p>
+          <PublicProfileCard profile={publicProfile} />
+        </div>
       </header>
       {storageProblem && (
         <p className="tp-banner" role="alert">This browser is blocking storage, so changes last only until you close this tab.</p>
@@ -47,7 +61,7 @@ export function ProfileView() {
 
       <div className="tp-profile-grid">
         <div className="tp-stack">
-          <section className="tp-panel" aria-labelledby="tp-you">
+          <section className="tp-panel" data-tint="peach" aria-labelledby="tp-you">
             <h2 id="tp-you">Photo and name</h2>
             <PhotoEditor name={profile.displayName} photo={profile.photoDataUrl} onChange={(photoDataUrl) => update({ photoDataUrl })} />
             <div className="tp-field">
@@ -76,20 +90,21 @@ export function ProfileView() {
             </div>
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-where">
+          <section className="tp-panel" data-tint="mint" aria-labelledby="tp-where">
             <h2 id="tp-where">Area and travel radius</h2>
             <p className="tp-callout">Only your approximate area is public. Your exact location is never stored or shown.</p>
             <AreaRadiusPicker areaId={profile.areaId} radiusKm={profile.radiusKm}
+              showDrawing={false}
               onAreaChange={(areaId) => { if (areaId) update({ areaId }); }} onRadiusChange={(radiusKm) => update({ radiusKm })} />
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-likes">
+          <section className="tp-panel" data-tint="blue" aria-labelledby="tp-likes">
             <h2 id="tp-likes">Interests</h2>
             <InterestPicker selected={profile.interests} onChange={(interests) => update({ interests })} legend="Events are recommended from these"
               error={profile.interests.length === 0 ? "With no interests picked, your feed has nothing to recommend." : undefined} />
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-privacy">
+          <section className="tp-panel" data-tint="amber" aria-labelledby="tp-privacy">
             <h2 id="tp-privacy">Privacy</h2>
             <Toggle label="Show past events I attended" hint="Off: only you see your past events, in My Events."
               checked={profile.privacy.showAttendanceHistory} onChange={(value) => setPrivacy({ showAttendanceHistory: value })} />
@@ -102,23 +117,24 @@ export function ProfileView() {
             </div>
           </section>
 
-          <section className="tp-panel" aria-labelledby="tp-verification">
+          <section className="tp-panel" data-tint="pink" aria-labelledby="tp-verification">
             <h2 id="tp-verification">ID check</h2>
             <VerificationFlow />
           </section>
         </div>
 
-        <aside className="tp-stack tp-sticky" aria-label="How others see you">
-          <section className="tp-panel tp-panel-tint" aria-labelledby="tp-public-heading">
-            <h2 id="tp-public-heading">What others see</h2>
-            <PublicProfileCard profile={publicProfile} />
-          </section>
-          <section className="tp-panel" aria-labelledby="tp-trust">
+        <aside className="tp-stack tp-sticky" aria-label="Trust">
+          <section className="tp-panel" data-tint="blue" aria-labelledby="tp-trust">
             <h2 id="tp-trust">Trust score</h2>
-            <div className="tp-score">
-              <strong>{trust.score}</strong><span>of 100</span>
+            <div className="tp-sun" role="img" aria-label={`Trust score ${trust.score} out of 100`}>
+              <svg viewBox="0 0 140 140" aria-hidden="true">
+                {Array.from({ length: 12 }, (_, index) => (
+                  <path key={index} d="M70 14v-10" transform={`rotate(${index * 30} 70 70)`} />
+                ))}
+                <circle cx="70" cy="70" r="46" />
+              </svg>
+              <p><strong>{trust.score}</strong><span>of 100</span></p>
             </div>
-            <div className="tp-meter" role="img" aria-label={`Trust score ${trust.score} out of 100`}><span style={{ width: `${trust.score}%` }} /></div>
             <ul className="tp-breakdown">
               {trust.parts.map((part) => (
                 <li key={part.label}><span>{part.label}</span><span>{part.points} of {part.max}</span></li>

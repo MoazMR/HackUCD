@@ -157,6 +157,17 @@ try {
   check("cancel unknown order -> 404", r.status === 404);
   r = await call("/api/business/my-events");
   check("demo user's own events listed, not promoted", r.body.events.length === 1 && r.body.events[0].promoted === false);
+
+  console.log("Privacy");
+  const leaksPrivate = (event: Record<string, unknown>) => "attendeeIds" in event || "coordinates" in event;
+  check("my-events hides attendee ids and exact coordinates", !r.body.events.some(leaksPrivate), r.body.events[0]);
+  const p = createPendingOrder({ planId: "community-boost-3d", eventId: "coffee-and-code", buyer: { type: "user" } });
+  attachCheckoutSession(p.order.id, "cs_test_offline_user");
+  await signedWebhook({ id: "cs_test_offline_user", payment_status: "paid", amount_total: 299, currency: "eur", metadata: { orderId: p.order.id } });
+  r = await call("/api/promotions");
+  const userPromo = r.body.promotions.find((x: { eventId: string }) => x.eventId === "coffee-and-code");
+  check("user self-promotion activates (€2.99)", userPromo?.tier === "user");
+  check("promotion snapshots hide attendee ids and exact coordinates", !r.body.promotions.some((x: { event: Record<string, unknown> }) => leaksPrivate(x.event)));
 } finally {
   server.close();
   console.log(`\n${passed} passed, ${failed} failed`);

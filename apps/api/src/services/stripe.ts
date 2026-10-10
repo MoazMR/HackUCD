@@ -1,12 +1,6 @@
-import { existsSync } from "node:fs";
 import Stripe from "stripe";
 
-// Load apps/api/.env for local development without adding a dotenv dependency.
-// `npm run dev` runs the API with apps/api as the working directory.
-// process.loadEnvFile exists from Node 20.12; on older Node, export the variables in your shell instead.
-if (existsSync(".env") && typeof process.loadEnvFile === "function") {
-  process.loadEnvFile(".env");
-}
+// apps/api/.env is loaded by `dotenv/config` in server.ts. Variables are read lazily so tests can set them.
 
 export class PaymentsConfigError extends Error {}
 

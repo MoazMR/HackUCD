@@ -106,13 +106,25 @@ export function listBusinessEvents(): BusinessEvent[] {
   return businessEvents;
 }
 
+/**
+ * Public-safe copy of a core event: only the shared OutingEvent fields. Drops attendeeIds,
+ * exact coordinates and other API-internal fields before anything is returned by business routes.
+ */
+function toPublicEvent(event: OutingEvent): OutingEvent {
+  const { id, title, description, startsAt, locationName, category, attendeeCount } = event;
+  return { id, title, description, startsAt, locationName, category, attendeeCount };
+}
+
 /** Looks up an event in the business store first, then (read-only) in the core event service. */
 export function findAnyEvent(id: string): HostedEvent | undefined {
-  return businessEvents.find((event) => event.id === id) ?? getEvent(id);
+  const business = businessEvents.find((event) => event.id === id);
+  if (business) return business;
+  const core = getEvent(id);
+  return core && { ...toPublicEvent(core), hostType: "user" };
 }
 
 export function listDemoUserEvents(): HostedEvent[] {
   return listEvents()
     .filter((event) => DEMO_USER.ownedEventIds.includes(event.id))
-    .map((event) => ({ ...event, hostType: "user" as const }));
+    .map((event) => ({ ...toPublicEvent(event), hostType: "user" as const }));
 }

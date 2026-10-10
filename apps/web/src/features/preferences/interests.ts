@@ -27,3 +27,7 @@ export const INTERESTS: Interest[] = [
 export function interestLabel(id: string): string {
   return INTERESTS.find((interest) => interest.id === id)?.label ?? id;
 }
+
+export function interestCategory(id: string): EventCategory {
+  return INTERESTS.find((interest) => interest.id === id)?.category ?? "other";
+}

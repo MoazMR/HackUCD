@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { AreaRadiusPicker } from "../preferences/AreaRadiusPicker";
 import { InterestPicker } from "../preferences/InterestPicker";
 import { useProfile } from "../profile/ProfileStore";
+import { Ribbon } from "../profile/Ribbon";
 import { AGE_RANGES } from "../profile/types";
 import "../profile/profile.css";
 import { UNDER_18, checkAge, checkDisplayName, type AgeAnswer } from "./ageValidation";
@@ -56,7 +57,7 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
   if (blocked) {
     return (
       <section className="tp tp-onboarding" aria-labelledby="tp-blocked-heading">
-        <div className="tp-panel tp-panel-narrow">
+        <div className="tp-panel tp-panel-narrow" data-tint="mint">
           <h1 id="tp-blocked-heading" className="tp-title">ThirdPlace is for adults</h1>
           <p>ThirdPlace is only for people aged 18 or over, so you can't create an account yet. Nothing you entered has been saved.</p>
           <button type="button" className="tp-button tp-button-quiet" onClick={() => { setBlocked(false); setAge(""); }}>
@@ -69,7 +70,8 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
 
   return (
     <section className="tp tp-onboarding" aria-labelledby="tp-onboarding-heading">
-      <form className="tp-panel tp-panel-narrow" onSubmit={submit} noValidate>
+      <form className="tp-panel tp-panel-narrow" data-tint="mint" onSubmit={submit} noValidate>
+        <Ribbon />
         <ol className="tp-steps" aria-label="Setup progress">
           {STEPS.map((label, index) => (
             <li key={label} aria-current={index === step ? "step" : undefined} data-done={index < step || undefined}>{label}</li>

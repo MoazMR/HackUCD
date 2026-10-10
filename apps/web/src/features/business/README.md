@@ -25,7 +25,7 @@ It is a standalone page so it doesn't touch `App.tsx`; link or route it from the
    BUSINESS_PORTAL_PATH=/src/features/business/portal.html
    ```
 
-   `apps/api/.env.example` lists the same variables. The API loads `apps/api/.env` on start-up (Node 20.12+); on older Node, export the variables in your shell.
+   `apps/api/.env.example` lists the same variables. The API loads `apps/api/.env` on start-up through `dotenv`.
 3. Restart `npm run dev`. The portal shows a yellow notice if the key is missing or isn't a test key.
 4. Pay with Stripe's test card `4242 4242 4242 4242`, any future expiry, any CVC, any name and postcode.
 
@@ -68,6 +68,9 @@ Business venue events live in `GET /api/business/events` (and each promotion inc
 
 ## Known limits (prototype)
 
+- The portal is a separate Vite page, so it is served by `npm run dev` but not yet included in `vite build`. For deployment, add it as a build input or route it from the app shell.
+- Core events carry Moaz's static `isPaidPromotion` flag; paid boosts bought here live in `/api/promotions` and are not yet reflected in that flag or in `/api/events?paid=true`.
+
 - No authentication: the "own event" check uses a synthetic demo user (`Aoife`, owns `coffee-and-code`) and the business name typed in the form. Replace with the real host id once `Event` carries one.
 - In-memory storage; no refunds; one active promotion per event.
 
@@ -75,7 +78,7 @@ Business venue events live in `GET /api/business/events` (and each promotion inc
 
 ```bash
 npm run typecheck
-cd apps/api && npx tsx scripts/payments-smoke.ts   # 32 offline checks: normal, boundary and failure requests + signed webhook
+cd apps/api && npx tsx scripts/payments-smoke.ts   # 35 offline checks: normal, boundary and failure requests + signed webhook
 ```
 
 Screenshots of each state are in `screenshots/`.
