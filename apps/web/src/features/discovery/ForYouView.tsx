@@ -25,7 +25,7 @@ export function ForYouView({ ranked, joined, filters, onReset }: Props) {
         </p>
         <div className="tp-state__actions">
           <button type="button" className="tp-btn tp-btn--ghost" onClick={onReset}>Reset filters</button>
-          <a className="tp-btn tp-btn--primary" href="#/create">Create an event</a>
+          <a className="tp-btn tp-btn--primary" href="#/create">Create Event</a>
         </div>
       </div>
     );

@@ -15,7 +15,7 @@ import { AGE_RANGES, type AgeRange, type PrivacySettings } from "./types";
 import "./profile.css";
 
 /** The Profile destination: edit what you share, see exactly what others see. */
-export function ProfileView() {
+export function ProfileView({ onOpenMyEvents }: { onOpenMyEvents?: () => void } = {}) {
   const { profile, update, storageProblem } = useProfile();
   const [nameDraft, setNameDraft] = useState(profile.displayName);
   const [nameError, setNameError] = useState<string>();
@@ -47,6 +47,7 @@ export function ProfileView() {
           <h1 id="pf-profile-heading" className="pf-title pf-title-big">Seen around, <span className="pf-accent">never pinned down.</span></h1>
           <p className="pf-motto">Your area <span aria-hidden="true">·</span> Your interests <span aria-hidden="true">·</span> Your trust</p>
           <p className="pf-lede">This is your profile. People see your area, your interests and how trusted you are. Nothing more.</p>
+          {onOpenMyEvents && <button type="button" className="pf-button" onClick={onOpenMyEvents}>My Events</button>}
         </div>
         <div className="pf-hero-card">
           <p className="pf-scribble">this is all anyone sees

@@ -211,7 +211,7 @@ function Loaded({ store, children }: { store: EventsStore; children: ReactNode }
       <div className="tp-state">
         <h3>No events nearby yet</h3>
         <p>Be the first to start something in your area.</p>
-        <a className="tp-btn tp-btn--primary" href="#/create">Create an event</a>
+        <a className="tp-btn tp-btn--primary" href="#/create">Create Event</a>
       </div>
     );
   }
