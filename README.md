@@ -34,8 +34,17 @@ Every feature must use its assigned branch and a pull request. Never work direct
 2. Bring in the latest shared work before editing: `git pull origin main`.
 3. Change only the folders assigned to you below. Do not overwrite another person's changes.
 4. Run `npm run typecheck` and the relevant local workflow before committing.
-5. Commit with a clear message, push the branch, and open a PR into `main`.
-6. Do not merge your own PR. A different teammate reviews it and the integration owner merges it only after checks pass.
+5. Save your work: `git add <the-files-you-changed>` then `git commit -m "feat: describe the feature"`.
+6. Push **your branch** - not `main`: `git push origin feature/kate-discovery-map` (substitute your branch name).
+7. Open GitHub. On the repository page, select **Compare & pull request**, set the base branch to `main`, give the PR a clear title, explain what you tested, then select **Create pull request**.
+8. Do not merge your own PR. A different teammate reviews it and the integration owner merges it only after checks pass.
+
+### What the words mean
+
+- **Pull:** download the latest shared changes from GitHub before you start (`git pull origin main`).
+- **Push:** upload your completed branch to GitHub (`git push origin feature/...`).
+- **Pull request (PR):** a GitHub request to merge that pushed branch into `main`. A PR is created on GitHub after pushing; it is not itself pushed.
+- **Main:** the shared, working version. Only approved PRs are merged into it.
 
 Never commit secrets, API keys, identity documents, or `.env` files.
 
