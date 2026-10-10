@@ -4,7 +4,7 @@ The aim is for each person to own a vertical slice of the product. Do not make t
 
 | Person | Owns | Safe folders | Branch |
 | --- | --- | --- | --- |
-| Kate | map, feed, search, filters, event discovery UX | `apps/web/src/features/discovery`, selected presentational files in `apps/web/src/components` | `feature/kate-discovery-map` |
+| Kate | map, feed, search, filters, create/edit event UX, event details, public group-chat UI | `apps/web/src/features/discovery`, `apps/web/src/features/events`, selected presentational files in `apps/web/src/components` | `feature/kate-discovery-map` |
 | Sarah | onboarding, preferences, profile, ID-verification status, endorsements | `apps/web/src/features/auth`, `apps/web/src/features/profile`, `apps/web/src/features/preferences` | `feature/sarah-profile-trust` |
 | Moaz | event/profile APIs, recommendation, attendance, public event chat, reports | `apps/api/src/routes`, `apps/api/src/services`, `apps/api/src/models` | `feature/moaz-api-recommendations` |
 | Cahal | business portal, promotion, Stripe sandbox, deployment integration | `apps/web/src/features/business`, related routes/services, `infra` | `feature/cahal-business-stripe` |

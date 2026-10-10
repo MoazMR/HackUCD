@@ -17,6 +17,8 @@ For the hackathon, the complete demo journey is: **onboard with preferences -> d
 
 Read [docs/TEAM-OWNERSHIP.md](docs/TEAM-OWNERSHIP.md) before changing code. It assigns the four team members, safe folders, and integration order.
 
+All web UI must follow [docs/DESIGN.md](docs/DESIGN.md): a distinct Social Outings design inspired by the clarity and locality of Manna, Once Upon, and Deliveroo, without copying their branding or assets.
+
 ## Repository layout
 
 - `apps/web`: the user-facing website.
@@ -26,10 +28,10 @@ Read [docs/TEAM-OWNERSHIP.md](docs/TEAM-OWNERSHIP.md) before changing code. It a
 
 ## Mandatory Git workflow
 
-Every feature must use its own branch and pull request. Never work directly on `main`.
+Every feature must use its assigned branch and a pull request. Never work directly on `main`. The four first-task branches have already been published.
 
-1. Start from the latest main branch: `git checkout main` then `git pull origin main`.
-2. Create one narrowly named branch: `git checkout -b feature/discovery-map`.
+1. Switch to your assigned branch, for example `git checkout feature/kate-discovery-map`.
+2. Bring in the latest shared work before editing: `git pull origin main`.
 3. Change only the folders assigned to you below. Do not overwrite another person's changes.
 4. Run `npm run typecheck` and the relevant local workflow before committing.
 5. Commit with a clear message, push the branch, and open a PR into `main`.
@@ -44,9 +46,9 @@ Give each person **only their own prompt**. They must follow the Git workflow ab
 ### Kate - discovery and event experience
 
 ```text
-You are Kate's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout main, pull origin main, then create the branch feature/kate-discovery-map. Do not work on main and do not edit files outside the folders assigned to Kate without asking.
+You are Kate's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout the already-created branch feature/kate-discovery-map and run git pull origin main. Do not work on main and do not edit files outside the folders assigned to Kate without asking.
 
-Build the main user discovery experience in apps/web/src/features/discovery and reusable presentational components in apps/web/src/components only when necessary. Deliver a responsive home screen with (1) map hotspots for nearby events, (2) a feed/list view of the same events, (3) search by event name/area, (4) filters for event type, paid/free, interests, and maximum travel distance, and (5) a visible Create Event call to action. A user interested in poker, football, padel, and tennis should only be recommended matching relevant events, not unrelated knitting events. Include useful loading, empty, and error states. Use the shared event API contract; do not change it yourself.
+Build the main user discovery and ordinary-user event experience in apps/web/src/features/discovery, apps/web/src/features/events, and reusable presentational components in apps/web/src/components only when necessary. First read docs/DESIGN.md and create an original responsive UI consistent with it; do not copy Manna, Once Upon, or Deliveroo branding/assets. Deliver (1) map hotspots for nearby events, (2) a feed/list view of the same events, (3) search by event name/area, (4) filters for event type, paid/free, interests, and maximum travel distance, (5) a visible Create Event flow, (6) event detail and Join flow, and (7) public event-group chat UI only. A user interested in poker, football, padel, and tennis should only be recommended matching relevant events, not unrelated knitting events. Include useful loading, empty, and error states. Use the shared event API contract; do not change it yourself.
 
 Use realistic, clearly labelled synthetic local event data if the API is not ready. Keep private user information off event cards. Run npm run typecheck, test the workflow locally, commit, push, and open a PR into main with a screenshot and a short test summary. Do not merge the PR.
 ```
@@ -54,7 +56,7 @@ Use realistic, clearly labelled synthetic local event data if the API is not rea
 ### Sarah - accounts, profiles, trust, and safety UI
 
 ```text
-You are Sarah's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout main, pull origin main, then create the branch feature/sarah-profile-trust. Do not work on main and do not edit files outside Sarah's assigned folders without asking.
+You are Sarah's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout the already-created branch feature/sarah-profile-trust and run git pull origin main. Do not work on main and do not edit files outside Sarah's assigned folders without asking.
 
 Build the user onboarding, profile, preferences, and trust experience in apps/web/src/features/auth, apps/web/src/features/profile, and apps/web/src/features/preferences. Collect age range/age validation, self-described gender (optional), approximate location, interests, and travel radius. Make clear that only an approximate location is public. Create profile editing and a privacy control to show or hide previous attended events. Show a public-safe profile with interests, endorsement/trust score, and no private contact details, address, birth date, ID number, or exact location.
 
@@ -64,7 +66,7 @@ Create a mock ID-verification status flow for Irish IDs: verified / pending / fa
 ### Moaz - backend, recommendation, moderation, and public event chat
 
 ```text
-You are Moaz's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout main, pull origin main, then create the branch feature/moaz-api-recommendations. Do not work on main and do not edit files outside Moaz's assigned folders without asking.
+You are Moaz's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout the already-created branch feature/moaz-api-recommendations and run git pull origin main. Do not work on main and do not edit files outside Moaz's assigned folders without asking.
 
 Build backend routes and services in apps/api/src/routes, apps/api/src/services, and apps/api/src/models. Provide APIs for profiles/preferences, events, search/filtering by type/location/distance/paid status, joining an event, public event-group messages, endorsements, and verification status. Implement a transparent recommendation function: score nearby upcoming events using matching interests, distance within the user's chosen radius, and event category; return an explanation such as 'Matches football and is 2 km away.' Exclude events outside the radius and unrelated categories unless explicitly requested.
 
@@ -74,7 +76,7 @@ Use synthetic data and document assumptions. Ensure no direct-message route or p
 ### Cahal - business portal, promotions, Stripe sandbox, and integration
 
 ```text
-You are Cahal's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout main, pull origin main, then create the branch feature/cahal-business-stripe. Do not work on main and do not edit files outside Cahal's assigned folders without asking.
+You are Cahal's coding agent for the Social Outings repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout the already-created branch feature/cahal-business-stripe and run git pull origin main. Do not work on main and do not edit files outside Cahal's assigned folders without asking.
 
 Build a clearly separate business experience in apps/web/src/features/business and its related backend endpoints under apps/api/src/routes and apps/api/src/services. Businesses can create venue-based events and choose a paid promotion/boost; ordinary users can optionally promote one of their own events. Clearly label paid/promoted events in the map/feed. Add Stripe sandbox Checkout through a server-side route, using environment variables only and no secret keys in the client or repository. After the sandbox success callback/webhook, record a mock order and activate the promotion in the product. Include a pricing screen that says what the payment buys, price, and currency.
 
