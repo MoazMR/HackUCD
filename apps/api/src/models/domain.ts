@@ -7,6 +7,15 @@ export type EventRecord = OutingEvent & {
   interests: string[];
   isPaidPromotion: boolean;
   attendeeIds: string[];
+  hostId: string;
+  hostType: "user" | "business";
+  hostName: string;
+  businessName?: string;
+  area: string;
+  priceEur: number;
+  capacity: number;
+  createdAt: string;
+  publicationStatus: "draft" | "published";
 };
 
 export type Profile = {

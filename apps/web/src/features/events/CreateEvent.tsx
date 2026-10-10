@@ -3,7 +3,7 @@ import { AREAS } from "./geo";
 import { CATEGORY_LABELS, INTERESTS, type DiscoveryEvent, type NewEventDraft } from "./types";
 
 type Props = {
-  onCreate: (draft: NewEventDraft) => DiscoveryEvent;
+  onCreate: (draft: NewEventDraft) => Promise<DiscoveryEvent>;
   onCreated: (event: DiscoveryEvent) => void;
   backHref: string;
 };
@@ -49,11 +49,13 @@ export function CreateEvent({ onCreate, onCreated, backHref }: Props) {
     priceEur: 0
   });
   const [errors, setErrors] = useState<Errors>({});
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string>();
 
   const set = <K extends keyof NewEventDraft>(key: K, value: NewEventDraft[K]) =>
     setDraft((current) => ({ ...current, [key]: value }));
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
     const found = validateDraft(draft);
     setErrors(found);
@@ -62,7 +64,15 @@ export function CreateEvent({ onCreate, onCreated, backHref }: Props) {
       document.getElementById(`${uid}-${first}`)?.focus();
       return;
     }
-    onCreated(onCreate(draft));
+    setSaving(true);
+    setSubmitError(undefined);
+    try {
+      onCreated(await onCreate(draft));
+    } catch (problem) {
+      setSubmitError(problem instanceof Error ? problem.message : "Could not publish the event.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   const field = (key: keyof NewEventDraft) => ({
@@ -136,9 +146,10 @@ export function CreateEvent({ onCreate, onCreated, backHref }: Props) {
         </div>
         <p className="tp-muted">Only the area is shown publicly. Don't put your home address or phone number in the description.</p>
         <div className="tp-form__actions">
-          <button type="submit" className="tp-btn tp-btn--primary tp-btn--lg">Publish event</button>
+          <button type="submit" disabled={saving} className="tp-btn tp-btn--primary tp-btn--lg">{saving ? "Publishing…" : "Publish event"}</button>
           <a className="tp-btn tp-btn--ghost" href={backHref}>Cancel</a>
         </div>
+        {submitError && <p className="tp-error" role="alert">{submitError}</p>}
       </form>
     </div>
   );

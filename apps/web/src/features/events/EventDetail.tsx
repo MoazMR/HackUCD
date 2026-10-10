@@ -2,6 +2,8 @@ import { distanceKm, USER_ORIGIN } from "./geo";
 import { GroupChat } from "./GroupChat";
 import { formatKm, formatPrice, formatWhen, spotsLeft } from "./format";
 import { CATEGORY_LABELS, type ChatMessage, type DiscoveryEvent } from "./types";
+import { useEffect } from "react";
+import { trackEvent } from "./eventsClient";
 
 type Props = {
   event: DiscoveryEvent | undefined;
@@ -14,6 +16,9 @@ type Props = {
 };
 
 export function EventDetail({ event, joined, messages, onJoin, onLeave, onPost, backHref }: Props) {
+  useEffect(() => {
+    if (event?.promotion) trackEvent(event.id, "detail_view");
+  }, [event?.id, event?.promotion]);
   if (!event) {
     return (
       <section className="tp-state" role="alert">
@@ -66,6 +71,7 @@ export function EventDetail({ event, joined, messages, onJoin, onLeave, onPost, 
                 {started ? "Already started" : full ? "Event is full" : event.priceEur > 0 ? `Join · ${formatPrice(event.priceEur)} on the day` : "Join this event"}
               </button>
             )}
+            <a className="tp-btn tp-btn--ghost" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.locationName}, ${event.area}, Dublin`)}`} target="_blank" rel="noreferrer" onClick={() => event.promotion && trackEvent(event.id, "directions")}>Directions</a>
           </div>
           <p className="tp-muted tp-detail__note">
             Only an approximate area is shown. The exact meeting point is shared in the group chat by the host.

@@ -95,6 +95,7 @@ try {
   r2 = await call("/api/business/events", { method: "POST", json: { businessName: "Test Café", title: "Quiz", venueName: "Test Café", venueAddressArea: "Smithfield", category: "social", startsAt: future(2), priceEur: -1, capacity: 1.5 } });
   check("bad price and capacity -> 422", r2.status === 422 && Boolean(r2.body.fieldErrors?.priceEur && r2.body.fieldErrors?.capacity), r2.body);
   check("valid venue event -> 201", r.status === 201 && bizEvent?.hostType === "business" && bizEvent?.locationName === "Test Café", r.body);
+  check("unpaid business event stays out of public catalogue", !listEvents().some((event) => event.id === bizEvent.id));
 
   console.log("Checkout request validation");
   const checkout = (json: unknown) => call("/api/payments/checkout", { method: "POST", json });
@@ -131,6 +132,7 @@ try {
   r = await call("/api/promotions");
   const promo = r.body.promotions.find((p: { eventId: string }) => p.eventId === bizEvent.id);
   check("promotion now active and labelled Promoted", promo?.label === "Promoted" && promo?.sponsorName === "Test Café", r.body);
+  check("paid business event is published into public catalogue", listEvents().some((event) => event.id === bizEvent.id));
   check("promotion ends when the event starts (event in 2 days < 7-day plan)", promo && new Date(promo.endsAt).getTime() === new Date(bizEvent.startsAt).getTime(), promo);
 
   r = await signedWebhook({ id: "cs_test_offline_success", payment_status: "paid", amount_total: 1499, currency: "eur", metadata: { orderId: order.id } });

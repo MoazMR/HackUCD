@@ -19,6 +19,23 @@ nav { display: flex; gap: .25rem; }
 a.nav-link { text-decoration: none; font-size: .95rem; white-space: nowrap; }
 a.create-action { display: inline-block; background: #0a5de0; color: #fff6e8; border: 2.5px solid #3e072d; box-shadow: 3px 4px 0 #3e072d; text-decoration: none; font-weight: 800; padding: .6rem 1.1rem; }
 a.create-action:hover { background: #0848b0; }
+.assistant { max-width: 900px; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+.assistant__heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.assistant__heading h1 { margin-top: .25rem; }
+.assistant__intro { max-width: 720px; color: #6a4a60; font-weight: 600; font-size: 1.08rem; }
+.assistant__starters { display: flex; flex-wrap: wrap; gap: .65rem; margin: 1.5rem 0; }
+.assistant__starters button { background: #fbc42f; color: #3e072d; border: 2.5px solid #3e072d; border-radius: 999px; font-weight: 800; box-shadow: 3px 4px 0 #3e072d; }
+.assistant__conversation { display: grid; gap: .85rem; margin: 1.5rem 0; }
+.assistant__message { max-width: 82%; padding: 1rem 1.1rem; border: 2.5px solid #3e072d; font-weight: 600; border-radius: 1.25rem; white-space: pre-wrap; line-height: 1.5; }
+.assistant__message--user { justify-self: end; background: #ffeebf; color: #3e072d; border-bottom-right-radius: .35rem; }
+.assistant__message--assistant { justify-self: start; background: #dbe7fc; color: #3e072d; border-bottom-left-radius: .35rem; }
+.assistant__provider { color: #6a4a60; font-weight: 700; font-size: .84rem; }
+.assistant__composer { margin-top: 1rem; }
+.assistant__composer label { display: block; font-weight: 750; margin-bottom: .45rem; }
+.assistant__composer > div { display: flex; align-items: stretch; gap: .65rem; }
+.assistant__composer textarea { flex: 1; resize: vertical; min-height: 82px; font-family: inherit; font-weight: 600; color: #3e072d; background: #fffdf8; border: 2.5px solid #3e072d; border-radius: 1.1rem; padding: .7rem .9rem; }
+.assistant__composer button { align-self: stretch; min-width: 96px; }
+@media (max-width: 650px) { .assistant__heading, .assistant__composer > div { flex-direction: column; } .assistant__message { max-width: 94%; } }
 .hero { padding: 3.5rem 0 2.5rem; max-width: 700px; } h1 { font-family: "Caprasimo", "Cooper Black", Georgia, serif; font-weight: 400; font-size: clamp(2.6rem, 6.2vw, 4.6rem); line-height: 1; margin: .3rem 0 1rem; }
 .hero p:last-child { font-size: 1.2rem; color: #6a4a60; }.eyebrow, .event-category { color: #c4200e; font-size: .8rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }.section-heading h2 { margin: .25rem 0 1.25rem; }

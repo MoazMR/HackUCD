@@ -54,18 +54,35 @@ type EventPlanRequest = {
 
 It returns `{ plan, provider, model?, notice? }`. `provider` is `openrouter` only when `OPENROUTER_API_KEY` is configured; otherwise it is `synthetic`. The client never receives the key. Do not put profile data, exact locations, identity documents, contact details, or private messages in this request.
 
+## Ask ThirdPlace assistant
+
+- `GET /api/assistant/status` reports whether the OpenClaw and OpenRouter server boundaries are configured.
+- `POST /api/assistant` accepts `{ messages, conversationId?, userId? }`, with 1–12 `{ role: "user" | "assistant", content }` messages of at most 800 characters.
+- The response is `{ reply, provider, suggestedEventIds, notice? }`; provider is `openclaw`, `openrouter`, or `synthetic`.
+
+The assistant is grounded in the same upcoming, relevant, in-radius recommendations returned by the transparent scorer. Paid status may add only the documented sponsored score and is disclosed; it never bypasses interest/category/radius eligibility. Mood text is request context only and is never written to a profile, analytics, or runtime storage. The assistant may draft an event but cannot publish it, make a payment, or access private data.
+
+## Event creation and commercial analytics
+
+- `POST /api/events` creates an ordinary-user event with server ownership. Approximate coordinates and area are required; exact home locations must not be supplied.
+- Business event creation produces a private draft. A successful `venue-boost-7d` payment publishes it and activates the labelled promotion.
+- `POST /api/analytics/events/:id` accepts `impression`, `detail_view`, `join`, or `directions` and stores an aggregate event metric without a user identity.
+- `GET /api/analytics/events/:id` returns aggregate impressions, opens, joins, direction taps, and conversion rates.
+
+Prototype events, orders, promotions, and aggregate metrics persist to the git-ignored runtime JSON file. This is a single-process hackathon boundary, not a production payments database.
+
 Changes to this document need agreement from both the related UI and API owners.
 
-## Business, promotions and payments (proposed by Cahal; needs Moaz's agreement)
+## Business, promotions and payments
 
-Additive only: these routes do **not** change the `Event` type or the core `/api/events` routes. Business venue events and promotions live in separate services. Full flow and setup: `apps/web/src/features/business/README.md`.
+These routes are integrated with the shared event catalogue. Ordinary-user events publish immediately and can optionally be boosted. Business events are saved as drafts, then published and promoted after verified Stripe sandbox payment. Full flow and setup: `apps/web/src/features/business/README.md`.
 
 | Method and path | Purpose | Owner |
 | --- | --- | --- |
 | `GET /api/business/plans` | promotion plans: what each buys, price in cents, currency (`eur`), duration | business |
 | `GET /api/business/events` | venue-based events created by businesses | business |
 | `POST /api/business/events` | create a venue event; `422` with `fieldErrors` on invalid input | business |
-| `GET /api/business/my-events` | the demo user's own events (until `Event` has a host id) | business |
+| `GET /api/business/my-events` | events owned by the current synthetic demo user | business |
 | `GET /api/business/orders` | mock order log | business |
 | `GET /api/promotions` | active promotions for feed/map labels | business |
 | `GET /api/payments/status` | whether Stripe test mode is configured | payments |

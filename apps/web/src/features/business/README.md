@@ -1,8 +1,8 @@
 # Business portal, promotions and Stripe sandbox (Cahal)
 
-A separate business experience for promoting events. Promotion is optional: browsing, joining and creating events stay free.
+A separate business experience for publishing and promoting venue events. Browsing, joining and ordinary-user event creation stay free; businesses pay the displayed one-time price to publish and boost a venue event.
 
-- **Businesses** create a venue-based event and can buy a **Venue Boost** (€14.99 one-time, 7 days).
+- **Businesses** save a venue-event draft and buy a **Venue Boost** (€14.99 one-time, 7 days) to publish and promote it.
 - **Ordinary users** can optionally buy a **Community Boost** (€2.99 one-time, 3 days) for one of their own events.
 - Promoted events are labelled **Promoted** with the sponsor's name in the feed and on the map (`PromotedBadge`).
 - Payment uses **Stripe-hosted Checkout in sandbox (test) mode** via a server-side route. Live keys are refused.
@@ -49,7 +49,7 @@ Activation is idempotent: if the webhook and the success return both arrive, the
    **Cancel** → `portal.html?checkout=cancelled&order=...` → `POST /api/payments/cancel` marks the order **cancelled** and expires the unused session. Nothing is charged.
 4. `GET /api/promotions` now returns the promotion; the feed and map show the **Promoted** label.
 
-Orders and promotions are kept in memory (mock orders) and reset when the API restarts.
+Events, mock orders, promotions and aggregate reach metrics use the API's durable prototype JSON boundary and survive an API restart. The file is git-ignored and contains no Stripe secret, payment-card details, mood text or identity documents.
 
 ## In the feed and map
 
@@ -65,17 +65,16 @@ Wired up in `features/business/promotedFeed.ts`, called from Kate's `events/even
 ## Known limits (prototype)
 
 - The portal is a separate Vite page, so it is served by `npm run dev` but not yet included in `vite build`. For deployment, add it as a build input or route it from the app shell.
-- A paid boost on a core event sets its existing `isPaidPromotion` flag (and clears it when the boost ends), so `/api/events?paid=true` includes it. Business venue events live in the business store, so they appear in `/api/business/events` and `/api/promotions`, not `/api/events`.
+- A paid boost sets the shared event's `isPaidPromotion` flag (and clears it when the boost ends), so `/api/events?paid=true` includes both user and published business events.
 
-- A promoted core API event that isn't in the feed's sample data (e.g. `coffee-and-code`) isn't shown in the feed until it reads `/api/events`; `sunday-five-a-side` exists in both, so use it for the user-promotion demo.
-- No authentication: the "own event" check uses a synthetic demo user (`Dara L.`, owns `sunday-five-a-side` and `coffee-and-code`) and the business name typed in the form. Replace with the real host id once `Event` carries one.
-- In-memory storage; no refunds; one active promotion per event.
+- No production authentication: events now carry stable synthetic `hostId` ownership, while the browser still acts as demo user `demo-user`. Replace the demo identity boundary with real sessions before live payments.
+- Prototype JSON storage is single-process and not a substitute for a production database; no refunds; one active promotion per event.
 
 ## Tests
 
 ```bash
 npm run typecheck
-cd apps/api && npx tsx scripts/payments-smoke.ts   # 41 offline checks: normal, boundary and failure requests + signed webhook
+cd apps/api && npx tsx scripts/payments-smoke.ts   # offline checks: normal, boundary and failure requests + signed webhook
 ```
 
 Screenshots of each state are in `screenshots/`.

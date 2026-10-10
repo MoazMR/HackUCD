@@ -5,6 +5,7 @@ import { setUserOrigin } from "./features/events/geo";
 import { INTERESTS as DISCOVERY_INTERESTS } from "./features/events/types";
 import { useEventsStore } from "./features/events/useEventsStore";
 import { EventPlanner } from "./features/planning/EventPlanner";
+import { ThirdPlaceAssistant } from "./features/planning/ThirdPlaceAssistant";
 import { AREAS, fromDiscoveryInterest, toDiscoveryInterest } from "./features/preferences";
 import { EndorsementScreen, Logo, MyEventsView, ProfileProvider, ProfileView, sampleMyEvents, useProfile, type MyEvent } from "./features/profile";
 import { ProfileApiSync } from "./integration/ProfileApiSync";
@@ -13,7 +14,7 @@ import { BUSINESS_PORTAL_PATH } from "./features/business/paths";
 type MainView = "for-you" | "map" | "my-events" | "profile";
 /** Discovery sub-routes handled inside Kate's DiscoverEvents (#/event/:id, #/create, #/search). */
 type DiscoveryRoute = "event" | "create" | "search";
-type View = MainView | "plan" | "demo" | DiscoveryRoute;
+type View = MainView | "plan" | "assistant" | "demo" | DiscoveryRoute;
 const mainViews: Array<{ id: MainView; label: string }> = [
   { id: "for-you", label: "For You" }, { id: "map", label: "Map" },
   { id: "my-events", label: "My Events" }, { id: "profile", label: "Profile" }
@@ -23,7 +24,7 @@ const discoveryRoutes: DiscoveryRoute[] = ["event", "create", "search"];
 /** Accepts both "#map" (shell nav) and "#/map" / "#/event/:id" (discovery links). */
 function viewFromHash(): View {
   const first = window.location.hash.replace(/^#\/?/, "").split("/")[0] as View;
-  return [...mainViews.map((item) => item.id), "plan", "demo", ...discoveryRoutes].includes(first) ? first : "for-you";
+  return [...mainViews.map((item) => item.id), "plan", "assistant", "demo", ...discoveryRoutes].includes(first) ? first : "for-you";
 }
 
 const discoveryInterestNames: readonly string[] = DISCOVERY_INTERESTS;
@@ -92,6 +93,7 @@ function AppContent() {
         <div className="topbar-actions">
           <button type="button" className="nav-link" aria-current={view === "demo" ? "page" : undefined} onClick={() => setView("demo")}>Demo</button>
           <a className="nav-link" href={BUSINESS_PORTAL_PATH}>For Businesses</a>
+          <button type="button" className="nav-link" aria-current={view === "assistant" ? "page" : undefined} onClick={() => setView("assistant")}>Ask ThirdPlace</button>
           <a className="create-action" href="#/create">Create Event</a>
           <button type="button" className="nav-link nav-pill" aria-current={view === "profile" || view === "my-events" ? "page" : undefined} onClick={() => setView("profile")}>Profile</button>
         </div>
@@ -105,6 +107,7 @@ function AppContent() {
           : view === "my-events" ? <MyEventsView events={events} pastAreSample onOpenChat={openEvent} onOpenEvent={openEvent} onEndorse={setEndorsementEventId} onFindEvents={() => setView("for-you")} />
           : view === "demo" ? <iframe className="demo-frame" src="/demo/index.html" title="ThirdPlace pitch demo" allow="fullscreen" onLoad={(event) => event.currentTarget.contentWindow?.focus()} />
           : view === "profile" ? <ProfileView onOpenMyEvents={() => setView("my-events")} />
+          : view === "assistant" ? <ThirdPlaceAssistant onBack={() => setView("for-you")} />
           : <EventPlanner onBack={() => setView("for-you")} />}
       </main>
     </div>

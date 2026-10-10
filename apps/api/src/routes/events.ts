@@ -1,7 +1,8 @@
 import { Router } from "express";
 import type { EventCategory } from "@social-outings/shared";
-import { getEvent, joinEvent, listEvents } from "../services/events.js";
+import { createEvent, getEvent, joinEvent, listEvents } from "../services/events.js";
 import { addPublicMessage, listPublicMessages } from "../services/messages.js";
+import { recordMetric } from "../services/analytics.js";
 
 export const eventsRouter = Router();
 const categories: EventCategory[] = ["food", "sport", "music", "social", "other"];
@@ -23,10 +24,37 @@ eventsRouter.get("/", (request, response) => {
   return response.json({ events: listEvents({ category: category as EventCategory | undefined, location: typeof request.query.location === "string" ? request.query.location : undefined, latitude, longitude, distanceKm, paid }) });
 });
 
+eventsRouter.post("/", (request, response) => {
+  const body = (request.body ?? {}) as Record<string, unknown>;
+  const title = typeof body.title === "string" ? body.title.trim() : "";
+  const description = typeof body.description === "string" ? body.description.trim() : "";
+  const startsAt = typeof body.startsAt === "string" ? body.startsAt : "";
+  const locationName = typeof body.locationName === "string" ? body.locationName.trim() : "";
+  const interest = typeof body.interest === "string" ? body.interest.trim() : "";
+  const area = typeof body.area === "string" ? body.area.trim() : "";
+  const category = body.category as EventCategory;
+  const latitude = typeof body.latitude === "number" ? body.latitude : NaN;
+  const longitude = typeof body.longitude === "number" ? body.longitude : NaN;
+  const capacity = typeof body.capacity === "number" ? body.capacity : 20;
+  const priceEur = typeof body.priceEur === "number" ? body.priceEur : 0;
+  const start = new Date(startsAt);
+  if (title.length < 3 || title.length > 80 || description.length < 10 || description.length > 500 || !locationName
+    || !interest || interest.length > 40 || !area || !categories.includes(category) || Number.isNaN(start.getTime()) || start <= new Date()
+    || !Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180
+    || !Number.isInteger(capacity) || capacity < 2 || capacity > 500 || !Number.isFinite(priceEur) || priceEur < 0 || priceEur > 500) {
+    return response.status(422).json({ error: "Provide a valid future event, public area, approximate coordinates, capacity and price." });
+  }
+  const requestedUser = request.header("x-user-id")?.trim();
+  const hostId = requestedUser ? requestedUser.slice(0, 80) : "demo-user";
+  const hostName = typeof body.hostName === "string" && body.hostName.trim() ? body.hostName.trim().slice(0, 80) : "Dara L. (demo user)";
+  return response.status(201).json({ event: createEvent({ title, description, startsAt, locationName, category, interest, area, latitude, longitude, capacity, priceEur, hostId, hostName }) });
+});
+
 eventsRouter.post("/:id/attendance", (request, response) => {
   const userId = (request.body as { userId?: unknown }).userId;
   if (typeof userId !== "string" || !userId.trim()) return response.status(400).json({ error: "userId is required" });
   const result = joinEvent(request.params.id, userId);
+  if (result?.joined && result.event.isPaidPromotion) recordMetric(request.params.id, "join");
   return result ? response.status(result.joined ? 201 : 200).json(result) : response.status(404).json({ error: "Event not found" });
 });
 

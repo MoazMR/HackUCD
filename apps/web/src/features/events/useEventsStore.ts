@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { loadEvents } from "./eventsClient";
-import { findArea } from "./geo";
+import { loadEvents, publishEvent } from "./eventsClient";
 import { buildSeedMessages } from "./syntheticData";
 import type { ChatMessage, DiscoveryEvent, NewEventDraft } from "./types";
 
@@ -29,6 +28,7 @@ export function useEventsStore() {
   useEffect(load, [load]);
 
   const join = useCallback((eventId: string) => {
+    void fetch(`/api/events/${encodeURIComponent(eventId)}/attendance`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: "demo-user" }) }).catch(() => undefined);
     setEvents((current) =>
       current.map((event) =>
         event.id === eventId && event.attendeeCount < event.capacity
@@ -66,25 +66,8 @@ export function useEventsStore() {
     return true;
   }, []);
 
-  const createEvent = useCallback((draft: NewEventDraft): DiscoveryEvent => {
-    const area = findArea(draft.area);
-    const event: DiscoveryEvent = {
-      id: `user-${Date.now().toString(36)}`,
-      title: draft.title.trim(),
-      description: draft.description.trim(),
-      startsAt: new Date(draft.startsAt).toISOString(),
-      locationName: draft.locationName.trim(),
-      category: draft.category,
-      attendeeCount: 1,
-      interest: draft.interest,
-      area: draft.area,
-      lat: area?.lat ?? 53.3498,
-      lng: area?.lng ?? -6.2603,
-      priceEur: draft.priceEur,
-      capacity: draft.capacity,
-      hostName: "You",
-      synthetic: true
-    };
+  const createEvent = useCallback(async (draft: NewEventDraft): Promise<DiscoveryEvent> => {
+    const event = await publishEvent(draft);
     setEvents((current) => [event, ...current]);
     setJoined((current) => new Set(current).add(event.id));
     return event;

@@ -11,6 +11,10 @@ Location-based social outings: discover nearby events, create one, and join peop
 
 The event-planning assistant works immediately with clearly labelled synthetic output. To use OpenRouter, copy `apps/api/.env.example` to an untracked `.env`, set `OPENROUTER_API_KEY`, and choose an `OPENROUTER_MODEL`. Environment files and API keys must never be committed. The browser sends event details to the ThirdPlace API only; the OpenRouter key stays on the server.
 
+The conversational **Ask ThirdPlace** guide can use an OpenClaw Gateway. Set `OPENCLAW_GATEWAY_URL` and `OPENCLAW_GATEWAY_TOKEN`; the API calls the Gateway's OpenAI-compatible `/v1/chat/completions` endpoint with model `openclaw/default`. If OpenClaw is unavailable it falls back to configured OpenRouter, then to transparent rule-based recommendations. Mood text is used only for the current request and is not written to the profile or runtime data.
+
+Prototype-created events, promotion orders, active promotions, and aggregate promotion metrics are stored in `apps/api/.data/runtime.json` by default (git-ignored). This makes Stripe returns recoverable across API restarts. Set `THIRDPLACE_DATA_FILE=:memory:` for a disposable run. A production deployment should replace this small JSON boundary with a transactional database.
+
 ## Product scope
 
 ThirdPlace helps people safely discover and create local events. People browse a map and feed, set interests and travel radius, create or join events, and chat only in the event's public group space. Businesses can create and pay to promote events; users can optionally pay to promote an event.
