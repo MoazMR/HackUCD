@@ -22,6 +22,8 @@ The test suites cover:
 - OpenClaw success, OpenClaw failure with OpenRouter fallback, both providers unavailable, deadlines, actual-profile grounding, invalid messages, secret-safe output, and restricted requests.
 - Persistent preferences/mock verification, default JSON location, disposable mode, malformed/oversized requests, and business UI state handling.
 
+The final run with current main integrated passed type checking, 103 tests, 43 offline payment smoke checks, and the production build. The build includes the main website, business portal, and Demo assets.
+
 Payment smoke mocks Stripe SDK create/retrieve/expire operations and verifies locally signed webhook fixtures through the real route. Provider tests use controlled responses. Tests bind temporary localhost ports; storage tests use disposable state or isolated temporary files. No integration credentials or outbound payment/provider requests are needed.
 
 ## Observed browser journeys
@@ -34,7 +36,9 @@ It also checked matching feed/API recommendation order, radius/relevance exclusi
 
 Ask ThirdPlace handled mood, grounded sponsored suggestions, and creation guidance through its labelled rule-based fallback, and refused publishing/payment, diagnosis, exact-address, identity-document, and private-message requests. The mobile feed had no horizontal overflow, and the functional run reported no uncaught browser exceptions.
 
-The illustrative map matched its accessible event list, including City Centre, Docklands, and distinct coarse points in an unknown neighbourhood. Nearby targets appear as clusters whose preview lists every included event; clustering retains the original approximate points. Hotspots were exercised with keyboard and pointer input.
+The illustrative map matched its accessible event list, including City Centre, Docklands, and distinct coarse points in an unknown neighbourhood. Nearby targets appear as clusters whose preview lists every included event; clustering retains the original approximate points. Normal pointer clicks reached every rendered hotspot on desktop and mobile; their previews covered all nine eligible listed events.
+
+After integrating current main, the Demo iframe loaded its local HTML, scripts, styles, logo and fonts, and slide controls worked. The branded assistant retained grounded follow-up guidance and restrictions; the final mobile feed and assistant had no horizontal overflow or uncaught exceptions.
 
 | Journey | Screenshots |
 | --- | --- |
@@ -47,6 +51,7 @@ The illustrative map matched its accessible event list, including City Centre, D
 | Restart recovery | [Recovered checkout](screenshots/commercial-ai/14-restart-recovered-checkout.png), [Recovered My Events](screenshots/commercial-ai/15-restart-my-events.png) |
 | Accessible map catalogue coverage; nearby targets are clustered | [Complete catalogue](screenshots/commercial-ai/16-complete-catalogue-map.png), [Unknown neighbourhood](screenshots/commercial-ai/17-unknown-neighbourhood-map.png) |
 | Pending payment and later confirmation | [Pending retry](screenshots/commercial-ai/18-pending-payment-retry.png), [Confirmed after payment](screenshots/commercial-ai/19-pending-payment-confirmed.png) |
+| Mobile map, preserved Demo and assistant | [Clustered mobile map](screenshots/commercial-ai/21-mobile-clustered-map.png), [Demo iframe](screenshots/commercial-ai/22-demo-iframe.png), [Mobile assistant](screenshots/commercial-ai/23-mobile-assistant.png) |
 
 ## Fixture limits
 
