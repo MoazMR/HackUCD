@@ -7,10 +7,12 @@ type Props = {
   onAreaChange: (areaId: string) => void;
   onRadiusChange: (radiusKm: number) => void;
   error?: string;
+  /** Hide the small drawing when a larger AreaMap is already on screen. */
+  showDrawing?: boolean;
 };
 
 /** Area + travel radius, with a drawing that shows how coarse the public location is. */
-export function AreaRadiusPicker({ areaId, radiusKm, onAreaChange, onRadiusChange, error }: Props) {
+export function AreaRadiusPicker({ areaId, radiusKm, onAreaChange, onRadiusChange, error, showDrawing = true }: Props) {
   const areaField = useId();
   const radiusField = useId();
   const [locating, setLocating] = useState(false);
@@ -30,7 +32,7 @@ export function AreaRadiusPicker({ areaId, radiusKm, onAreaChange, onRadiusChang
   }
 
   return (
-    <div className="tp-area">
+    <div className="tp-area" data-plain={!showDrawing || undefined}>
       <div className="tp-area-fields">
         <div className="tp-field">
           <label className="tp-label" htmlFor={areaField}>Your area</label>
@@ -56,7 +58,7 @@ export function AreaRadiusPicker({ areaId, radiusKm, onAreaChange, onRadiusChang
           <p className="tp-hint">Events further away than this are left out of your feed.</p>
         </div>
       </div>
-      <AreaDrawing label={areaId ? areaName(areaId) : "No area yet"} radiusKm={radiusKm} />
+      {showDrawing && <AreaDrawing label={areaId ? areaName(areaId) : "No area yet"} radiusKm={radiusKm} />}
     </div>
   );
 }

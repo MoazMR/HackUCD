@@ -1,3 +1,4 @@
+import { InterestBadge } from "./InterestIcon";
 import { INTERESTS } from "./interests";
 
 type Props = { selected: string[]; onChange: (next: string[]) => void; legend?: string; error?: string };
@@ -13,7 +14,7 @@ export function InterestPicker({ selected, onChange, legend = "Interests", error
         {INTERESTS.map((interest) => (
           <label className="tp-chip" key={interest.id}>
             <input type="checkbox" checked={selected.includes(interest.id)} onChange={() => toggle(interest.id)} />
-            <span>{interest.label}</span>
+            <span><InterestBadge id={interest.id} />{interest.label}</span>
           </label>
         ))}
       </div>

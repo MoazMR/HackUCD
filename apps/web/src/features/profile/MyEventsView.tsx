@@ -1,5 +1,8 @@
 import { useMemo } from "react";
+import { InterestBadge } from "../preferences/InterestIcon";
+import { interestCategory } from "../preferences/interests";
 import { useProfile } from "./ProfileStore";
+import { Ribbon } from "./Ribbon";
 import { sampleMyEvents } from "./sampleData";
 import type { MyEvent } from "./types";
 import "./profile.css";
@@ -32,7 +35,9 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
   return (
     <section className="tp tp-myevents" aria-labelledby="tp-myevents-heading">
       <header className="tp-page-head">
-        <h1 id="tp-myevents-heading" className="tp-title">My Events</h1>
+        <Ribbon />
+        <h1 id="tp-myevents-heading" className="tp-title tp-title-big">{headline(upcoming.length)[0]} <span className="tp-script">{headline(upcoming.length)[1]}</span></h1>
+        <p className="tp-lede">My Events keeps what you've joined or are hosting, and what you've already been to.</p>
         {!events && <p className="tp-sample">Sample events, until the events API is connected.</p>}
       </header>
 
@@ -50,7 +55,7 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
                 <EventSummary event={event} />
                 <div className="tp-event-actions">
                   <button type="button" className="tp-button" onClick={() => onOpenChat(event.id)}>Open group chat</button>
-                  <button type="button" className="tp-button tp-button-quiet" onClick={() => onOpenEvent(event.id)}>View event</button>
+                  <button type="button" className="tp-button tp-button-link" onClick={() => onOpenEvent(event.id)}>View event <span aria-hidden="true">↗</span></button>
                 </div>
               </li>
             ))}
@@ -100,16 +105,34 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
   );
 }
 
+/** Headline in two parts: the plain half, then the handwritten half. */
+function headline(count: number): [string, string] {
+  if (count === 0) return ["Nothing planned.", "Yet."];
+  if (count === 1) return ["One plan", "on the way."];
+  return [`${count} plans`, "on the way."];
+}
+
+/** "Tomorrow", "In 5 days", "3 days ago". */
+function relativeDay(date: Date): string {
+  const startOfDay = (value: Date) => new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+  const days = Math.round((startOfDay(date) - startOfDay(new Date())) / 86400000);
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  if (days === -1) return "Yesterday";
+  return days > 0 ? `In ${days} days` : `${-days} days ago`;
+}
+
 function EventSummary({ event }: { event: MyEvent }) {
   const date = new Date(event.startsAt);
   return (
     <div className="tp-event-summary">
-      <time className="tp-date" dateTime={event.startsAt}>
+      <time className="tp-date" data-category={event.interestId ? interestCategory(event.interestId) : "other"} dateTime={event.startsAt}>
         <span>{date.toLocaleDateString("en-IE", { month: "short" })}</span>
         <strong>{date.getDate()}</strong>
       </time>
       <div>
-        <h3>{event.title}</h3>
+        <p className="tp-when">{relativeDay(date)}</p>
+        <h3>{event.interestId && <InterestBadge id={event.interestId} />}{event.title}</h3>
         <p className="tp-muted">{when.format(date)}, {event.locationName}</p>
         <p className="tp-event-meta">
           <span className="tp-role" data-role={event.role}>{date.getTime() < Date.now()
