@@ -3,231 +3,263 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="ThirdPlace HackUCD pitch — an interactive product story about turning local intent into real-world connection." />
+  <meta name="description" content="ThirdPlace pitch for HackUCD 2026." />
   <title>ThirdPlace — HackUCD Pitch</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
   <main class="deck" id="deck" aria-live="polite">
+
     <section class="slide cover active" data-title="ThirdPlace">
-      <div class="sunburst" aria-hidden="true"></div>
       <div class="cover-copy">
-        <p class="kicker">HackUCD 2026 · Pitch demo</p>
         <img class="hero-logo" src="assets/thirdplace-logo.png" alt="ThirdPlace" />
         <h1 class="sr-only">ThirdPlace</h1>
         <p class="cover-line">Find your people.<br />Find your place.</p>
-        <button class="big-cta" data-next>Meet Jack <span aria-hidden="true">→</span></button>
+        <button class="btn btn-primary" data-next>Start</button>
       </div>
-      <p class="corner-note">Nearby plans, real people, public group chat.</p>
     </section>
 
     <section class="slide story" data-title="Meet Jack">
-      <div class="slide-grid story-grid">
+      <div class="slide-grid">
         <div>
-          <p class="kicker">User story · Friday, 18:10</p>
           <h2>Meet Jack.</h2>
-          <p class="lead">HackUCD has wrapped. Jack has energy left—but no plan.</p>
-          <div class="thoughts" aria-label="Jack's thoughts">
-            <span>“Poker?”</span><span>“Five-a-side?”</span><span>“Who’s actually free?”</span>
-          </div>
+          <p class="lead">It’s Friday evening. Jack is new to Dublin, has the night free and likes poker and football. His group chat has no answers.</p>
+          <div class="thoughts"><span>“Poker?”</span><span>“Five-a-side?”</span><span>“Who’s actually free?”</span></div>
         </div>
         <div class="jack-card">
           <div class="avatar-xl">J</div>
-          <div><strong>Jack, 22</strong><p>New to Dublin · likes poker, football and spontaneous plans</p></div>
-          <div class="phone-message"><span>Friends group</span><strong>Seen by 8</strong><p>“Anyone doing anything?”</p><small>No replies yet</small></div>
+          <div><strong>Jack, 22</strong><p>New to Dublin. Likes poker, football and last-minute plans.</p></div>
+          <div class="phone-message"><span>Friends group</span><p>“Anyone doing anything tonight?”</p><small>Seen by 8 · no replies</small></div>
         </div>
       </div>
-      <aside class="speaker-note">The problem is not a lack of things to do. It is the friction between wanting to go out and finding the right people nearby.</aside>
+      <aside class="speaker-note">The problem is not a lack of things to do. It is finding something relevant nearby, and people to go with.</aside>
     </section>
 
-    <section class="slide problem" data-title="The gap">
-      <p class="kicker">The gap</p>
-      <h2>We have places.<br />We have people.<br /><em>We’re missing the bridge.</em></h2>
-      <div class="problem-row">
-        <article><span class="big-number">1</span><h3>Intent</h3><p>“I feel like playing poker tonight.”</p></article>
-        <div class="broken-line" aria-hidden="true">······</div>
-        <article><span class="big-number">2</span><h3>Discovery</h3><p>What is nearby, relevant and actually happening?</p></article>
-        <div class="broken-line" aria-hidden="true">······</div>
-        <article><span class="big-number">3</span><h3>Belonging</h3><p>Turn one outing into familiar faces.</p></article>
+    <section class="slide evidence" data-title="Who we asked">
+      <h2>People want this.</h2>
+      <div class="evidence-grid">
+        <article class="stat stat-red">
+          <strong>20 of 25</strong>
+          <p>of the people we surveyed said they would use ThirdPlace.</p>
+        </article>
+        <article class="stat stat-blue">
+          <strong>1 in 6</strong>
+          <p>people worldwide experience loneliness.</p>
+          <a href="https://www.who.int/groups/commission-on-social-connection" target="_blank" rel="noreferrer">WHO Commission on Social Connection, 2025</a>
+        </article>
+        <div class="quotes">
+          <!-- Replace each quote with a real answer from the survey, then delete the "todo" class. -->
+          <blockquote class="todo"><p>Add a real quote from the survey here.</p><cite>Name or role, e.g. “first-year student”</cite></blockquote>
+          <blockquote class="todo"><p>Add a second real quote here.</p><cite>Name or role</cite></blockquote>
+          <blockquote class="todo"><p>Add a third real quote here.</p><cite>Name or role</cite></blockquote>
+        </div>
       </div>
-      <div class="evidence-card">
-        <strong>1 in 6</strong><span>people worldwide experience loneliness.</span>
-        <a href="https://www.who.int/groups/commission-on-social-connection" target="_blank" rel="noreferrer">WHO Commission on Social Connection, 2025 ↗</a>
-      </div>
+      <aside class="speaker-note">Say who the 25 were and how you asked them. 20 of 25 is a small sample, so describe it as early evidence.</aside>
     </section>
 
-    <section class="slide demo-slide" data-title="Set the intent">
+    <section class="slide demo-slide" data-title="Pick interests">
       <div class="demo-copy">
-        <p class="kicker">Product demo · 01</p>
-        <h2>Jack tells ThirdPlace what sounds good.</h2>
-        <p class="lead">A few interests. An approximate area. A travel radius. No endless profile setup.</p>
-        <div class="demo-caption"><span>Privacy by design</span> Only Jack’s approximate area is public—never his exact location.</div>
+        <h2>Jack picks what he likes.</h2>
+        <p class="lead">A few interests, a rough area and how far he’ll travel. Only the area is shown to others, never his exact location.</p>
       </div>
-      <div class="app-frame" aria-label="ThirdPlace onboarding demo">
-        <div class="app-top"><span class="mini-logo">ThirdPlace</span><span>1 of 2</span></div>
-        <h3>What are you into tonight?</h3>
-        <p>Pick one or more. We’ll keep the feed relevant.</p>
+      <div class="app-frame">
+        <div class="app-top"><span class="mini-logo">ThirdPlace</span><span>Step 1 of 2</span></div>
+        <h3>What are you into?</h3>
         <div class="choice-grid" id="interestChoices">
-          <button class="choice selected" data-interest="Poker"><span>♠</span>Poker</button>
-          <button class="choice selected" data-interest="Football"><span>⚽</span>Football</button>
-          <button class="choice" data-interest="Padel"><span>◒</span>Padel</button>
-          <button class="choice" data-interest="Coffee"><span>☕</span>Coffee</button>
+          <button class="choice selected" data-interest="Poker" aria-pressed="true">Poker</button>
+          <button class="choice selected" data-interest="Football" aria-pressed="true">Football</button>
+          <button class="choice" data-interest="Padel" aria-pressed="false">Padel</button>
+          <button class="choice" data-interest="Tennis" aria-pressed="false">Tennis</button>
+          <button class="choice" data-interest="Coffee" aria-pressed="false">Coffee</button>
+          <button class="choice" data-interest="Board games" aria-pressed="false">Board games</button>
         </div>
         <label class="radius-label">Travel radius <strong id="radiusValue">5 km</strong><input id="radius" type="range" min="1" max="15" value="5" /></label>
-        <button class="app-primary" data-next>Show me what’s nearby</button>
-        <small class="synthetic">Interactive pitch demo · synthetic profile</small>
+        <button class="btn btn-primary" data-next>Show me what’s nearby</button>
       </div>
     </section>
 
     <section class="slide demo-slide feed-slide" data-title="For You">
       <div class="demo-copy">
-        <p class="kicker">Product demo · 02</p>
-        <h2>Not more events.<br /><em>The right events.</em></h2>
-        <p class="lead">ThirdPlace ranks nearby plans by interests, category and distance—and explains every recommendation.</p>
-        <div class="formula"><span>interest match</span><b>+</b><span>distance</span><b>+</b><span>category</span></div>
+        <h2>Only events Jack would go to.</h2>
+        <p class="lead">Events are ranked by his interests, category and distance, and each one says why it’s there. A poker fan won’t see knitting.</p>
       </div>
       <div class="app-frame feed-frame">
-        <div class="app-top"><span class="mini-logo">For You</span><span>Dublin 2 · 5 km</span></div>
-        <div class="search-pill">⌕ Search events, categories, areas</div>
+        <div class="app-top"><span class="mini-logo">For you, nearby</span><span>Portobello · within 5 km</span></div>
         <button class="event-card active" data-event="poker">
-          <span class="event-art poker-art">♠</span>
-          <span class="event-body"><small>TONIGHT · 20:00</small><strong>Low-stakes poker night</strong><span>The Barge · Portobello</span><em>Matches poker · 1.2 km away</em></span>
-          <span class="price">Free</span>
+          <span class="date-block date-social"><small>FRI</small><b>16</b><small>OCT</small></span>
+          <span class="event-body"><span class="tags"><i class="tag">Social</i><i class="tag soft">poker</i></span><strong>Low-stakes poker night</strong><em>Matches poker · 1.2 km away</em><span class="meta">20:00 · Free · 3 spots left</span></span>
         </button>
         <button class="event-card" data-event="football">
-          <span class="event-art football-art">⚽</span>
-          <span class="event-body"><small>TODAY · 19:30</small><strong>Friendly five-a-side</strong><span>Iveagh Grounds · Crumlin</span><em>Matches football · 2.1 km away</em></span>
-          <span class="price">€6</span>
+          <span class="date-block date-sport"><small>FRI</small><b>16</b><small>OCT</small></span>
+          <span class="event-body"><span class="tags"><i class="tag">Sport</i><i class="tag soft">football</i></span><strong>Five-a-side</strong><em>Matches football · 2.1 km away</em><span class="meta">19:30 · €6 · 2 spots left</span></span>
         </button>
-        <div class="feed-actions"><span id="eventHint">Poker selected</span><button class="app-primary compact" data-next>View event</button></div>
-        <small class="synthetic">Synthetic events for demonstration</small>
+        <div class="feed-actions"><span id="eventHint">Poker selected</span><button class="btn btn-primary btn-sm" data-next>View event</button></div>
       </div>
     </section>
 
-    <section class="slide demo-slide detail-slide" data-title="Join the outing">
+    <section class="slide demo-slide detail-slide" data-title="Join an event">
       <div class="demo-copy">
-        <p class="kicker">Product demo · 03</p>
-        <h2>Enough context to say yes.</h2>
-        <ul class="check-list"><li>Verified host</li><li>Approximate public venue</li><li>Group size and price</li><li>Public group-chat rules</li></ul>
+        <h2>Enough to say yes.</h2>
+        <ul class="check-list"><li>Who’s hosting, and whether they’re verified</li><li>The area, not a street address</li><li>Price and how many spots are left</li><li>The rules of the public group chat</li></ul>
       </div>
       <div class="app-frame event-detail">
-        <div class="event-hero poker-art"><button class="back-chip">← For You</button><span>♠</span></div>
+        <div class="event-hero poker-art"><button class="back-chip">← For you</button></div>
         <div class="detail-content">
-          <div class="detail-eyebrow">TONIGHT · 20:00 · FREE</div>
+          <div class="detail-eyebrow">Fri 16 Oct · 20:00 · Free</div>
           <h3 id="detailTitle">Low-stakes poker night</h3>
-          <p>A relaxed game for beginners and regulars. Chips provided; no cash betting.</p>
-          <div class="host"><span class="avatar">A</span><div><strong>Hosted by Aoife <span title="Verified">✓</span></strong><small>18 endorsements · ID checked</small></div></div>
-          <div class="attendees"><span class="avatar">M</span><span class="avatar">S</span><span class="avatar">D</span><span class="avatar more">+5</span><p>8 people are going</p></div>
-          <button class="app-primary join-button" id="joinButton">Join this event</button>
-          <p class="join-status" id="joinStatus" aria-live="polite">You’ll unlock the public event group when you join.</p>
+          <p>A relaxed game for beginners and regulars. Chips provided, no cash betting.</p>
+          <div class="host"><span class="avatar">A</span><div><strong>Hosted by Aoife</strong><small>18 endorsements · ID checked</small></div></div>
+          <div class="attendees"><span class="avatar">M</span><span class="avatar blue">S</span><span class="avatar gold">D</span><p>5 going</p></div>
+          <button class="btn btn-primary join-button" id="joinButton">Join this event</button>
+          <p class="join-status" id="joinStatus" aria-live="polite">Joining unlocks the public group chat.</p>
         </div>
       </div>
     </section>
 
-    <section class="slide demo-slide chat-slide" data-title="Public group chat">
+    <section class="slide demo-slide chat-slide" data-title="Group chat">
       <div class="demo-copy">
-        <p class="kicker">Product demo · 04</p>
-        <h2>Break the ice <em>before</em> you arrive.</h2>
-        <p class="lead">Every event has one public group space. No cold DMs. No private-message pressure.</p>
-        <div class="trust-strip"><span>✓ Verified host</span><span>◉ Public by default</span><span>⚑ Reportable</span></div>
+        <h2>Say hello before you arrive.</h2>
+        <p class="lead">Each event has one public group chat. There are no private messages, so nobody gets cold DMs. Anyone can report a message.</p>
       </div>
       <div class="app-frame chat-frame">
-        <div class="chat-head"><button>←</button><div><strong>Poker night</strong><small>9 members · public event group</small></div><span>•••</span></div>
+        <div class="chat-head"><div><strong>Low-stakes poker night</strong><small>Public group chat · 6 members</small></div></div>
         <div class="messages">
-          <div class="message"><span class="avatar">A</span><p><strong>Aoife · Host</strong>Hey everyone! We’ve got the back table from 8. Beginners very welcome 👋</p></div>
+          <div class="message"><span class="avatar">A</span><p><strong>Aoife · Host</strong>We’ve got the back table from 8. Beginners welcome.</p></div>
           <div class="message"><span class="avatar blue">M</span><p><strong>Mateo</strong>I can bring an extra deck.</p></div>
-          <div class="message own"><p><strong>Jack</strong>Perfect—first time joining. See you there!</p></div>
-          <div class="system-message">Jack joined the event · location details shared with attendees</div>
+          <div class="message own"><p><strong>Jack</strong>First time joining. See you there!</p></div>
         </div>
-        <form class="chat-input" id="chatForm"><input id="chatInput" maxlength="80" placeholder="Message the public group" aria-label="Public group message" /><button>Send</button></form>
-        <small class="synthetic">Synthetic conversation for demonstration</small>
+        <form class="chat-input" id="chatForm"><input id="chatInput" maxlength="80" placeholder="Message the group" aria-label="Public group message" /><button class="btn btn-primary btn-sm">Send</button></form>
       </div>
     </section>
 
-    <section class="slide outcome" data-title="From outing to belonging">
-      <p class="kicker">The morning after</p>
-      <h2>Jack didn’t just fill an evening.</h2>
+    <section class="slide outcome" data-title="After the event">
+      <h2>From one night to a regular game.</h2>
       <div class="outcome-path">
         <article><span>18:10</span><strong>No plan</strong><p>“Anyone doing anything?”</p></article>
-        <i>→</i><article><span>18:13</span><strong>Relevant match</strong><p>Poker · 1.2 km</p></article>
-        <i>→</i><article><span>20:00</span><strong>Real outing</strong><p>Nine people around a table</p></article>
-        <i>→</i><article class="highlight"><span>Next Friday</span><strong>Familiar faces</strong><p>“Same time?”</p></article>
+        <i>→</i><article><span>18:13</span><strong>Found a match</strong><p>Poker, 1.2 km away</p></article>
+        <i>→</i><article><span>20:00</span><strong>Went along</strong><p>Six people around a table</p></article>
+        <i>→</i><article class="highlight"><span>Next Friday</span><strong>Knows people</strong><p>“Same time?”</p></article>
       </div>
-      <div class="endorse-card"><div class="avatar-row"><span class="avatar">A</span><span class="avatar blue">M</span><span class="avatar gold">S</span></div><div><strong>Would you meet them again?</strong><p>Endorse people you met. Reports stay separate and go to moderator review.</p></div><button>Endorse all</button></div>
+      <div class="endorse-card"><div class="avatar-row"><span class="avatar">A</span><span class="avatar blue">M</span><span class="avatar gold">S</span></div><div><strong>Would you meet them again?</strong><p>Endorse the people you met. Reports are kept separate and a moderator reviews them.</p></div></div>
     </section>
 
-    <section class="slide impact" data-title="Social impact">
-      <div class="impact-left">
-        <p class="kicker">Social impact</p>
-        <h2>Connection needs a <em>place</em> to happen.</h2>
-        <p class="lead">ThirdPlace turns vague social intent into low-friction, interest-led encounters in the real world.</p>
-      </div>
-      <div class="impact-orbit" aria-label="ThirdPlace connection flywheel">
-        <div class="orbit-center">Belonging</div>
-        <div class="orbit-item one"><b>1</b><span>Discover</span></div>
-        <div class="orbit-item two"><b>2</b><span>Join</span></div>
-        <div class="orbit-item three"><b>3</b><span>Meet</span></div>
-        <div class="orbit-item four"><b>4</b><span>Return</span></div>
-      </div>
-      <p class="impact-foot">We do not promise to “solve loneliness.” We create more chances for meaningful social connection.</p>
-    </section>
-
-    <section class="slide business" data-title="Business value">
+    <section class="slide business" data-title="For businesses">
       <div class="business-copy">
-        <p class="kicker">The other side of the marketplace</p>
-        <h2>Empty seats become local energy.</h2>
-        <p class="lead">A venue can turn a quiet time slot into a promoted social event—reaching people nearby who already want that activity.</p>
-        <div class="business-points"><span>Target by area + interest</span><span>Promote quiet hours</span><span>Measure joins + orders</span></div>
+        <h2>Fill the quiet nights.</h2>
+        <p class="lead"><strong>Maria</strong> runs a 30-seat restaurant near Portobello. Weekday evenings are quiet and she wants more people through the door. Posters and social posts reach people who don’t live nearby.</p>
+        <p class="lead">With ThirdPlace she lists a Tuesday supper night and promotes it to people within 5 km who like food and meeting new people.</p>
       </div>
       <div class="venue-card">
-        <div class="venue-head"><span class="venue-icon">♣</span><div><small>BUSINESS PORTAL</small><h3>The Back Page</h3></div><span class="verified">Verified venue</span></div>
-        <div class="venue-metric"><span><b>Tuesday</b> quiet period</span><strong>18:00–21:00</strong></div>
-        <div class="campaign"><div><small>PROMOTED EVENT</small><strong>Social poker night</strong><p>People within 5 km · poker + social interests</p></div><span class="status-live">Live</span></div>
-        <div class="metric-row"><div><strong>1,240</strong><span>local views</span></div><div><strong>36</strong><span>joins</span></div><div><strong>€14</strong><span>illustrative spend</span></div></div>
-        <small class="synthetic">Synthetic venue and campaign metrics</small>
+        <div class="venue-head"><span class="venue-icon">M</span><div><small>Business portal</small><h3>Maria’s Kitchen</h3></div></div>
+        <div class="venue-metric"><span>Quiet slot</span><strong>Tue 18:00–21:00</strong></div>
+        <div class="campaign"><div><small>Promoted event</small><strong>Tuesday supper club</strong><p>Shown to people within 5 km who like food and social events</p></div><span class="status-live">Promoted</span></div>
+        <p class="card-note">Promoted events are always labelled “Promoted”. Promotion changes the order, not who is eligible: people only see events that match their interests and distance.</p>
       </div>
     </section>
 
-    <section class="slide model" data-title="Business model">
-      <p class="kicker">Business model</p>
-      <h2>Free to connect.<br />Paid to amplify.</h2>
+    <section class="slide model" data-title="Pricing">
+      <h2>Free to use. Pay to be seen.</h2>
       <div class="model-grid">
-        <article><span class="model-icon">☺</span><h3>People</h3><strong>Free</strong><p>Browse, create, join and chat without paying.</p><small>Optional event boost · €3</small></article>
-        <article class="featured"><span class="model-icon">↗</span><h3>Local businesses</h3><strong>€49<small>/month</small></strong><p>Venue profile, recurring events and audience insights.</p><small>Illustrative launch pricing</small></article>
-        <article><span class="model-icon">◎</span><h3>Marketplace</h3><strong>8%</strong><p>Commission on paid tickets and activities.</p><small>Plus promoted placements from €15</small></article>
+        <article>
+          <h3>Everyone</h3>
+          <strong>Free</strong>
+          <p>Browse, create events, join and chat. No payment needed.</p>
+        </article>
+        <article class="featured">
+          <h3>Venue Boost · for businesses</h3>
+          <strong>€14.99</strong><span class="per">one-time · 7 days</span>
+          <p>Top slots in For You for nearby people who like that activity, a highlighted pin on the map, and a “Promoted” label with the business name.</p>
+          <p class="why">Pay once for a night you want to fill. Break-even is about one extra table, assuming roughly €15 spend per person.</p>
+        </article>
+        <article>
+          <h3>Community Boost · for people</h3>
+          <strong>€2.99</strong><span class="per">one-time · 3 days</span>
+          <p>For someone hosting an event who wants to get the word out. Moves it higher for nearby people with matching interests.</p>
+          <p class="why">Optional. Hosts who don’t pay can still run events.</p>
+        </article>
       </div>
-      <p class="assumption">Pricing shown is an illustrative hackathon hypothesis—not a live commercial offer.</p>
+      <p class="assumption">Payments run through Stripe in test mode. We would test these prices with venues before launch.</p>
     </section>
 
-    <section class="slide advantage" data-title="Why ThirdPlace">
-      <p class="kicker">Why ThirdPlace wins</p>
-      <h2>Not a feed.<br />A local connection engine.</h2>
-      <div class="advantage-grid">
-        <article><b>01</b><h3>Relevant</h3><p>Interest + category + distance, with transparent explanations.</p></article>
-        <article><b>02</b><h3>Immediate</h3><p>Designed for “what can I do today?” rather than someday.</p></article>
-        <article><b>03</b><h3>Safer by design</h3><p>Public event groups, visible trust signals and separate reports.</p></article>
-        <article><b>04</b><h3>Aligned incentives</h3><p>People find belonging while venues earn real footfall.</p></article>
+    <section class="slide live ai-live" data-title="Live: AI planner">
+      <div class="live-copy">
+        <h2>Plan an event with AI.</h2>
+        <p class="lead">A host describes the night they want. Our server asks a model on OpenRouter for a draft title, description and checklist. The host edits it before posting.</p>
+        <ul class="plain-list">
+          <li>The reply must be valid JSON in our format, or it’s rejected.</li>
+          <li>The model can invent details, so nothing is posted automatically.</li>
+          <li>It times out after 15 seconds, and the prompt bans addresses and contact details.</li>
+        </ul>
+      </div>
+      <div class="app-frame live-frame">
+        <form id="aiForm" class="live-form">
+          <label>What do you want to run?<input id="aiGoal" value="A relaxed poker night for beginners" maxlength="160" required /></label>
+          <div class="row2">
+            <label>Area<input id="aiArea" value="Portobello" maxlength="100" required /></label>
+            <label>Type<select id="aiCategory"><option>social</option><option>sport</option><option>food</option><option>music</option><option>other</option></select></label>
+          </div>
+          <button class="btn btn-primary" id="aiButton">Generate a plan</button>
+        </form>
+        <div class="live-out" id="aiOut" aria-live="polite"><p class="muted">Nothing generated yet.</p></div>
       </div>
     </section>
 
-    <section class="slide closing" data-title="The ask">
+    <section class="slide live stripe-live" data-title="Live: Stripe">
+      <div class="live-copy">
+        <h2>Paying, in Stripe’s test mode.</h2>
+        <ol class="steps">
+          <li>The business picks Venue Boost for one of its events.</li>
+          <li>Our server creates a Stripe Checkout session. The price is set on the server, not the browser.</li>
+          <li>They pay with a test card. No real money moves.</li>
+          <li>We check the payment with Stripe, record the order and mark the event “Promoted”.</li>
+        </ol>
+        <a class="btn btn-primary" id="portalLink" href="http://localhost:5173/src/features/business/portal.html" target="_blank" rel="noreferrer">Open the business portal</a>
+      </div>
+      <div class="app-frame live-frame">
+        <div class="status-row"><span>Stripe</span><b id="stripeStatus" class="pill">Checking…</b></div>
+        <h3>Orders</h3>
+        <div class="live-out" id="orderOut" aria-live="polite"><p class="muted">Loading orders…</p></div>
+        <button class="btn btn-ghost btn-sm" id="orderRefresh" type="button">Refresh orders</button>
+      </div>
+    </section>
+
+    <section class="slide first-users" data-title="First users">
+      <h2>Where the first users are.</h2>
+      <div class="plan-grid">
+        <article><b>1</b><h3>UCD society events</h3><p>We start where students already meet. A stall with a QR code at society and club events, such as a poker or sports society night.</p></article>
+        <article><b>2</b><h3>Societies post their sessions</h3><p>Clubs list their open sessions on ThirdPlace, so there is something to join from day one.</p></article>
+        <article><b>3</b><h3>Venues near campus</h3><p>Cafés and restaurants nearby try a Venue Boost for their quiet evenings.</p></article>
+        <article><b>4</b><h3>Friends bring friends</h3><p>People join a public group chat, then share the next event in their own group chats.</p></article>
+      </div>
+      <p class="assumption">We’d track sign-ups per society night, and how many of those people join an event in their first week.</p>
+    </section>
+
+    <section class="slide learned" data-title="What we tested">
+      <h2>What we tested and changed.</h2>
+      <div class="plan-grid three">
+        <article><h3>Built separately, wouldn’t fit</h3><p>We assumed four separately built parts would work together. They didn’t: the feed ignored the area picked at sign-up, joined events never reached My Events, and two features used the same CSS names and broke each other. We now share one events store and gave each feature its own styles.</p></article>
+        <article><h3>Location and age</h3><p>We assumed people want exact distances. We show only a neighbourhood and ask for an age range instead of a birth date. The cost is rougher distance estimates.</p></article>
+        <article><h3>Reports</h3><p>We first planned for reports to lower a trust score straight away. We changed it so a report does nothing until a moderator looks, because automatic penalties can be used against someone.</p></article>
+      </div>
+      <p class="assumption">Limits: events and people in the demo are made up, data resets when the server restarts, and ID checks are a mock.</p>
+    </section>
+
+    <section class="slide closing" data-title="Close">
       <img class="closing-logo" src="assets/thirdplace-logo.png" alt="ThirdPlace" />
-      <p class="closing-story">Tonight Jack found a poker game.<br />Next Friday, he already knows where he belongs.</p>
-      <h2>Make the city feel smaller.</h2>
-      <div class="closing-actions"><span>Discover nearby</span><span>Meet around interests</span><span>Bring life to local places</span></div>
-      <p class="ask">We’re building the bridge between <strong>“I want to”</strong> and <strong>“we’re doing it.”</strong></p>
-      <button class="big-cta" data-restart>Replay the story ↺</button>
+      <h2>ThirdPlace</h2>
+      <p class="ask">Helping people find a local plan, and people to go with.</p>
+      <button class="btn btn-ghost" data-restart>Back to the start</button>
     </section>
   </main>
 
   <nav class="deck-controls" aria-label="Presentation controls">
     <button id="prevButton" aria-label="Previous slide">←</button>
-    <div><strong id="slideNumber">01</strong><span>/</span><span id="slideTotal">12</span><small id="slideTitle">ThirdPlace</small></div>
+    <div><strong id="slideNumber">01</strong><span>/</span><span id="slideTotal">15</span><small id="slideTitle">ThirdPlace</small></div>
     <button id="nextButton" aria-label="Next slide">→</button>
     <button id="fullscreenButton" class="fullscreen" aria-label="Toggle fullscreen">⛶</button>
   </nav>
-  <button class="notes-toggle" id="notesToggle" aria-pressed="false">Presenter note</button>
+  <button class="notes-toggle" id="notesToggle" aria-pressed="false">Notes</button>
   <script src="script.js"></script>
 </body>
 </html>
