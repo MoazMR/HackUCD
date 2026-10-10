@@ -40,6 +40,8 @@ The illustrative map matched its accessible event list, including City Centre, D
 
 After integrating current main, the Demo iframe loaded its local HTML, scripts, styles, logo and fonts, and slide controls worked. The branded assistant retained grounded follow-up guidance and restrictions; the final mobile feed and assistant had no horizontal overflow or uncaught exceptions.
 
+The newer pinned header stayed visible while scrolling on desktop and mobile. The desktop map preview and Close control remained below the header, and mobile navigation scrolled within its single row to reach Ask ThirdPlace without page overflow.
+
 | Journey | Screenshots |
 | --- | --- |
 | Onboarding and free hosted event | [Onboarding](screenshots/commercial-ai/01-onboarding.png), [My Events hosting](screenshots/commercial-ai/02-my-events-hosting.png), [Owned event controls](screenshots/commercial-ai/20-owned-event-hosting.png) |
@@ -52,6 +54,7 @@ After integrating current main, the Demo iframe loaded its local HTML, scripts, 
 | Accessible map catalogue coverage; nearby targets are clustered | [Complete catalogue](screenshots/commercial-ai/16-complete-catalogue-map.png), [Unknown neighbourhood](screenshots/commercial-ai/17-unknown-neighbourhood-map.png) |
 | Pending payment and later confirmation | [Pending retry](screenshots/commercial-ai/18-pending-payment-retry.png), [Confirmed after payment](screenshots/commercial-ai/19-pending-payment-confirmed.png) |
 | Mobile map, preserved Demo and assistant | [Clustered mobile map](screenshots/commercial-ai/21-mobile-clustered-map.png), [Demo iframe](screenshots/commercial-ai/22-demo-iframe.png), [Mobile assistant](screenshots/commercial-ai/23-mobile-assistant.png) |
+| Pinned header and reachable controls | [Desktop header](screenshots/commercial-ai/24-desktop-pinned-header.png), [Map preview](screenshots/commercial-ai/25-pinned-map-preview.png), [Mobile assistant](screenshots/commercial-ai/26-mobile-pinned-assistant.png) |
 
 ## Fixture limits
 

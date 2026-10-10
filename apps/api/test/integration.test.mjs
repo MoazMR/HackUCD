@@ -107,18 +107,26 @@ test("assistant has a safe synthetic fallback and supports the OpenClaw gateway 
   assert.equal(fallbackBody.provider, "synthetic");
   assert.ok(Array.isArray(fallbackBody.suggestedEventIds));
 
+  const created = await fetch(`${baseUrl}/events`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title: "Future gateway football", description: "A friendly local football session for all levels.", startsAt: new Date(Date.now() + 3 * 86400000).toISOString(), locationName: "Public sports ground", category: "sport", interest: "football", area: "Dublin city centre", latitude: 53.347, longitude: -6.26, capacity: 12, priceEur: 0, hostName: "Demo host" })
+  });
+  assert.equal(created.status, 201);
+  const eligibleEvent = (await created.json()).event;
+
   let request;
   const openClaw = await askAssistant([{ role: "user", content: "What suits me?" }], "me", "test-session", {
     openClawUrl: "http://openclaw.test:18789", openClawToken: "gateway-secret",
     fetchImpl: async (url, init) => {
       request = { url, init, body: JSON.parse(init.body) };
-      return new Response(JSON.stringify({ choices: [{ message: { content: "Try Sunday five-a-side; it matches football and is nearby." } }] }), { status: 200, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ intent: "recommend", eventIds: [eligibleEvent.id] }) } }] }), { status: 200, headers: { "Content-Type": "application/json" } });
     }
   });
   assert.equal(openClaw.provider, "openclaw");
   assert.equal(request.url, "http://openclaw.test:18789/v1/chat/completions");
   assert.equal(request.init.headers.Authorization, "Bearer gateway-secret");
   assert.equal(request.body.model, "openclaw/default");
+  assert.deepEqual(openClaw.suggestedEventIds, [eligibleEvent.id]);
   assert.equal(JSON.stringify(openClaw).includes("gateway-secret"), false);
 });
 
