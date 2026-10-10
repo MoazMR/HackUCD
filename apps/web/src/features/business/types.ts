@@ -21,6 +21,10 @@ export type HostedEvent = OutingEvent & {
   hostType?: BuyerType;
   businessName?: string;
   venueAddressArea?: string;
+  interest?: string;
+  interests?: string[];
+  priceEur?: number;
+  capacity?: number;
   promoted?: boolean;
 };
 
@@ -68,6 +72,9 @@ export type BusinessEventDraft = {
   venueName: string;
   venueAddressArea: string;
   category: EventCategory | "";
+  interest: string;
+  priceEur: string; // text input value, euro
+  capacity: string; // text input value
 };
 
 export type FieldErrors = Partial<Record<keyof BusinessEventDraft, string>>;

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { PromotedBadge } from "../business/PromotedBadge";
 import { EventTile } from "../events/EventTile";
 import { AREAS, MAP_HEIGHT, MAP_PX_PER_KM, MAP_WIDTH, USER_ORIGIN, project } from "../events/geo";
 import type { DiscoveryFilters, RankedEvent } from "../events/types";
@@ -50,20 +51,24 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
             <span className="tp-me__label">You (approx.)</span>
           </span>
 
-          {hotspots.map((spot) => (
+          {hotspots.map((spot) => {
+            const promoted = spot.items.find((item) => item.event.promotion)?.event.promotion;
+            return (
             <button
               key={spot.area}
               type="button"
-              className="tp-hotspot"
+              className={`tp-hotspot${promoted ? " tp-hotspot--promoted" : ""}`}
               aria-pressed={selectedArea === spot.area}
-              aria-label={`${spot.area}: ${spot.items.length} ${spot.items.length === 1 ? "event" : "events"}`}
+              aria-label={`${spot.area}: ${spot.items.length} ${spot.items.length === 1 ? "event" : "events"}${promoted ? ", includes a promoted event" : ""}`}
               style={{ left: pct(spot.x, MAP_WIDTH), top: pct(spot.y, MAP_HEIGHT) }}
               onClick={() => setSelectedArea(selectedArea === spot.area ? null : spot.area)}
             >
+              {promoted && <span className="tp-hotspot__promo" aria-hidden="true"><PromotedBadge variant="pin" sponsorName={promoted.sponsorName} /></span>}
               <span className="tp-hotspot__count">{spot.items.length}</span>
               <span className="tp-hotspot__name">{spot.area}</span>
             </button>
-          ))}
+            );
+          })}
         </div>
         <p className="tp-map__caption">Illustrative map · circle shows your {filters.radiusKm} km travel radius · only neighbourhoods are shown, never exact addresses.</p>
       </div>

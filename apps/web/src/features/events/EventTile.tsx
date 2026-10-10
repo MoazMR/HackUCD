@@ -1,3 +1,4 @@
+import { PromotedBadge } from "../business/PromotedBadge";
 import { formatDay, formatPrice, formatTime, spotsLeft } from "./format";
 import { CATEGORY_LABELS, type RankedEvent } from "./types";
 
@@ -11,7 +12,7 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
   const full = left === 0;
 
   return (
-    <article className={`tp-tile tp-tile--${event.category}${compact ? " tp-tile--compact" : ""}`}>
+    <article className={`tp-tile tp-tile--${event.category}${compact ? " tp-tile--compact" : ""}${event.promotion ? " tp-tile--promoted" : ""}`}>
       <div className="tp-tile__date" aria-hidden="true">
         <span>{day.weekday}</span>
         <strong>{day.day}</strong>
@@ -19,6 +20,7 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
       </div>
       <div className="tp-tile__body">
         <p className="tp-tile__meta">
+          {event.promotion && <PromotedBadge sponsorName={event.promotion.sponsorName} />}
           <span className="tp-tag">{CATEGORY_LABELS[event.category]}</span>
           <span className="tp-tag tp-tag--soft">{event.interest}</span>
           {joined && <span className="tp-tag tp-tag--joined">You're going</span>}
@@ -42,6 +44,7 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
       <div className="tp-tile__more">
         <p><span>Where</span> {event.locationName}, {event.area}</p>
         <p><span>Host</span> {event.hostName}</p>
+        {event.promotion && <p><span>Promoted by</span> {event.promotion.sponsorName} (paid placement)</p>}
       </div>
     </article>
   );
