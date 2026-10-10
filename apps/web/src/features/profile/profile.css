@@ -236,6 +236,35 @@
 .tp-steps li::before { content: counter(step, decimal-leading-zero) "  "; font-variant-numeric: tabular-nums; }
 .tp-person { border-radius: 1.5rem; }
 
+/* Category colours, icon badges and map markers */
+.tp {
+  --tp-cat-sport: #ff7461;
+  --tp-cat-social: #8fa8ea;
+  --tp-cat-music: #eba8d3;
+  --tp-cat-food: #f5c55b;
+  --tp-cat-other: #a6d9c4;
+}
+.tp-ico { --ico: var(--tp-cat-other); flex: none; display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--ico); color: #17201d; }
+.tp-ico svg { width: 62%; height: 62%; display: block; }
+.tp-ico[data-category="sport"] { --ico: var(--tp-cat-sport); }
+.tp-ico[data-category="social"] { --ico: var(--tp-cat-social); }
+.tp-ico[data-category="music"] { --ico: var(--tp-cat-music); }
+.tp-ico[data-category="food"] { --ico: var(--tp-cat-food); }
+
+.tp-chip > span { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.95rem 0.35rem 0.4rem; }
+.tp-chip input:checked + span { background: #17201d; border-color: #17201d; color: #fff; }
+.tp-chip:hover > span { border-color: #17201d; }
+.tp-tags li { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0.7rem 0.2rem 0.25rem; }
+.tp-tags .tp-ico { width: 1.4rem; height: 1.4rem; }
+.tp-event h3 { display: flex; align-items: center; gap: 0.5rem; }
+.tp-event h3 .tp-ico { width: 1.6rem; height: 1.6rem; }
+.tp-event-past .tp-ico { filter: saturate(0.55); }
+
+.tp .tp-pins { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.tp-pin { position: absolute; transform: translate(-50%, -100%); filter: drop-shadow(0 6px 6px rgba(23, 32, 29, 0.28)); }
+.tp-pin .tp-ico { width: 2.9rem; height: 2.9rem; border: 3px solid #fff; position: relative; z-index: 1; }
+.tp-pin::after { content: ""; position: absolute; left: 50%; bottom: -0.42rem; width: 0.95rem; height: 0.95rem; background: #fff; transform: translateX(-50%) rotate(45deg); border-radius: 0.15rem; }
+
 @media (max-width: 860px) {
   .tp-profile-grid { grid-template-columns: minmax(0, 1fr); }
   .tp-sticky { position: static; }
@@ -245,6 +274,9 @@
   .tp-map { position: relative; height: 11rem; border-radius: 1.4rem; overflow: hidden; z-index: 0; }
   .tp-map::after { display: none; }
   .tp-map-label { right: 0.75rem; bottom: 0.75rem; }
+  .tp-pin .tp-ico { width: 2.1rem; height: 2.1rem; border-width: 2px; }
+  .tp-pin::after { width: 0.7rem; height: 0.7rem; bottom: -0.3rem; }
+  .tp-pin:nth-child(n + 5) { display: none; }
   .tp-hero-card { max-width: none; }
   .tp-panel { padding: 1.1rem; border-radius: 1rem; }
   .tp-panel-narrow { padding: 1.25rem; }

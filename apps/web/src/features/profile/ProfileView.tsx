@@ -40,7 +40,7 @@ export function ProfileView() {
   return (
     <section className="tp tp-profile" aria-labelledby="tp-profile-heading">
       <header className="tp-hero">
-        <AreaMap label={profile.areaId ? `${areaName(profile.areaId)} area` : "No area yet"} radiusKm={profile.radiusKm} />
+        <AreaMap label={profile.areaId ? `${areaName(profile.areaId)} area` : "No area yet"} radiusKm={profile.radiusKm} interests={profile.interests} />
         <div className="tp-hero-copy">
           <h1 id="tp-profile-heading" className="tp-title tp-title-big">Seen around, never pinned down.</h1>
           <p className="tp-lede">This is your profile. People see your area, your interests and how trusted you are. Nothing more.</p>

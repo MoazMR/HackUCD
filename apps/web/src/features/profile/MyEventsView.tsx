@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { InterestBadge } from "../preferences/InterestIcon";
 import { useProfile } from "./ProfileStore";
 import { sampleMyEvents } from "./sampleData";
 import type { MyEvent } from "./types";
@@ -127,7 +128,7 @@ function EventSummary({ event }: { event: MyEvent }) {
       </time>
       <div>
         <p className="tp-when">{relativeDay(date)}</p>
-        <h3>{event.title}</h3>
+        <h3>{event.interestId && <InterestBadge id={event.interestId} />}{event.title}</h3>
         <p className="tp-muted">{when.format(date)}, {event.locationName}</p>
         <p className="tp-event-meta">
           <span className="tp-role" data-role={event.role}>{date.getTime() < Date.now()

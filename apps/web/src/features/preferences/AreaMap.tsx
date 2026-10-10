@@ -1,16 +1,22 @@
+import { InterestBadge } from "./InterestIcon";
 import { MAX_RADIUS_KM, MIN_RADIUS_KM } from "./areas";
+import { interestLabel } from "./interests";
+
+/** Fixed spots for decorative markers, as percentages of the map. */
+const MARKER_SPOTS = [[58, 26], [84, 58], [47, 66], [78, 20], [66, 80], [92, 34]];
 
 /**
  * A wide, stylised map band. It is an illustration, not a real map: the shaded
  * patch stands for the public area and the dashed ring grows with the travel radius.
- * There is deliberately no pin.
+ * Markers stand for the kinds of events the person follows. No marker ever
+ * stands for the person: their own position is never drawn.
  */
-export function AreaMap({ label, radiusKm }: { label: string; radiusKm: number }) {
+export function AreaMap({ label, radiusKm, interests = [] }: { label: string; radiusKm: number; interests?: string[] }) {
   const ring = 52 + ((radiusKm - MIN_RADIUS_KM) / (MAX_RADIUS_KM - MIN_RADIUS_KM)) * 150;
   return (
     <div className="tp-map">
       <svg viewBox="0 0 800 360" preserveAspectRatio="xMidYMid slice" role="img"
-        aria-label={`Illustrated map. Others see "${label}" as a shaded area, never a pin. Travel radius ${radiusKm} kilometres.`}>
+        aria-label={`Illustrated map. Others see "${label}" as a shaded area, never as a marker. Travel radius ${radiusKm} kilometres.`}>
         <rect width="800" height="360" className="tp-map-land" />
         <path className="tp-map-park" d="M610 30 q70 -20 110 30 q30 50 -20 90 q-60 30 -110 -10 q-30 -60 20 -110z" />
         <path className="tp-map-park" d="M70 230 q50 -30 100 0 q30 40 0 80 q-60 30 -110 0 q-20 -50 10 -80z" />
@@ -26,6 +32,14 @@ export function AreaMap({ label, radiusKm }: { label: string; radiusKm: number }
         <circle className="tp-ring" cx="560" cy="170" r={ring} />
         <circle className="tp-blob" cx="560" cy="170" r="46" />
       </svg>
+      <ul className="tp-pins" aria-label="Kinds of events you follow">
+        {interests.slice(0, MARKER_SPOTS.length).map((id, index) => (
+          <li key={id} className="tp-pin" style={{ left: `${MARKER_SPOTS[index][0]}%`, top: `${MARKER_SPOTS[index][1]}%` }}>
+            <InterestBadge id={id} />
+            <span className="tp-visually-hidden">{interestLabel(id)}</span>
+          </li>
+        ))}
+      </ul>
       <p className="tp-map-label"><strong>{label}</strong><span>{radiusKm} km travel radius</span></p>
     </div>
   );

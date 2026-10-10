@@ -48,6 +48,8 @@ export type MyEvent = {
   startsAt: string;
   locationName: string;
   role: MyEventRole;
+  /** Interest id used for the event's icon (see preferences/interests). */
+  interestId?: string;
   attendeeCount: number;
   /** Other people who were there. Only filled for past events. */
   attendees: Attendee[];
