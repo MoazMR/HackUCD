@@ -48,3 +48,6 @@
 .tp-iconbtn--photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 @media (prefers-reduced-motion: reduce) { .tp-iconbtn { transition: none; } .tp-iconbtn:hover { transform: none; } }
+
+/* When the pinned icon bar is on the page, sticky panels (e.g. the map preview) sit below it */
+:root:has(.tp-topbar) { --tp-sticky-offset: 5.5rem; }
