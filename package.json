@@ -1,0 +1,15 @@
+{
+  "name": "social-outings",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace @social-outings/web\" \"npm run dev --workspace @social-outings/api\"",
+    "build": "npm run build --workspace @social-outings/web && npm run build --workspace @social-outings/api",
+    "start": "npm run start --workspace @social-outings/api",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
