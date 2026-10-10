@@ -386,31 +386,31 @@
 .pf-scribble svg, .pf-map-note svg { width: 2.2rem; height: auto; fill: none; stroke: var(--pf-yellow); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .pf-scribble { margin-left: 0.4rem; }
 
-/* Charcoal hero with a night map, as the logo sits on charcoal */
-.pf-hero { background: var(--pf-charcoal); border: var(--line); border-radius: 2.25rem; box-shadow: 7px 8px 0 var(--pf-plum); color: var(--pf-cream); }
-.pf-hero .pf-title, .pf-hero .pf-lede, .pf-hero .pf-motto, .pf-hero .pf-scribble { color: var(--pf-cream); }
-.pf-hero .pf-accent { color: var(--pf-yellow); }
-.pf-hero .pf-lede { opacity: 0.86; }
-.pf-map-land { fill: #1b2222; }
-.pf-map-blocks rect { fill: #222b2b; }
-.pf-map-park { fill: #20382b; }
-.pf-map-water { stroke: #0b3f96; }
-.pf-map-minor path { stroke: #2c3838; }
-.pf-map-main-casing path { stroke: #141a1a; }
-.pf-map-main path { stroke: #364444; }
-.pf-map-avenue-casing path { stroke: #141a1a; }
-.pf-map-avenue path { stroke: #5a4a1c; }
-.pf-map::after { background: linear-gradient(90deg, #1b2222 0%, rgba(27, 34, 34, 0.95) 36%, rgba(27, 34, 34, 0) 60%); }
-.pf-map .pf-ring { stroke: var(--pf-cream); fill: rgba(252, 234, 207, 0.06); stroke-width: 2.5; }
-.pf-map .pf-blob { fill: rgba(251, 196, 47, 0.55); filter: blur(16px); }
-.pf .pf-map-place { font-family: var(--pf-display); font-weight: 400; font-size: clamp(1.3rem, 2.8vw, 2.2rem); color: var(--pf-cream); text-shadow: 0 2px 0 var(--pf-plum), 0 0 10px #1b2222; }
-.pf .pf-map-note { position: absolute; left: 52%; top: 6%; z-index: 1; color: var(--pf-cream); text-shadow: 0 0 6px #1b2222; }
-.pf-map-label { background: var(--pf-cream); color: var(--pf-plum); border: var(--line); box-shadow: 3px 4px 0 var(--pf-plum); }
+/* Pastel green hero and map */
+.pf-hero { background: #d9f1e4; border: var(--line); border-radius: 2.25rem; box-shadow: 7px 8px 0 var(--pf-plum); color: var(--pf-plum); }
+.pf-hero .pf-title, .pf-hero .pf-lede, .pf-hero .pf-motto, .pf-hero .pf-scribble { color: var(--pf-plum); }
+.pf-hero .pf-accent { color: var(--pf-blue); }
+.pf-map-land { fill: #d9f1e4; }
+.pf-map-blocks rect { fill: #cdebd9; }
+.pf-map-park { fill: #aedfc0; }
+.pf-map-water { stroke: #a9d8ee; }
+.pf-map-minor path { stroke: #ffffff; }
+.pf-map-main-casing path { stroke: #bfe3cf; }
+.pf-map-main path { stroke: #ffffff; }
+.pf-map-avenue-casing path { stroke: #f0d58a; }
+.pf-map-avenue path { stroke: #fdeebd; }
+.pf-map::after { background: linear-gradient(90deg, #d9f1e4 0%, rgba(217, 241, 228, 0.96) 36%, rgba(217, 241, 228, 0) 60%); }
+.pf-map .pf-ring { stroke: var(--pf-plum); fill: rgba(62, 7, 45, 0.05); stroke-width: 2.5; }
+.pf-map .pf-blob { fill: rgba(10, 93, 224, 0.32); filter: blur(16px); }
+.pf .pf-map-place { font-family: var(--pf-display); font-weight: 400; font-size: clamp(1.3rem, 2.8vw, 2.2rem); color: var(--pf-plum); text-shadow: 0 0 8px #d9f1e4, 0 0 3px #d9f1e4; }
+.pf .pf-map-note { position: absolute; left: 52%; top: 6%; z-index: 1; color: var(--pf-plum); text-shadow: 0 0 6px #d9f1e4, 0 0 3px #d9f1e4; }
+.pf-scribble svg, .pf-map-note svg { stroke: var(--pf-red); }
+.pf-map-label { background: #fff6e8; color: var(--pf-plum); border: var(--line); box-shadow: 3px 4px 0 var(--pf-plum); }
 .pf-map-label span { color: var(--pf-plum); opacity: 0.75; }
-.pf-area-drawing svg { background: #1b2222; }
-.pf-area-drawing .pf-streets path { stroke: #364444; }
-.pf-area-drawing .pf-ring { stroke: var(--pf-cream); }
-.pf-area-drawing .pf-blob { fill: rgba(251, 196, 47, 0.6); }
+.pf-area-drawing svg { background: #d9f1e4; }
+.pf-area-drawing .pf-streets path { stroke: #ffffff; }
+.pf-area-drawing .pf-ring { stroke: var(--pf-plum); }
+.pf-area-drawing .pf-blob { fill: rgba(10, 93, 224, 0.4); }
 .pf-hero-card .pf-public { background: #fff6e8; color: var(--pf-plum); border: var(--line); box-shadow: 6px 7px 0 var(--pf-red); border-radius: 1.5rem; transform: rotate(-1.5deg); }
 .pf-public-head h3 { font-size: 1.45rem; }
 
@@ -419,9 +419,9 @@
 .pf-ico[data-category="food"], .pf-ico[data-category="other"], .pf-ico:not([data-category]) { --ico-fg: var(--pf-plum); }
 .pf-ico svg { stroke-width: 2.5; width: 62%; height: 62%; }
 .pf-pin { filter: none; }
-.pf-pin .pf-ico { border: 2.5px solid var(--pf-plum); box-shadow: 0 0 0 3px var(--pf-cream), 4px 6px 0 3px rgba(0, 0, 0, 0.45); }
+.pf-pin .pf-ico { border: 2.5px solid var(--pf-plum); box-shadow: 0 0 0 3px #fff6e8, 4px 6px 0 3px rgba(62, 7, 45, 0.3); }
 .pf-pin::after { display: none; }
-.pf-pin-label { color: var(--pf-cream); font-weight: 800; text-shadow: 0 1px 0 #1b2222, 0 0 6px #1b2222, 0 0 3px #1b2222; top: calc(100% + 0.5rem); }
+.pf-pin-label { color: var(--pf-plum); font-weight: 800; text-shadow: 0 0 4px #fff, 0 0 3px #fff, 0 0 2px #fff; top: calc(100% + 0.5rem); }
 
 /* Blocks, fields and buttons */
 .pf-panel { border: var(--line); border-radius: 1.9rem; }
@@ -433,7 +433,7 @@
 .pf ::placeholder { color: #8a6f82; }
 .pf [aria-invalid="true"] { border-color: var(--pf-red) !important; }
 .pf :focus-visible { outline: 3px solid var(--pf-blue); outline-offset: 3px; }
-.pf-hero :focus-visible { outline-color: var(--pf-yellow); }
+
 .pf input[type="range"], .pf-check input { accent-color: var(--pf-blue); }
 .pf-error { color: #c4200e; }
 
