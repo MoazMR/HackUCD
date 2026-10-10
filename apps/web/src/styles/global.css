@@ -2,7 +2,10 @@
 * { box-sizing: border-box; }
 body { margin: 0; }
 .page-shell { width: min(1120px, calc(100% - 2rem)); margin: auto; }
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 0; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 0; position: sticky; top: 0; z-index: 40; background: rgba(255, 246, 232, .94); backdrop-filter: blur(8px); }
+/* The bar stays pinned, so sticky panels (such as the map preview) sit below it */
+:root:has(.topbar) { --tp-sticky-offset: 6rem; }
+html { scroll-padding-top: 6rem; }
 .brand { background: none; border: 0; box-shadow: none; color: #3e072d; font-size: 1.35rem; font-weight: 800; padding: 0; border-radius: .5rem; }
 .brand:hover { background: none; }
 .brand-logo { display: block; width: 5.75rem; height: auto; }
@@ -75,3 +78,16 @@ button { background: #0a5de0; border: 2.5px solid #3e072d; border-radius: 999px;
 
 /* Demo tab: the pitch deck, shown full width inside the app */
 .demo-frame { display: block; width: 100%; height: calc(100vh - 11rem); min-height: 520px; border: 2.5px solid #3e072d; border-radius: 1.9rem; box-shadow: 6px 7px 0 #3e072d; background: #fff6e8; }
+
+/* Phones: keep the pinned top bar short (logo row + one scrollable row of buttons) */
+@media (max-width: 700px) {
+  .topbar { flex-wrap: wrap; gap: .3rem; padding: .45rem 0; }
+  .brand-logo { width: 3.4rem; }
+  .topbar-actions { flex: 1 1 100%; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; gap: .35rem; padding: .15rem .15rem .45rem; scrollbar-width: none; }
+  .topbar-actions::-webkit-scrollbar { display: none; }
+  .topbar .nav-link, a.create-action { font-size: .85rem; padding: .4rem .75rem; flex: 0 0 auto; }
+  a.create-action { order: -2; }
+  .topbar .nav-pill { order: -1; }
+  :root:has(.topbar) { --tp-sticky-offset: 1rem; }
+  html { scroll-padding-top: 6rem; }
+}
