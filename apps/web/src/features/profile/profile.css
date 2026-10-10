@@ -71,7 +71,7 @@
 .tp-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .tp-chip { position: relative; }
 .tp-chip input { position: absolute; z-index: 1; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
-.tp-chip span { display: block; padding: 0.5rem 0.95rem; border-radius: 999px; border: 1.5px solid #b9c4bc; background: #fff; font-weight: 550; }
+.tp-chip > span { display: block; padding: 0.5rem 0.95rem; border-radius: 999px; border: 1.5px solid #b9c4bc; background: #fff; font-weight: 550; }
 .tp-chip input:checked + span { background: var(--tp-green); border-color: var(--tp-green); color: #fff; }
 .tp-chip input:focus-visible + span { outline: 3px solid var(--tp-teal); outline-offset: 2px; }
 .tp-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
@@ -201,11 +201,51 @@
 
 .topbar nav a[aria-current="page"] { font-weight: 750; color: #145a43; }
 
+/* Editorial scale, map header and status labels */
+.tp .tp-title-big { font-size: clamp(2.6rem, 6.2vw, 4.6rem); line-height: 0.96; letter-spacing: -0.045em; font-weight: 800; max-width: 14ch; }
+.tp-page-head .tp-lede, .tp-hero .tp-lede { font-size: 1.15rem; max-width: 46ch; }
+.tp-tagline { font-size: 0.85rem; font-weight: 700; color: var(--tp-green-deep); }
+
+.tp-hero { position: relative; border-radius: 2rem; overflow: hidden; margin: 0.5rem 0 1.25rem; padding: clamp(1.5rem, 4vw, 3rem); display: grid; gap: 1.5rem; align-content: space-between; min-height: 30rem; isolation: isolate; }
+.tp-map { position: absolute; inset: 0; z-index: -1; }
+.tp-map svg { width: 100%; height: 100%; display: block; }
+.tp-map::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #eef3ec 0%, rgba(238, 243, 236, 0.94) 34%, rgba(238, 243, 236, 0) 62%); }
+.tp-map-land { fill: #eef3ec; }
+.tp-map-park { fill: #cfe6d3; }
+.tp-map-water { fill: none; stroke: #b9dfe3; stroke-width: 26; stroke-linecap: round; }
+.tp-map-streets path { fill: none; stroke: #fff; stroke-width: 13; stroke-linecap: round; }
+.tp-map-lanes path { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; opacity: 0.85; }
+.tp-map .tp-blob { filter: blur(11px); }
+.tp-map-label { position: absolute; right: 1.25rem; bottom: 1.25rem; z-index: 1; background: #fff; border-radius: 999px; padding: 0.5rem 1rem; display: flex; gap: 0.6rem; align-items: baseline; font-size: 0.9rem; box-shadow: 0 8px 20px -14px rgba(13, 65, 48, 0.6); }
+.tp-map-label span { color: var(--tp-muted); }
+.tp-hero-copy { display: grid; gap: 0.9rem; max-width: 34rem; }
+.tp-hero-card { display: grid; gap: 0.5rem; max-width: 24rem; }
+.tp-hero-card .tp-public { box-shadow: 0 18px 40px -22px rgba(13, 65, 48, 0.55); border-radius: 1.4rem; padding: 1.35rem; }
+
+.tp-panel { border-radius: 1.6rem; }
+.tp-chip > span { padding: 0.55rem 1rem; }
+.tp-area[data-plain] { grid-template-columns: minmax(0, 1fr); }
+.tp .tp-button-link { background: transparent; border-color: transparent; color: var(--tp-ink); padding-inline: 0.5rem; }
+.tp .tp-button-link:hover { background: transparent; border-color: transparent; text-decoration: underline; text-underline-offset: 4px; }
+.tp .tp-when { font-size: 0.8rem; font-weight: 750; color: var(--tp-teal); margin-bottom: 0.1rem; }
+.tp-event-past .tp-when { color: var(--tp-muted); }
+.tp-event { border-radius: 1.5rem; padding: 1.15rem 1.35rem; }
+.tp-event h3 { font-size: 1.2rem; letter-spacing: -0.015em; }
+.tp-date { border-radius: 1.1rem; width: 4rem; padding: 0.55rem 0; }
+.tp-myevents h2 { font-size: 1.6rem; letter-spacing: -0.025em; }
+.tp-steps li::before { content: counter(step, decimal-leading-zero) "  "; font-variant-numeric: tabular-nums; }
+.tp-person { border-radius: 1.5rem; }
+
 @media (max-width: 860px) {
   .tp-profile-grid { grid-template-columns: minmax(0, 1fr); }
-  .tp-sticky { position: static; grid-row: 1; }
+  .tp-sticky { position: static; }
 }
 @media (max-width: 620px) {
+  .tp-hero { padding: 0; min-height: 0; overflow: visible; border-radius: 0; gap: 1.1rem; }
+  .tp-map { position: relative; height: 11rem; border-radius: 1.4rem; overflow: hidden; z-index: 0; }
+  .tp-map::after { display: none; }
+  .tp-map-label { right: 0.75rem; bottom: 0.75rem; }
+  .tp-hero-card { max-width: none; }
   .tp-panel { padding: 1.1rem; border-radius: 1rem; }
   .tp-panel-narrow { padding: 1.25rem; }
   .tp-area { grid-template-columns: minmax(0, 1fr); }

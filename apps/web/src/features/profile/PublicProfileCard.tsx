@@ -1,4 +1,4 @@
-import { interestLabel } from "../preferences/interests";
+import { interestEmoji, interestLabel } from "../preferences/interests";
 import { Avatar } from "./Avatar";
 import type { PublicProfile } from "./types";
 
@@ -22,7 +22,7 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
         <p className="tp-muted">{[profile.ageRange && `Age ${profile.ageRange}`, profile.gender].filter(Boolean).join(", ")}</p>
       )}
       {profile.interests.length > 0
-        ? <ul className="tp-tags">{profile.interests.map((id) => <li key={id}>{interestLabel(id)}</li>)}</ul>
+        ? <ul className="tp-tags">{profile.interests.map((id) => <li key={id}><span aria-hidden="true">{interestEmoji(id)}</span> {interestLabel(id)}</li>)}</ul>
         : <p className="tp-muted">No interests added yet.</p>}
       {profile.pastEvents && (
         <div className="tp-public-history">

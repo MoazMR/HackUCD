@@ -32,7 +32,8 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
   return (
     <section className="tp tp-myevents" aria-labelledby="tp-myevents-heading">
       <header className="tp-page-head">
-        <h1 id="tp-myevents-heading" className="tp-title">My Events</h1>
+        <h1 id="tp-myevents-heading" className="tp-title tp-title-big">{headline(upcoming.length)}</h1>
+        <p className="tp-lede">My Events keeps what you've joined or are hosting, and what you've already been to.</p>
         {!events && <p className="tp-sample">Sample events, until the events API is connected.</p>}
       </header>
 
@@ -50,7 +51,7 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
                 <EventSummary event={event} />
                 <div className="tp-event-actions">
                   <button type="button" className="tp-button" onClick={() => onOpenChat(event.id)}>Open group chat</button>
-                  <button type="button" className="tp-button tp-button-quiet" onClick={() => onOpenEvent(event.id)}>View event</button>
+                  <button type="button" className="tp-button tp-button-link" onClick={() => onOpenEvent(event.id)}>View event <span aria-hidden="true">↗</span></button>
                 </div>
               </li>
             ))}
@@ -100,6 +101,22 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
   );
 }
 
+function headline(count: number): string {
+  if (count === 0) return "Nothing planned. Yet.";
+  if (count === 1) return "One plan on the way.";
+  return `${count} plans on the way.`;
+}
+
+/** "Tomorrow", "In 5 days", "3 days ago". */
+function relativeDay(date: Date): string {
+  const startOfDay = (value: Date) => new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+  const days = Math.round((startOfDay(date) - startOfDay(new Date())) / 86400000);
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  if (days === -1) return "Yesterday";
+  return days > 0 ? `In ${days} days` : `${-days} days ago`;
+}
+
 function EventSummary({ event }: { event: MyEvent }) {
   const date = new Date(event.startsAt);
   return (
@@ -109,6 +126,7 @@ function EventSummary({ event }: { event: MyEvent }) {
         <strong>{date.getDate()}</strong>
       </time>
       <div>
+        <p className="tp-when">{relativeDay(date)}</p>
         <h3>{event.title}</h3>
         <p className="tp-muted">{when.format(date)}, {event.locationName}</p>
         <p className="tp-event-meta">

@@ -13,7 +13,7 @@ export function InterestPicker({ selected, onChange, legend = "Interests", error
         {INTERESTS.map((interest) => (
           <label className="tp-chip" key={interest.id}>
             <input type="checkbox" checked={selected.includes(interest.id)} onChange={() => toggle(interest.id)} />
-            <span>{interest.label}</span>
+            <span><span aria-hidden="true">{interest.emoji}</span> {interest.label}</span>
           </label>
         ))}
       </div>

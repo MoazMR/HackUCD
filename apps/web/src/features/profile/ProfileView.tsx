@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { checkDisplayName } from "../auth/ageValidation";
+import { AreaMap } from "../preferences/AreaMap";
 import { AreaRadiusPicker } from "../preferences/AreaRadiusPicker";
+import { areaName } from "../preferences/areas";
 import { InterestPicker } from "../preferences/InterestPicker";
 import { PhotoEditor } from "./Avatar";
 import { useProfile } from "./ProfileStore";
@@ -37,9 +39,16 @@ export function ProfileView() {
 
   return (
     <section className="tp tp-profile" aria-labelledby="tp-profile-heading">
-      <header className="tp-page-head">
-        <h1 id="tp-profile-heading" className="tp-title">Profile</h1>
-        <p className="tp-lede">Control what you share. The card shows your public profile exactly as others see it.</p>
+      <header className="tp-hero">
+        <AreaMap label={profile.areaId ? `${areaName(profile.areaId)} area` : "No area yet"} radiusKm={profile.radiusKm} />
+        <div className="tp-hero-copy">
+          <h1 id="tp-profile-heading" className="tp-title tp-title-big">Seen around, never pinned down.</h1>
+          <p className="tp-lede">This is your profile. People see your area, your interests and how trusted you are. Nothing more.</p>
+        </div>
+        <div className="tp-hero-card">
+          <p className="tp-tagline">What others see</p>
+          <PublicProfileCard profile={publicProfile} />
+        </div>
       </header>
       {storageProblem && (
         <p className="tp-banner" role="alert">This browser is blocking storage, so changes last only until you close this tab.</p>
@@ -80,6 +89,7 @@ export function ProfileView() {
             <h2 id="tp-where">Area and travel radius</h2>
             <p className="tp-callout">Only your approximate area is public. Your exact location is never stored or shown.</p>
             <AreaRadiusPicker areaId={profile.areaId} radiusKm={profile.radiusKm}
+              showDrawing={false}
               onAreaChange={(areaId) => { if (areaId) update({ areaId }); }} onRadiusChange={(radiusKm) => update({ radiusKm })} />
           </section>
 
@@ -108,11 +118,7 @@ export function ProfileView() {
           </section>
         </div>
 
-        <aside className="tp-stack tp-sticky" aria-label="How others see you">
-          <section className="tp-panel tp-panel-tint" aria-labelledby="tp-public-heading">
-            <h2 id="tp-public-heading">What others see</h2>
-            <PublicProfileCard profile={publicProfile} />
-          </section>
+        <aside className="tp-stack tp-sticky" aria-label="Trust">
           <section className="tp-panel" aria-labelledby="tp-trust">
             <h2 id="tp-trust">Trust score</h2>
             <div className="tp-score">
