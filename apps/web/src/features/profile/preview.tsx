@@ -9,6 +9,7 @@ import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "../../styles/global.css";
 import { Onboarding } from "../auth";
+import { Logo } from "./Logo";
 import { EndorsementScreen, MyEventsView, ProfileProvider, ProfileView, sampleMyEvents, useProfile } from "./index";
 
 function useHash(): [string, (next: string) => void] {
@@ -37,11 +38,11 @@ function Preview() {
   } else if (stub) {
     const event = events.find((item) => item.id === stub[1]);
     screen = (
-      <section className="tp">
-        <div className="tp-panel tp-panel-narrow">
-          <h1 className="tp-title">{stub[2] ? "Public group chat" : "Event details"}</h1>
+      <section className="pf">
+        <div className="pf-panel pf-panel-narrow">
+          <h1 className="pf-title">{stub[2] ? "Public group chat" : "Event details"}</h1>
           <p>{event?.title}. This screen belongs to the events feature (Kate). My Events hands over the event id <code>{stub[1]}</code>.</p>
-          <button type="button" className="tp-button" onClick={() => go("/my-events")}>Back to My Events</button>
+          <button type="button" className="pf-button" onClick={() => go("/my-events")}>Back to My Events</button>
         </div>
       </section>
     );
@@ -55,7 +56,7 @@ function Preview() {
   return (
     <main className="page-shell">
       <header className="topbar">
-        <a className="brand" href="#/profile">ThirdPlace</a>
+        <a className="brand pf-brand-link" href="#/profile"><Logo /></a>
         {profile.onboarded && <nav aria-label="Preview navigation">
           <a href="#/my-events" aria-current={route.startsWith("/my-events") ? "page" : undefined}>My Events</a>
           <a href="#/profile" aria-current={route === "/profile" ? "page" : undefined}>Profile</a>
