@@ -34,7 +34,10 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
 
   return (
     <div className="tp-mapview">
-      <div className="tp-mapwrap">
+      {/* The stage holds just the map and the preview panel. The panel is sticky, and a sticky
+          element stops at the bottom of its container, so keeping the list below (outside the
+          stage) makes the panel release exactly when the bottom of the map reaches it. */}
+      <div className="tp-mapstage">
         <div className="tp-map" style={{ aspectRatio: `${MAP_WIDTH} / ${MAP_HEIGHT}` }}>
           <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} role="img" aria-label={`Illustrative map of your area with ${hotspots.length} event hotspots within ${filters.radiusKm} kilometres. The same events are listed below the map.`} preserveAspectRatio="xMidYMid slice">
             <rect width={MAP_WIDTH} height={MAP_HEIGHT} className="tp-map__land" />
@@ -65,8 +68,6 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
             </button>
           ))}
         </div>
-        <p className="tp-map__caption">Illustrative map · circle shows your {filters.radiusKm} km travel radius · only neighbourhoods are shown, never exact addresses.</p>
-      </div>
 
       <aside className="tp-preview" aria-live="polite">
         {selected ? (
@@ -93,6 +94,9 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
           </div>
         )}
       </aside>
+      </div>
+
+      <p className="tp-map__caption">Illustrative map · circle shows your {filters.radiusKm} km travel radius · only neighbourhoods are shown, never exact addresses.</p>
 
       <section className="tp-maplist" aria-labelledby="maplist-title">
         <h3 id="maplist-title">All events on the map <span className="tp-muted">(list view)</span></h3>
