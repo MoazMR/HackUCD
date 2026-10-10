@@ -55,24 +55,39 @@ test("event planner rejects invalid boundary input", async () => {
 });
 
 test("ordinary-user event creation is durable in the API catalogue and owned by the demo user", async () => {
-  const payload = { title: "API poker social", description: "A welcoming low-stakes poker table for beginners.", startsAt: "2026-11-05T19:00:00.000Z", locationName: "Smithfield Games Room", category: "social", interest: "poker", area: "Smithfield", latitude: 53.3498, longitude: -6.2778, capacity: 10, priceEur: 5, hostName: "Dara L." };
+  const payload = { title: "API poker social", description: "A welcoming low-stakes poker table for beginners.", startsAt: new Date(Date.now() + 5 * 86400000).toISOString(), locationName: "Smithfield Games Room", category: "social", interest: "poker", area: "Smithfield", latitude: 53.3498, longitude: -6.2778, capacity: 10, priceEur: 5, hostName: "Dara L." };
   const created = await fetch(`${baseUrl}/events`, { method: "POST", headers: { "Content-Type": "application/json", "x-user-id": "demo-user" }, body: JSON.stringify(payload) });
   assert.equal(created.status, 201);
   const event = (await created.json()).event;
-  assert.equal(event.hostId, "demo-user");
-  const mine = await fetch(`${baseUrl}/business/my-events`);
-  assert.ok((await mine.json()).events.some((item) => item.id === event.id));
+  assert.equal('hostId' in event, false);
+  assert.equal('attendeeIds' in event, false);
+  const mine = await fetch(`${baseUrl}/events/mine`, { headers: { 'x-user-id': 'demo-user' } });
+  assert.equal(mine.status, 200);
+  assert.ok((await mine.json()).memberships.some((item) => item.event.id === event.id && item.role === 'hosting'));
+  const other = await fetch(`${baseUrl}/events/mine`, { headers: { 'x-user-id': 'another-demo-user' } });
+  assert.equal((await other.json()).memberships.some((item) => item.event.id === event.id), false);
   const invalid = await fetch(`${baseUrl}/events`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, startsAt: "2020-01-01", capacity: 1 }) });
   assert.equal(invalid.status, 422);
 });
 
-test("recommendations disclose sponsored scoring without bypassing relevance", async () => {
+test("recommendations do not present an unpaid seed as sponsored or bypass relevance", async () => {
+  const created = await fetch(`${baseUrl}/events`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': 'demo-user' },
+    body: JSON.stringify({ title: 'Free football meetup', description: 'A friendly local football session for all levels.', startsAt: new Date(Date.now() + 2 * 86400000).toISOString(), locationName: 'Public sports ground', category: 'sport', interest: 'football', area: 'Dublin city centre', latitude: 53.347, longitude: -6.26, capacity: 12, priceEur: 0, hostName: 'Demo host' })
+  });
+  assert.equal(created.status, 201);
+  const createdEvent = (await created.json()).event;
   const response = await fetch(`${baseUrl}/recommendations?userId=me`);
   assert.equal(response.status, 200);
   const recommendations = (await response.json()).recommendations;
-  const sponsored = recommendations.find((item) => item.event.id === "sunday-five-a-side");
-  assert.equal(sponsored.scoreBreakdown.sponsored, 15);
-  assert.match(sponsored.explanation, /Sponsored placement/);
+  const seeded = await fetch(`${baseUrl}/events/sunday-five-a-side`);
+  assert.equal(seeded.status, 200);
+  assert.equal((await seeded.json()).event.isPaidPromotion, false);
+  const ordinary = recommendations.find((item) => item.event.id === createdEvent.id);
+  assert.ok(ordinary);
+  assert.equal(ordinary.scoreBreakdown.sponsored, 0);
+  assert.doesNotMatch(ordinary.explanation, /Sponsored placement/);
+  assert.ok(recommendations.every((item) => !('attendeeIds' in item.event) && !('hostId' in item.event)));
   assert.equal(recommendations.some((item) => item.event.id === "coastal-knitting"), false);
 });
 
@@ -92,18 +107,26 @@ test("assistant has a safe synthetic fallback and supports the OpenClaw gateway 
   assert.equal(fallbackBody.provider, "synthetic");
   assert.ok(Array.isArray(fallbackBody.suggestedEventIds));
 
+  const created = await fetch(`${baseUrl}/events`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title: "Future gateway football", description: "A friendly local football session for all levels.", startsAt: new Date(Date.now() + 3 * 86400000).toISOString(), locationName: "Public sports ground", category: "sport", interest: "football", area: "Dublin city centre", latitude: 53.347, longitude: -6.26, capacity: 12, priceEur: 0, hostName: "Demo host" })
+  });
+  assert.equal(created.status, 201);
+  const eligibleEvent = (await created.json()).event;
+
   let request;
   const openClaw = await askAssistant([{ role: "user", content: "What suits me?" }], "me", "test-session", {
     openClawUrl: "http://openclaw.test:18789", openClawToken: "gateway-secret",
     fetchImpl: async (url, init) => {
       request = { url, init, body: JSON.parse(init.body) };
-      return new Response(JSON.stringify({ choices: [{ message: { content: "Try Sunday five-a-side; it matches football and is nearby." } }] }), { status: 200, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ intent: "recommend", eventIds: [eligibleEvent.id] }) } }] }), { status: 200, headers: { "Content-Type": "application/json" } });
     }
   });
   assert.equal(openClaw.provider, "openclaw");
   assert.equal(request.url, "http://openclaw.test:18789/v1/chat/completions");
   assert.equal(request.init.headers.Authorization, "Bearer gateway-secret");
   assert.equal(request.body.model, "openclaw/default");
+  assert.deepEqual(openClaw.suggestedEventIds, [eligibleEvent.id]);
   assert.equal(JSON.stringify(openClaw).includes("gateway-secret"), false);
 });
 

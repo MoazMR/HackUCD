@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PromotedBadge } from "../business/PromotedBadge";
 import { EventTile } from "../events/EventTile";
-import { AREAS, MAP_HEIGHT, MAP_PX_PER_KM, MAP_WIDTH, USER_ORIGIN, project } from "../events/geo";
+import { MAP_HEIGHT, MAP_PX_PER_KM, MAP_WIDTH, USER_ORIGIN, project } from "../events/geo";
 import type { DiscoveryFilters, RankedEvent } from "../events/types";
+import { buildHotspots, clusterHotspots } from "./mapHotspots";
 
 type Props = {
   ranked: RankedEvent[];
@@ -10,8 +11,6 @@ type Props = {
   filters: DiscoveryFilters;
   onReset: () => void;
 };
-
-type Hotspot = { area: string; x: number; y: number; items: RankedEvent[] };
 
 const pct = (value: number, total: number) => `${(value / total) * 100}%`;
 
@@ -21,17 +20,27 @@ const pct = (value: number, total: number) => `${(value / total) * 100}%`;
  * and the same events are always listed below as the accessible alternative.
  */
 export function MapView({ ranked, joined, filters, onReset }: Props) {
-  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedHotspotId, setSelectedHotspotId] = useState<string | null>(null);
 
-  const hotspots = useMemo<Hotspot[]>(() => {
-    return AREAS.map((area) => {
-      const items = ranked.filter((item) => item.event.area === area.name);
-      return { area: area.name, ...project(area.lat, area.lng), items };
-    }).filter((spot) => spot.items.length > 0);
-  }, [ranked]);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [renderedWidth, setRenderedWidth] = useState(MAP_WIDTH);
+  useLayoutEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const updateWidth = () => setRenderedWidth(map.getBoundingClientRect().width);
+    updateWidth();
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(updateWidth);
+      observer.observe(map);
+      return () => observer.disconnect();
+    }
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+  const hotspots = useMemo(() => clusterHotspots(buildHotspots(ranked), renderedWidth, MAP_WIDTH), [ranked, renderedWidth]);
 
   const me = project(USER_ORIGIN.lat, USER_ORIGIN.lng);
-  const selected = hotspots.find((spot) => spot.area === selectedArea) ?? null;
+  const selected = hotspots.find((spot) => spot.id === selectedHotspotId) ?? null;
 
   return (
     <div className="tp-mapview">
@@ -39,7 +48,7 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
           element stops at the bottom of its container, so keeping the list below (outside the
           stage) makes the panel release exactly when the bottom of the map reaches it. */}
       <div className="tp-mapstage">
-        <div className="tp-map" style={{ aspectRatio: `${MAP_WIDTH} / ${MAP_HEIGHT}` }}>
+        <div ref={mapRef} className="tp-map" style={{ aspectRatio: `${MAP_WIDTH} / ${MAP_HEIGHT}` }}>
           <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} role="img" aria-label={`Illustrative map of your area with ${hotspots.length} event hotspots within ${filters.radiusKm} kilometres. The same events are listed below the map.`} preserveAspectRatio="xMidYMid slice">
             <rect width={MAP_WIDTH} height={MAP_HEIGHT} className="tp-map__land" />
             <path className="tp-map__sea" d={`M ${MAP_WIDTH * 0.8} 0 C ${MAP_WIDTH * 0.74} ${MAP_HEIGHT * 0.3}, ${MAP_WIDTH * 0.9} ${MAP_HEIGHT * 0.5}, ${MAP_WIDTH * 0.78} ${MAP_HEIGHT} L ${MAP_WIDTH} ${MAP_HEIGHT} L ${MAP_WIDTH} 0 Z`} />
@@ -71,13 +80,13 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
             const promoted = spot.items.find((item) => item.event.promotion)?.event.promotion;
             return (
             <button
-              key={spot.area}
+              key={spot.id}
               type="button"
               className={`tp-hotspot${promoted ? " tp-hotspot--promoted" : ""}`}
-              aria-pressed={selectedArea === spot.area}
+              aria-pressed={selectedHotspotId === spot.id}
               aria-label={`${spot.area}: ${spot.items.length} ${spot.items.length === 1 ? "event" : "events"}${promoted ? ", includes a promoted event" : ""}`}
               style={{ left: pct(spot.x, MAP_WIDTH), top: pct(spot.y, MAP_HEIGHT) }}
-              onClick={() => setSelectedArea(selectedArea === spot.area ? null : spot.area)}
+              onClick={() => setSelectedHotspotId(selectedHotspotId === spot.id ? null : spot.id)}
             >
               {promoted && <span className="tp-hotspot__promo" aria-hidden="true"><PromotedBadge variant="pin" sponsorName={promoted.sponsorName} /></span>}
               <span className="tp-hotspot__count">{spot.items.length}</span>
@@ -92,7 +101,7 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
           <>
             <div className="tp-preview__head">
               <h3>{selected.area}</h3>
-              <button type="button" className="tp-btn tp-btn--ghost tp-btn--sm" onClick={() => setSelectedArea(null)}>Close</button>
+              <button type="button" className="tp-btn tp-btn--ghost tp-btn--sm" onClick={() => setSelectedHotspotId(null)}>Close</button>
             </div>
             <ul className="tp-list tp-list--stack">
               {selected.items.map((item) => (
@@ -114,7 +123,7 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
       </aside>
       </div>
 
-      <p className="tp-map__caption">Illustrative map · circle shows your {filters.radiusKm} km travel radius · only neighbourhoods are shown, never exact addresses.</p>
+      <p className="tp-map__caption">Illustrative map · circle shows your {filters.radiusKm} km travel radius · nearby points share a hotspot · only neighbourhoods are shown, never exact addresses.</p>
 
       <section className="tp-maplist" aria-labelledby="maplist-title">
         <h3 id="maplist-title">All events on the map <span className="tp-muted">(list view)</span></h3>

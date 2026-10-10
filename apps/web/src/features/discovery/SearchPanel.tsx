@@ -120,7 +120,7 @@ export function SearchPanel({ filters, onChange, onClear, onClose, resultCount }
             <div className="tp-field">
               <label htmlFor={`${uid}-radius`}>Travel radius</label>
               <select id={`${uid}-radius`} value={filters.radiusKm} onChange={(event) => set("radiusKm", Number(event.target.value))}>
-                {RADIUS_OPTIONS_KM.map((km) => <option key={km} value={km}>within {km} km</option>)}
+                {[...new Set<number>([...RADIUS_OPTIONS_KM, filters.radiusKm])].sort((a, b) => a - b).map((km) => <option key={km} value={km}>within {km} km</option>)}
               </select>
             </div>
             <button type="button" className="tp-chip tp-chip--toggle" aria-pressed={filters.freeOnly} onClick={() => set("freeOnly", !filters.freeOnly)}>

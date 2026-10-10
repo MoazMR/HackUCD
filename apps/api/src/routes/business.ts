@@ -26,11 +26,12 @@ businessRouter.post("/events", (request, response) => {
   return response.status(201).json({ event: createBusinessEvent(request.body) });
 });
 
-/** Events the demo user hosts (placeholder until events carry a creator id). */
-businessRouter.get("/my-events", (_request, response) => {
+/** Prototype identity matches ordinary-user event creation; production requires authentication. */
+businessRouter.get("/my-events", (request, response) => {
+  const userId = request.header("x-user-id")?.trim().slice(0, 80) || undefined;
   const promotedIds = new Set(listActivePromotions().map((promotion) => promotion.eventId));
   response.json({
-    events: listDemoUserEvents().map((event) => ({ ...event, promoted: promotedIds.has(event.id) }))
+    events: listDemoUserEvents(userId).map((event) => ({ ...event, promoted: promotedIds.has(event.id) }))
   });
 });
 

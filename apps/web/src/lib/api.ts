@@ -1,4 +1,4 @@
-import type { ApiProfile, AssistantMessage, AssistantResponse, EventPlanRequest, EventPlanResponse, EventRecommendation, EventRecord } from "@social-outings/shared";
+import type { ApiProfile, AssistantMessage, AssistantResponse, EventPlanRequest, EventPlanResponse, EventRecommendation, PublicEventRecord } from "@social-outings/shared";
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, { ...init, headers: { "Content-Type": "application/json", ...init?.headers } });
@@ -8,10 +8,10 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  listEvents: () => requestJson<{ events: EventRecord[] }>("/api/events"),
+  listEvents: () => requestJson<{ events: PublicEventRecord[] }>("/api/events"),
   recommendations: (userId = "me") => requestJson<{ recommendations: EventRecommendation[]; appliedRadiusKm: number }>(`/api/recommendations?userId=${encodeURIComponent(userId)}`),
   profile: (userId = "me") => requestJson<{ profile: ApiProfile }>(`/api/profiles/${encodeURIComponent(userId)}`),
-  updatePreferences: (interests: string[], travelRadiusKm: number, userId = "me") => requestJson<{ profile: ApiProfile }>(`/api/profiles/${encodeURIComponent(userId)}/preferences`, { method: "PUT", body: JSON.stringify({ interests, travelRadiusKm }) }),
+  updatePreferences: (interests: string[], travelRadiusKm: number, userId = "me", area?: string) => requestJson<{ profile: ApiProfile }>(`/api/profiles/${encodeURIComponent(userId)}/preferences`, { method: "PUT", body: JSON.stringify({ interests, travelRadiusKm, area }) }),
   planEvent: (input: EventPlanRequest) => requestJson<EventPlanResponse>("/api/event-plans", { method: "POST", body: JSON.stringify(input) }),
   askAssistant: (messages: AssistantMessage[], conversationId: string, userId = "me") => requestJson<AssistantResponse>("/api/assistant", { method: "POST", body: JSON.stringify({ messages, conversationId, userId }) })
 };

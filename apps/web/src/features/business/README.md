@@ -1,80 +1,103 @@
-# Business portal, promotions and Stripe sandbox (Cahal)
+# Business portal, promotions, and Stripe sandbox
 
-A separate business experience for publishing and promoting venue events. Browsing, joining and ordinary-user event creation stay free; businesses pay the displayed one-time price to publish and boost a venue event.
+Browsing, joining, and ordinary-user event creation are free. Promotion is optional for user-owned events. Business events are saved as drafts and stay unpublished until verified Stripe sandbox payment publishes and boosts them.
 
-- **Businesses** save a venue-event draft and buy a **Venue Boost** (€14.99 one-time, 7 days) to publish and promote it.
-- **Ordinary users** can optionally buy a **Community Boost** (€2.99 one-time, 3 days) for one of their own events.
-- Promoted events are labelled **Promoted** with the sponsor's name in the feed and on the map (`PromotedBadge`).
-- Payment uses **Stripe-hosted Checkout in sandbox (test) mode** via a server-side route. Live keys are refused.
+| Plan | Buyer | One-time price | Result |
+| --- | --- | --- | --- |
+| Venue Boost | Business owning the venue event | €14.99 | Publish and promote for seven days |
+| Community Boost | User owning a published event | €2.99 | Optional promotion for three days |
 
-Open the portal at <http://localhost:5173/src/features/business/portal.html> after `npm run dev`.
-It is a standalone page so it doesn't touch `App.tsx`; link or route it from the main app when the team integrates navigation.
+Both promotions end at the event start if that is sooner. The boost fee buys disclosed placement, not guaranteed attendees or an event admission ticket. Server-side plans define prices; the client sends a plan ID rather than a trusted amount.
 
-## Stripe sandbox setup
+Open <http://localhost:5173/src/features/business/portal.html> after `npm run dev`, or use **For businesses** in the main app. The portal is a separate Vite page included in `npm run build`; serve the whole `apps/web/dist` directory in production so Stripe returns reach the correct page.
 
-1. Create or sign in to a Stripe account and switch to **Test mode / Sandbox**. In *Developers → API keys*, copy the **secret key** (`sk_test_...`).
-   Hosted Checkout runs entirely server-side, so no publishable key is needed.
-2. Create `apps/api/.env` (git-ignored; never commit it):
+## Optional Stripe sandbox setup
+
+The portal loads without credentials and explains when checkout is unavailable. Never install live Stripe credentials; the API refuses live keys.
+
+1. In Stripe **Test mode / Sandbox**, copy a test secret key (`sk_test_...`). Hosted Checkout runs server-side and needs no browser publishable key.
+2. Copy `apps/api/.env.example` to git-ignored `apps/api/.env`. Set only the integrations you use:
 
    ```bash
    STRIPE_SECRET_KEY=sk_test_...
-   # Optional: only needed to test the webhook (see below)
+   # Required only for signed webhooks:
    STRIPE_WEBHOOK_SECRET=whsec_...
-   # Optional overrides
    WEB_BASE_URL=http://localhost:5173
    BUSINESS_PORTAL_PATH=/src/features/business/portal.html
    ```
 
-   `apps/api/.env.example` lists the same variables. The API loads `apps/api/.env` on start-up through `dotenv`.
-3. Restart `npm run dev`. The portal shows a yellow notice if the key is missing or isn't a test key.
-4. Pay with Stripe's test card `4242 4242 4242 4242`, any future expiry, any CVC, any name and postcode.
+   Leave unused provider settings blank. Never commit environment files or keys.
+3. Restart the API. Confirm `GET /api/payments/status` reports test-mode configuration.
+4. Use Stripe's test card `4242 4242 4242 4242`, a future expiry, and a test CVC/name/postcode. Never enter real payment-card data.
 
-### Webhook (optional)
-
-The success return already verifies payment by retrieving the Checkout Session server-side, so the demo works without a webhook. To also test the webhook:
+To exercise local webhooks:
 
 ```bash
 stripe login
 stripe listen --forward-to localhost:3001/api/payments/webhook
-# copy the whsec_... it prints into STRIPE_WEBHOOK_SECRET, restart the API
 ```
 
-Activation is idempotent: if the webhook and the success return both arrive, the promotion is activated once.
+Set the signing secret shown by Stripe CLI in `STRIPE_WEBHOOK_SECRET` and restart the API. Hosted webhook endpoints should listen to `checkout.session.completed` and `checkout.session.expired`.
 
-## How a payment flows
+A webhook is optional for a success-return demonstration because the API can retrieve and verify the Checkout Session server-side. A browser redirect or `checkout=success` query parameter alone never proves payment.
 
-1. Portal → `POST /api/payments/checkout` with `{ planId, eventId, buyer }`. The server validates the plan, buyer and event ownership, records a **pending mock order**, and creates a Checkout Session with the server-side price. The client never sends an amount.
-2. Browser goes to Stripe Checkout.
-3. **Success** → Stripe redirects to `portal.html?checkout=success&session_id=...` → `GET /api/payments/confirm` retrieves the session from Stripe, checks `payment_status`, amount and currency, marks the order **paid**, and activates the promotion.
-   **Cancel** → `portal.html?checkout=cancelled&order=...` → `POST /api/payments/cancel` marks the order **cancelled** and expires the unused session. Nothing is charged.
-4. `GET /api/promotions` now returns the promotion; the feed and map show the **Promoted** label.
+## Publication and payment lifecycle
 
-Events, mock orders, promotions and aggregate reach metrics use the API's durable prototype JSON boundary and survive an API restart. The file is git-ignored and contains no Stripe secret, payment-card details, mood text or identity documents.
+1. `POST /api/business/events` saves a draft in the unified catalogue. The management list includes it; public `GET /api/events`, details, and recommendations exclude it.
+2. `POST /api/payments/checkout` validates the plan, buyer, ownership, event start, and existing promotion, records a pending sandbox order, and creates an attached Stripe Checkout Session.
+3. Stripe hosts payment. The success return calls `GET /api/payments/confirm?session_id=...`; a signed webhook can independently confirm it.
+4. The server checks paid status, session/order association, amount, and currency. Only a verified matching payment marks the order paid, publishes a business event, and activates its promotion.
+5. The feed and map display **Promoted** and the sponsor name. User boosts use the same labelled promotion and scoring contract.
 
-## In the feed and map
+A cancelled checkout calls `POST /api/payments/cancel` and expires an unused pending session. Cancellation, expiry, or failure leaves a business event as a draft. An ordinary-user event stays published without that boost. Incorrect amount/currency or a mismatched session cannot activate promotion. Repeated webhooks and success returns are idempotent.
 
-Wired up in `features/business/promotedFeed.ts`, called from Kate's `events/eventsClient.ts`:
+If a cancel return arrives after Stripe has already taken a verified sandbox payment, the API reconciles the paid order instead. If cancellation cannot be verified, the API returns a retryable error and keeps the order pending rather than claiming it was cancelled.
 
-- A promoted event already in the feed gets a **Promoted** badge (`PromotedBadge`) on its card and on its map hotspot, with "Promoted by <sponsor> (paid placement)" in the card details.
-- A promoted business venue event is added to the feed at its neighbourhood (the portal's Area list is the feed's `AREAS`), with its interest, price and capacity from the portal form.
-- Ranking: interest matches first, then promoted, then nearest. Promotion never bypasses the radius, date, filter or interest rules, so a padel-only user never sees a promoted poker night.
-- Fails soft: if `/api/promotions` is down, the feed renders normally without labels.
+## Catalogue, ranking, and analytics
 
-`usePromotions` is still exported for any other view that needs the active list.
+The website loads the published API catalogue. User and business events use the same relevance and ranking rules: future start, selected radius, relevant interest/category, then transparent interest/category/distance scoring plus a small sponsored score. Explicit search/filter choices can relax relevance within the other filters. Promotion never bypasses time, radius, or category eligibility.
 
-## Known limits (prototype)
+Paid labels are backed by verified sandbox orders and active promotions. Unsupported paid flags on synthetic seeds are removed; sample events must not imply a real purchase. Public event responses and promotion snapshots omit attendee IDs and internal owner IDs and expose only approximate neighbourhood locations.
 
-- The portal is a separate Vite page, so it is served by `npm run dev` but not yet included in `vite build`. For deployment, add it as a build input or route it from the app shell.
-- A paid boost sets the shared event's `isPaidPromotion` flag (and clears it when the boost ends), so `/api/events?paid=true` includes both user and published business events.
+The analytics panel displays aggregate impressions, detail opens, joins, and direction taps. Impressions/detail opens are deduplicated per event per tab session, including React rerenders; direction taps count each action. The backend counts a promoted join only on a successful new attendance. It stores counters with optional paid-order attribution, never user identity, session IDs, or mood text. Cost-per-join uses corresponding paid campaign spending and joins during those campaigns; it is empty until an attributed join exists.
 
-- No production authentication: events now carry stable synthetic `hostId` ownership, while the browser still acts as demo user `demo-user`. Replace the demo identity boundary with real sessions before live payments.
-- Prototype JSON storage is single-process and not a substitute for a production database; no refunds; one active promotion per event.
+## Storage and prototype limits
 
-## Tests
+Profiles, events, sandbox orders, promotions, and aggregate analytics use the git-ignored `apps/api/.data/runtime.json` file and recover across API restarts when that file remains available. Set `THIRDPLACE_DATA_FILE=:memory:` for disposable runs, or an absolute path on a durable disk when hosting. Never commit runtime data, secrets, real payment-card data, mood text, identity documents, or private information.
+
+- Demo identity is synthetic (`demo-user`), not production authentication. Ownership checks operate within that demo boundary.
+- The business-management and order lists have no production access control.
+- Atomic JSON storage supports one API process; multiple instances require a transactional shared database.
+- Stripe remains sandbox-only; there are no refunds and at most one active promotion per event.
+- Aggregate counts do not prove unique people, reliable campaign attribution, or attendance.
+
+## Verification
+
+Run from the repository root with Node 24:
 
 ```bash
+git diff --check
 npm run typecheck
-cd apps/api && npx tsx scripts/payments-smoke.ts   # offline checks: normal, boundary and failure requests + signed webhook
+npm test
+npm run build
 ```
 
-Screenshots of each state are in `screenshots/`.
+`npm test` includes integration checks, persistence/restart checks, and the payment smoke test. The payment smoke uses mocked Stripe SDK checkout/create/retrieve/expire calls and real locally signed webhook fixtures; it is fully offline and needs no Stripe account or credentials. To run just that smoke test:
+
+```bash
+cd apps/api
+THIRDPLACE_DATA_FILE=:memory: npx tsx scripts/payments-smoke.ts
+```
+
+Tests bind temporary localhost ports and use disposable or isolated temporary files. They cover business draft privacy, payment publication, owner-only user boosts, cancellation/expiry, amount mismatch, replay, session verification, and API restart recovery. Automated provider fixtures do not establish live provider availability.
+
+For a configured manual sandbox demonstration:
+
+1. Save a future business draft; confirm it is absent from For You/Map and public `GET /api/events`.
+2. Cancel checkout; confirm the draft remains unpublished.
+3. Complete Stripe test Checkout; confirm the return shows a paid order and the event is published with the **Promoted** label.
+4. Create an ordinary-user event free from the main app; confirm it appears in My Events and can receive an optional Community Boost.
+5. Open the promoted event, join it, and use directions; check aggregate analytics without promising unique reach.
+6. Restart the API using the same durable file; confirm orders, publication, and active promotions recover.
+
+Existing screenshots are under `screenshots/`; capture current UI states when preparing a PR.

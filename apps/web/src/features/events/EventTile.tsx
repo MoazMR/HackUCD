@@ -2,7 +2,7 @@ import { PromotedBadge } from "../business/PromotedBadge";
 import { formatDay, formatPrice, formatTime, spotsLeft } from "./format";
 import { CATEGORY_LABELS, type RankedEvent } from "./types";
 import { useEffect } from "react";
-import { trackEvent } from "./eventsClient";
+import { trackEventOnce } from "./analytics";
 
 type Props = { ranked: RankedEvent; joined: boolean; compact?: boolean };
 
@@ -14,8 +14,8 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
   const full = left === 0;
 
   useEffect(() => {
-    if (event.promotion) trackEvent(event.id, "impression");
-  }, [event.id, event.promotion]);
+    if (event.promotion) trackEventOnce(event.id, "impression");
+  }, [event.id, Boolean(event.promotion)]);
 
   return (
     <article className={`tp-tile tp-tile--${event.category}${compact ? " tp-tile--compact" : ""}${event.promotion ? " tp-tile--promoted" : ""}`}>
@@ -37,6 +37,10 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
           </a>
         </h3>
         <p className="tp-tile__reason">{reason}</p>
+        <details className="tp-tile__score">
+          <summary>Why this event?</summary>
+          <p className="tp-muted">Score {ranked.score}: interest match {ranked.scoreBreakdown.interest}, category {ranked.scoreBreakdown.category}, distance {ranked.scoreBreakdown.distance}, sponsored placement {ranked.scoreBreakdown.sponsored}. Paid placement only affects ranking after relevance and radius checks.</p>
+        </details>
         <p className="tp-tile__time">{formatTime(event.startsAt)}</p>
         <p className="tp-tile__foot">
           <span className="tp-price">{formatPrice(event.priceEur)}</span>
@@ -50,7 +54,7 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
       <div className="tp-tile__more">
         <p><span>Where</span> {event.locationName}, {event.area}</p>
         <p><span>Host</span> {event.hostName}</p>
-        {event.promotion && <p><span>Promoted by</span> {event.promotion.sponsorName} (paid placement)</p>}
+        {event.promotion && <p>{event.promotion.sponsorName ? <><span>Promoted by</span> {event.promotion.sponsorName} (paid placement)</> : "Promoted · paid placement"}</p>}
       </div>
     </article>
   );

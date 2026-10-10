@@ -137,9 +137,10 @@ export function BusinessEventForm({ draft, errors, saving, onChange, onSubmit, o
         <textarea id="biz-description" rows={3} value={draft.description} onChange={set("description")} maxLength={500} aria-invalid={Boolean(errors.description)} aria-describedby={describedBy("description")} />,
         `${draft.description.length}/500`)}
       <div className="biz-actions">
-        <button type="submit" disabled={saving}>{saving ? "Publishing…" : "Publish event"}</button>
+        <button type="submit" disabled={saving}>{saving ? "Saving draft…" : "Save event draft"}</button>
         <button type="button" className="biz-button--quiet" onClick={onFillSample}>Fill with sample venue event</button>
       </div>
+      <p className="biz-fineprint">Your business event stays an unpublished draft until payment is confirmed. Payment publishes it and adds the boost.</p>
     </form>
   );
 }

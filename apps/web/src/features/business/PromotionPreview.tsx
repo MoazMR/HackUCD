@@ -18,7 +18,7 @@ export function PromotionPreview({ event, sponsorName, promoted }: { event: Prev
 
   return (
     <div className="biz-preview" aria-label="Preview of how your event will appear">
-      <p className="biz-preview__caption">In For You</p>
+      <p className="biz-preview__caption">Preview after payment · For You</p>
       <article className={`event-card biz-preview__card${promoted ? " biz-preview__card--promoted" : ""}`}>
         <div className="biz-preview__top">
           <p className="event-category">{event.category || "category"}</p>
@@ -33,7 +33,7 @@ export function PromotionPreview({ event, sponsorName, promoted }: { event: Prev
         {promoted && <p className="biz-preview__sponsor">Paid placement by {sponsorName.trim() || "you"}</p>}
       </article>
 
-      <p className="biz-preview__caption">On the Map</p>
+      <p className="biz-preview__caption">Preview after payment · Map</p>
       <div className="biz-preview__map" role="img" aria-label={promoted ? `Highlighted map hotspot labelled Promoted for ${title}` : `Map hotspot for ${title}`}>
         <span className="biz-preview__street biz-preview__street--a" />
         <span className="biz-preview__street biz-preview__street--b" />

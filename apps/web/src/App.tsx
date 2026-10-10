@@ -47,17 +47,17 @@ function AppContent() {
   const preferences = useMemo(() => ({
     interests: profile.interests.map(toDiscoveryInterest).filter((name) => discoveryInterestNames.includes(name)),
     radiusKm: profile.radiusKm
-  }), [profile.interests, profile.radiusKm]);
+  }), [profile.interests, profile.radiusKm, profile.areaId]);
 
   // My Events: upcoming comes from the shared store; past stays sample data so endorsements can be demonstrated.
   const samplePast = useMemo(() => sampleMyEvents().filter((event) => new Date(event.startsAt).getTime() < Date.now()), []);
   const events = useMemo<MyEvent[]>(() => [
-    ...store.events.filter((event) => store.joined.has(event.id)).map((event): MyEvent => ({
+    ...store.events.filter((event) => event.hosting || store.joined.has(event.id)).map((event): MyEvent => ({
       id: event.id,
       title: event.title,
       startsAt: event.startsAt,
       locationName: `${event.locationName}, ${event.area}`,
-      role: event.hostName === "You" ? "hosting" : "going",
+      role: event.hosting ? "hosting" : "going",
       interestId: fromDiscoveryInterest(event.interest),
       attendeeCount: event.attendeeCount,
       attendees: []

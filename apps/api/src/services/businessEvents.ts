@@ -3,11 +3,8 @@ import type { EventRecord } from "../models/domain.js";
 import { createEvent, getEvent, listAllEvents, listEventsOwnedBy } from "./events.js";
 
 /**
- * Venue-based events created by businesses. Kept in the business service so Moaz's core
- * event store is untouched. Shape is a superset of the shared OutingEvent, so the feed
- * can render these with the existing EventCard.
- *
- * All data here is synthetic and in memory: it resets when the API restarts.
+ * Business drafts share the persistent event catalogue with ordinary-user events.
+ * A verified sandbox payment publishes the draft; unpaid drafts stay private to the portal.
  */
 export type BusinessEvent = OutingEvent & {
   hostType: "business";
@@ -20,6 +17,7 @@ export type BusinessEvent = OutingEvent & {
   capacity: number;
   createdAt: string;
   publicationStatus: "draft" | "published";
+  isPaidPromotion: boolean;
 };
 
 export type HostedEvent = OutingEvent & {
@@ -31,16 +29,17 @@ export type HostedEvent = OutingEvent & {
   interest?: string;
   priceEur?: number;
   capacity?: number;
+  isPaidPromotion?: boolean;
+  publicationStatus?: "draft" | "published";
   /** Core events only: the API's interest tags (public). */
   interests?: string[];
 };
 
 export const EVENT_CATEGORIES: EventCategory[] = ["food", "sport", "music", "social", "other"];
 
-/** Placeholder identity until the shared Event model gains a host/creator id. */
+/** Default identity for the unauthenticated prototype. */
 export const DEMO_USER = {
   id: "demo-user",
-  // Hosts "Sunday five-a-side" in both the API store and the discovery feed's sample data.
   name: "Dara L. (demo user)"
 };
 
@@ -121,7 +120,7 @@ function toBusinessEvent(event: EventRecord): BusinessEvent {
     id: event.id, title: event.title, description: event.description, startsAt: event.startsAt, locationName: event.locationName,
     category: event.category, attendeeCount: event.attendeeCount, hostType: "business", businessName: event.businessName ?? event.hostName,
     venueAddressArea: event.area, interest: event.interests[0], priceEur: event.priceEur, capacity: event.capacity, createdAt: event.createdAt,
-    publicationStatus: event.publicationStatus ?? "published"
+    publicationStatus: event.publicationStatus ?? "published", isPaidPromotion: event.isPaidPromotion
   };
 }
 
@@ -130,16 +129,16 @@ function toBusinessEvent(event: EventRecord): BusinessEvent {
  * exact coordinates and other API-internal fields before anything is returned by business routes.
  */
 function toPublicEvent(event: EventRecord): HostedEvent {
-  const { id, title, description, startsAt, locationName, category, attendeeCount, interests, hostId, hostType, hostName, businessName, area, priceEur, capacity } = event;
-  return { id, title, description, startsAt, locationName, category, attendeeCount, interests, hostId, hostType, hostName, businessName, venueAddressArea: area, interest: interests[0], priceEur, capacity };
+  const { id, title, description, startsAt, locationName, category, attendeeCount, interests, hostType, hostName, businessName, area, priceEur, capacity, isPaidPromotion, publicationStatus } = event;
+  return { id, title, description, startsAt, locationName, category, attendeeCount, interests, hostType, hostName, businessName, venueAddressArea: area, interest: interests[0], priceEur, capacity, isPaidPromotion, publicationStatus };
 }
 
-/** Looks up an event in the business store first, then (read-only) in the core event service. */
+/** Public-safe snapshot from the shared event catalogue. */
 export function findAnyEvent(id: string): HostedEvent | undefined {
   const core = getEvent(id);
   return core && toPublicEvent(core);
 }
 
-export function listDemoUserEvents(): HostedEvent[] {
-  return listEventsOwnedBy(DEMO_USER.id).map(toPublicEvent);
+export function listDemoUserEvents(userId = DEMO_USER.id): HostedEvent[] {
+  return listEventsOwnedBy(userId).map(toPublicEvent);
 }

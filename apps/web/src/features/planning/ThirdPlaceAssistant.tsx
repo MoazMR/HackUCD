@@ -23,7 +23,8 @@ export function ThirdPlaceAssistant({ onBack }: { onBack: () => void }) {
     const next = [...messages, { role: "user" as const, content }].slice(-11);
     setMessages(next); setInput(""); setBusy(true); setError(undefined);
     try {
-      const response = await api.askAssistant(next, conversationId.current);
+      // Full replies stay visible locally; bound the history sent back to the API.
+      const response = await api.askAssistant(next.map((message) => ({ ...message, content: message.content.slice(0, 800) })), conversationId.current);
       setLatest(response);
       setMessages([...next, { role: "assistant", content: response.reply }]);
     } catch (problem) {
@@ -36,16 +37,17 @@ export function ThirdPlaceAssistant({ onBack }: { onBack: () => void }) {
   return (
     <section className="assistant" aria-labelledby="assistant-heading">
       <header className="section-heading assistant__heading">
-        <div><p className="eyebrow">OpenClaw outing guide</p><h1 id="assistant-heading">What would feel good today?</h1></div>
+        <div><p className="eyebrow">Ask ThirdPlace</p><h1 id="assistant-heading">What would feel good today?</h1></div>
         <button className="button-secondary" type="button" onClick={onBack}>Back to For You</button>
       </header>
-      <p className="assistant__intro">Tell ThirdPlace your mood, time, budget, or what kind of people you want to meet. Suggestions stay inside your radius and use real eligible events. Mood text is not saved to your profile.</p>
-      {messages.length === 0 && <div className="assistant__starters" aria-label="Example questions">{starters.map((starter) => <button type="button" key={starter} onClick={() => void send(undefined, starter)}>{starter}</button>)}</div>}
+      <p className="assistant__intro">Tell ThirdPlace your mood or the activity you want to try. Suggestions use eligible published catalogue events, including demo data, inside your radius. Mood text is temporary and is not saved to your profile.</p>
+      {messages.length === 0 && <div className="assistant__starters" aria-label="Example questions">{starters.map((starter) => <button type="button" key={starter} disabled={busy} onClick={() => void send(undefined, starter)}>{starter}</button>)}</div>}
       <div className="assistant__conversation" aria-live="polite">
         {messages.map((message, index) => <div className={`assistant__message assistant__message--${message.role}`} key={`${message.role}-${index}`}>{message.content}</div>)}
         {busy && <div className="assistant__message assistant__message--assistant">Finding a thoughtful match…</div>}
       </div>
       {latest && <p className="assistant__provider">Response: {latest.provider === "openclaw" ? "OpenClaw agent" : latest.provider === "openrouter" ? "OpenRouter fallback" : "transparent rule-based fallback"}. {latest.notice}</p>}
+      {messages.length > 0 && <button className="button-secondary" type="button" disabled={busy} onClick={() => { setMessages([]); setLatest(undefined); setError(undefined); conversationId.current = `web-${crypto.randomUUID()}`; }}>Clear conversation</button>}
       <form className="assistant__composer" onSubmit={(event) => void send(event)}>
         <label htmlFor="assistant-message">Ask about an outing or creating one</label>
         <div><textarea id="assistant-message" rows={3} maxLength={800} value={input} onChange={(event) => setInput(event.target.value)} placeholder="I’ve had a long day and want something social but low-pressure…" /><button type="submit" disabled={busy || !input.trim()}>Ask</button></div>

@@ -278,3 +278,7 @@
 @media (max-width: 480px) {
   .tp-tile { grid-template-columns: 3.8rem 1fr; gap: .75rem; padding: .85rem; }
 }
+
+/* Grouped neighbourhood names wrap without displacing the preview close control. */
+.tp-preview__head h3 { min-width: 0; overflow-wrap: anywhere; }
+.tp-preview__head button { flex-shrink: 0; }

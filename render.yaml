@@ -11,7 +11,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: "22"
+        value: "24"
       - key: NODE_ENV
         value: production
       # Needed for "Plan an event" to use OpenRouter. Without them it shows a labelled synthetic plan.
