@@ -17,6 +17,16 @@ export const AREAS: Area[] = [
  */
 export const USER_ORIGIN = { name: "Belfield", lat: 53.3125, lng: -6.2395 };
 
+/**
+ * Points discovery at the approximate area chosen in the profile. Still area-level only:
+ * callers pass a neighbourhood centre, never a device position.
+ */
+export function setUserOrigin(area: { name: string; lat: number; lng: number }): void {
+  USER_ORIGIN.name = area.name;
+  USER_ORIGIN.lat = area.lat;
+  USER_ORIGIN.lng = area.lng;
+}
+
 export function findArea(name: string): Area | undefined {
   return AREAS.find((area) => area.name === name);
 }

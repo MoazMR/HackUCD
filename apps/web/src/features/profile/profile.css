@@ -511,6 +511,8 @@
 .pf-person[data-decision="reported"] .pf-decision { background: var(--pf-yellow); color: var(--pf-plum); }
 .pf-report { border-top: 2px dashed rgba(62, 7, 45, 0.35); }
 
+.pf-myevents section > .pf-sample { display: inline-block; margin-bottom: 0.7rem; }
+
 /* Onboarding steps */
 .pf-steps li { border: 0; border-top: 6px solid rgba(62, 7, 45, 0.18); border-radius: 0; padding-top: 0.5rem; font-weight: 800; color: var(--pf-muted); font-family: var(--pf-sans); }
 .pf-steps li[aria-current="step"] { border-color: var(--pf-red); color: var(--pf-plum); }
