@@ -14,12 +14,14 @@ type Props = {
   onOpenEvent: (eventId: string) => void;
   onEndorse: (eventId: string) => void;
   onFindEvents?: () => void;
+  /** Set when the past list is sample data while upcoming events are real. */
+  pastAreSample?: boolean;
 };
 
 const when = new Intl.DateTimeFormat("en-IE", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
 /** The My Events destination: what's coming up, and what you've been to. */
-export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFindEvents }: Props) {
+export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFindEvents, pastAreSample }: Props) {
   const { profile, update } = useProfile();
   const all = useMemo(() => events ?? sampleMyEvents(), [events]);
   const now = Date.now();
@@ -71,6 +73,7 @@ export function MyEventsView({ events, onOpenChat, onOpenEvent, onEndorse, onFin
             <span className="pf-toggle-text"><span>Show past events on my public profile</span></span>
           </label>
         </div>
+        {pastAreSample && <p className="pf-sample">Sample past events, so you can try endorsements.</p>}
         <p className="pf-visibility" data-public={historyPublic || undefined} role="status">
           {historyPublic
             ? "Public: people who view your profile can see the events below."
