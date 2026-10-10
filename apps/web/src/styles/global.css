@@ -55,3 +55,6 @@ button { background: #0a5de0; border: 2.5px solid #3e072d; border-radius: 999px;
   .planner-grid, .field-row { grid-template-columns: 1fr; }
   .plan-result { position: static; }
 }
+
+/* Demo tab: the pitch deck, shown full width inside the app */
+.demo-frame { display: block; width: 100%; height: calc(100vh - 11rem); min-height: 520px; border: 2.5px solid #3e072d; border-radius: 1.9rem; box-shadow: 6px 7px 0 #3e072d; background: #fff6e8; }

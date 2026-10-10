@@ -1,3 +1,5 @@
+// Inside the app (Demo tab, served at /demo/) the deck uses the app's own origin, where /api is proxied.
+const inApp = location.pathname.startsWith("/demo/");
 const slides = [...document.querySelectorAll(".slide")];
 const progressBar = document.getElementById("progressBar");
 const slideNumber = document.getElementById("slideNumber");
@@ -24,7 +26,7 @@ function showSlide(index, replaceHistory = false) {
   prevButton.disabled = current === 0;
   nextButton.disabled = current === slides.length - 1;
   const hash = `slide=${current + 1}`;
-  if (replaceHistory) history.replaceState(null, "", `#${hash}`);
+  if (replaceHistory || inApp) history.replaceState(null, "", `#${hash}`);
   else history.pushState(null, "", `#${hash}`);
 }
 
@@ -117,9 +119,11 @@ document.getElementById("chatForm").addEventListener("submit", (event) => {
 
 /* ---- live slides: call the running ThirdPlace API (npm run dev). Nothing here is faked. ---- */
 const params = new URLSearchParams(location.search);
-const API = (params.get("api") || "http://localhost:3001").replace(/\/$/, "");
-const WEB = (params.get("web") || "http://localhost:5173").replace(/\/$/, "");
+// Standalone, the deck talks to localhost.
+const API = (params.get("api") ?? (inApp ? "" : "http://localhost:3001")).replace(/\/$/, "");
+const WEB = (params.get("web") ?? (inApp ? "" : "http://localhost:5173")).replace(/\/$/, "");
 document.getElementById("portalLink").href = `${WEB}/src/features/business/portal.html`;
+document.getElementById("portalLink").target = inApp ? "_top" : "_blank";
 
 function el(tag, text, className) { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; }
 async function api(path, options) {
@@ -128,7 +132,7 @@ async function api(path, options) {
   if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
   return data;
 }
-const notRunning = `Can’t reach the API at ${API}. Start it with npm run dev.`;
+const notRunning = `Can’t reach the API${API ? ` at ${API}` : ""}. Start it with npm run dev.`;
 
 const aiForm = document.getElementById("aiForm");
 aiForm.addEventListener("submit", async (event) => {
