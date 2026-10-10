@@ -14,8 +14,8 @@ Build a distinctive ThirdPlace web experience inspired by the clarity, confidenc
 
 ThirdPlace has exactly four main user destinations. The navigation must make them obvious on desktop and mobile. “Create event” is a persistent primary action, not a fifth destination.
 
-1. **For You:** the default feed of recommended nearby events. It includes search and filters, curated event cards, and a prominent Create Event button at the right of the desktop layout (or a fixed primary action on mobile).
-2. **Map:** the user's approximate location plus interactive event hotspots. Selecting a hotspot opens a compact event preview and route into the full event. The map always has an equivalent accessible list/feed view.
+1. **For You:** the default feed of recommended nearby events. A prominent search bar sits at the top and searches event names, categories, and areas. It works with filters, curated event cards, and a prominent Create Event button at the right of the desktop layout (or a fixed primary action on mobile).
+2. **Map:** the user's approximate location plus interactive event hotspots. The active search query and filters carry into this view. Selecting a hotspot opens a compact event preview and route into the full event. The map always has an equivalent accessible list/feed view.
 3. **My Events:** upcoming and past events the user joined or created. Each event opens its details and its public event-group chat. Past events support the profile privacy setting for showing or hiding attendance history.
 4. **Profile:** public-safe profile summary, photo, editable name, approximate location, settings, interests, travel radius, privacy controls, verification status, and endorsement/trust signal.
 
