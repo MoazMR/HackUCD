@@ -36,5 +36,5 @@ export function InterestIcon({ id }: { id: string }) {
 
 /** The icon on a round badge in its category colour. */
 export function InterestBadge({ id }: { id: string }) {
-  return <span className="tp-ico" data-category={interestCategory(id)}><InterestIcon id={id} /></span>;
+  return <span className="pf-ico" data-category={interestCategory(id)}><InterestIcon id={id} /></span>;
 }

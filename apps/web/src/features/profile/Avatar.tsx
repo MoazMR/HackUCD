@@ -3,8 +3,8 @@ import { useRef, useState } from "react";
 export function Avatar({ name, photo, size = 72 }: { name: string; photo?: string; size?: number }) {
   const initial = (name.trim()[0] ?? "?").toUpperCase();
   return photo
-    ? <img className="tp-avatar" src={photo} alt="" width={size} height={size} />
-    : <span className="tp-avatar tp-avatar-initial" style={{ width: size, height: size, fontSize: size * 0.42 }} aria-hidden="true">{initial}</span>;
+    ? <img className="pf-avatar" src={photo} alt="" width={size} height={size} />
+    : <span className="pf-avatar pf-avatar-initial" style={{ width: size, height: size, fontSize: size * 0.42 }} aria-hidden="true">{initial}</span>;
 }
 
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -43,19 +43,19 @@ export function PhotoEditor({ name, photo, onChange }: { name: string; photo?: s
   }
 
   return (
-    <div className="tp-photo">
+    <div className="pf-photo">
       <Avatar name={name} photo={photo} size={88} />
       <div>
-        <div className="tp-inline">
-          <button type="button" className="tp-button tp-button-quiet" onClick={() => input.current?.click()}>
+        <div className="pf-inline">
+          <button type="button" className="pf-button pf-button-quiet" onClick={() => input.current?.click()}>
             {photo ? "Change photo" : "Add a photo"}
           </button>
-          {photo && <button type="button" className="tp-button tp-button-text" onClick={() => onChange(undefined)}>Remove photo</button>}
+          {photo && <button type="button" className="pf-button pf-button-text" onClick={() => onChange(undefined)}>Remove photo</button>}
         </div>
-        <input ref={input} type="file" accept="image/*" className="tp-visually-hidden" tabIndex={-1} aria-label="Choose a profile photo"
+        <input ref={input} type="file" accept="image/*" className="pf-visually-hidden" tabIndex={-1} aria-label="Choose a profile photo"
           onChange={(event) => choose(event.target.files?.[0])} />
-        <p className="tp-hint">Your photo is public. Avoid one that shows your home, workplace or documents.</p>
-        {error && <p className="tp-error" role="alert">{error}</p>}
+        <p className="pf-hint">Your photo is public. Avoid one that shows your home, workplace or documents.</p>
+        {error && <p className="pf-error" role="alert">{error}</p>}
       </div>
     </div>
   );
