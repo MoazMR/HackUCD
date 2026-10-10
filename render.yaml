@@ -1,0 +1,24 @@
+# One-click deployment on Render (https://render.com): New > Blueprint > pick this repository.
+# A single free web service builds the web app and the API, and the API serves both.
+# Secrets are typed into Render's dashboard when the blueprint is created; none live in this file.
+services:
+  - type: web
+    name: thirdplace
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Needed for "Plan an event" to use OpenRouter. Without them it shows a labelled synthetic plan.
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        sync: false
+      # Stripe TEST-mode secret key (sk_test_...). Optional; without it checkout is switched off.
+      - key: STRIPE_SECRET_KEY
+        sync: false
