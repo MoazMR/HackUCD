@@ -4,6 +4,7 @@ import { DiscoverEvents } from "./features/discovery/DiscoverEvents";
 import { EventPlanner } from "./features/planning/EventPlanner";
 import { EndorsementScreen, MyEventsView, ProfileProvider, ProfileView, sampleMyEvents, useProfile } from "./features/profile";
 import { ProfileApiSync } from "./integration/ProfileApiSync";
+import { BUSINESS_PORTAL_PATH } from "./features/business/paths";
 
 type MainView = "for-you" | "map" | "my-events" | "profile";
 /** Discovery sub-routes handled inside Kate's DiscoverEvents (#/event/:id, #/create, #/search). */
@@ -55,6 +56,7 @@ function AppContent() {
         <button className="brand" type="button" onClick={() => setView("for-you")}>ThirdPlace</button>
         <nav aria-label="Primary navigation">{mainViews.map((item) => <button type="button" key={item.id} className="nav-link" aria-current={view === item.id ? "page" : undefined} onClick={() => setView(item.id)}>{item.label}</button>)}</nav>
         <div className="topbar-actions">
+          <a className="nav-link" href={BUSINESS_PORTAL_PATH}>For businesses</a>
           <button type="button" className="nav-link" onClick={() => setView("plan")}>Plan an event</button>
           <a className="create-action" href="#/create">Create event</a>
         </div>
