@@ -18,8 +18,6 @@ const mainViews: Array<{ id: MainView; label: string }> = [
   { id: "for-you", label: "For You" }, { id: "map", label: "Map" },
   { id: "my-events", label: "My Events" }, { id: "profile", label: "Profile" }
 ];
-// The top bar only lists the feed views. Profile sits in the right corner and My Events lives inside Profile.
-const navViews = mainViews.filter((item) => item.id === "for-you" || item.id === "map");
 const discoveryRoutes: DiscoveryRoute[] = ["event", "create", "search"];
 
 /** Accepts both "#map" (shell nav) and "#/map" / "#/event/:id" (discovery links). */
@@ -91,11 +89,10 @@ function AppContent() {
     <div className="page-shell">
       <header className="topbar">
         <button className="brand" type="button" onClick={() => setView("for-you")}><Logo className="brand-logo" /></button>
-        <nav aria-label="Primary navigation">{navViews.map((item) => <button type="button" key={item.id} className="nav-link" aria-current={view === item.id ? "page" : undefined} onClick={() => setView(item.id)}>{item.label}</button>)}</nav>
         <div className="topbar-actions">
-          <a className="nav-link" href={BUSINESS_PORTAL_PATH}>For businesses</a>
+          <a className="nav-link" href={BUSINESS_PORTAL_PATH}>For Businesses</a>
           <a className="create-action" href="#/create">Create Event</a>
-          <button type="button" className="nav-link" aria-current={view === "profile" || view === "my-events" ? "page" : undefined} onClick={() => setView("profile")}>Profile</button>
+          <button type="button" className="nav-link nav-pill" aria-current={view === "profile" || view === "my-events" ? "page" : undefined} onClick={() => setView("profile")}>Profile</button>
         </div>
       </header>
       <ProfileApiSync />
