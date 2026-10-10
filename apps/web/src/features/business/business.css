@@ -36,6 +36,11 @@
 
 .biz-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 2.5rem; align-items: start; margin-top: 1rem; }
 .biz-aside { position: sticky; top: 1.5rem; }
+.biz-metrics { margin-top: 1rem; padding: 1rem; background: #fff; border: 1px solid #d9e8df; border-radius: 18px; }
+.biz-metrics h2 { margin: 0 0 .35rem; font-size: 1.15rem; }
+.biz-metrics > div { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin-top: .8rem; }
+.biz-metrics span { display: grid; padding: .7rem; background: #eef7f1; border-radius: 12px; font-size: .8rem; }
+.biz-metrics strong { font-size: 1.35rem; color: #145a43; }
 
 .biz-steps { list-style: none; counter-reset: biz-step; margin: 0; padding: 0; display: grid; gap: 1rem; }
 .biz-step {

@@ -26,7 +26,10 @@ export type HostedEvent = OutingEvent & {
   priceEur?: number;
   capacity?: number;
   promoted?: boolean;
+  publicationStatus?: "draft" | "published";
 };
+
+export type EventAnalytics = { eventId: string; impressions: number; detailViews: number; joins: number; directions: number; detailRate: number; joinRate: number };
 
 export type OrderStatus = "pending" | "paid" | "cancelled" | "expired" | "failed";
 

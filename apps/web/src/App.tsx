@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Onboarding } from "./features/auth/Onboarding";
 import { DiscoverEvents } from "./features/discovery/DiscoverEvents";
 import { EventPlanner } from "./features/planning/EventPlanner";
+import { ThirdPlaceAssistant } from "./features/planning/ThirdPlaceAssistant";
 import { EndorsementScreen, MyEventsView, ProfileProvider, ProfileView, sampleMyEvents, useProfile } from "./features/profile";
 import { ProfileApiSync } from "./integration/ProfileApiSync";
 import { BUSINESS_PORTAL_PATH } from "./features/business/paths";
@@ -9,7 +10,7 @@ import { BUSINESS_PORTAL_PATH } from "./features/business/paths";
 type MainView = "for-you" | "map" | "my-events" | "profile";
 /** Discovery sub-routes handled inside Kate's DiscoverEvents (#/event/:id, #/create, #/search). */
 type DiscoveryRoute = "event" | "create" | "search";
-type View = MainView | "plan" | DiscoveryRoute;
+type View = MainView | "plan" | "assistant" | DiscoveryRoute;
 const mainViews: Array<{ id: MainView; label: string }> = [
   { id: "for-you", label: "For You" }, { id: "map", label: "Map" },
   { id: "my-events", label: "My Events" }, { id: "profile", label: "Profile" }
@@ -19,7 +20,7 @@ const discoveryRoutes: DiscoveryRoute[] = ["event", "create", "search"];
 /** Accepts both "#map" (shell nav) and "#/map" / "#/event/:id" (discovery links). */
 function viewFromHash(): View {
   const first = window.location.hash.replace(/^#\/?/, "").split("/")[0] as View;
-  return [...mainViews.map((item) => item.id), "plan", ...discoveryRoutes].includes(first) ? first : "for-you";
+  return [...mainViews.map((item) => item.id), "plan", "assistant", ...discoveryRoutes].includes(first) ? first : "for-you";
 }
 
 export function App() {
@@ -57,6 +58,7 @@ function AppContent() {
         <nav aria-label="Primary navigation">{mainViews.map((item) => <button type="button" key={item.id} className="nav-link" aria-current={view === item.id ? "page" : undefined} onClick={() => setView(item.id)}>{item.label}</button>)}</nav>
         <div className="topbar-actions">
           <a className="nav-link" href={BUSINESS_PORTAL_PATH}>For businesses</a>
+          <button type="button" className="nav-link" onClick={() => setView("assistant")}>Ask ThirdPlace</button>
           <button type="button" className="nav-link" onClick={() => setView("plan")}>Plan an event</button>
           <a className="create-action" href="#/create">Create event</a>
         </div>
@@ -69,6 +71,7 @@ function AppContent() {
           : view === "map" || discoveryRoutes.includes(view as DiscoveryRoute) ? <DiscoverEvents />
           : view === "my-events" ? <MyEventsView events={events} onOpenChat={() => setNotice("Public event-group chat opens from Kate's event detail flow once it is merged.")} onOpenEvent={() => setNotice("Event details open here once Kate's event flow is merged.")} onEndorse={setEndorsementEventId} onFindEvents={() => setView("for-you")} />
           : view === "profile" ? <ProfileView />
+          : view === "assistant" ? <ThirdPlaceAssistant onBack={() => setView("for-you")} />
           : <EventPlanner onBack={() => setView("for-you")} />}
       </main>
     </div>

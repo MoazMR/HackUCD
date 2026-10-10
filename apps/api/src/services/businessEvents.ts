@@ -1,5 +1,6 @@
 import type { EventCategory, OutingEvent } from "@social-outings/shared";
-import { getEvent, listEvents } from "./events.js";
+import type { EventRecord } from "../models/domain.js";
+import { createEvent, getEvent, listAllEvents, listEventsOwnedBy } from "./events.js";
 
 /**
  * Venue-based events created by businesses. Kept in the business service so Moaz's core
@@ -18,11 +19,18 @@ export type BusinessEvent = OutingEvent & {
   priceEur: number;
   capacity: number;
   createdAt: string;
+  publicationStatus: "draft" | "published";
 };
 
 export type HostedEvent = OutingEvent & {
   hostType?: "business" | "user";
+  hostId?: string;
+  hostName?: string;
   businessName?: string;
+  venueAddressArea?: string;
+  interest?: string;
+  priceEur?: number;
+  capacity?: number;
   /** Core events only: the API's interest tags (public). */
   interests?: string[];
 };
@@ -33,28 +41,8 @@ export const EVENT_CATEGORIES: EventCategory[] = ["food", "sport", "music", "soc
 export const DEMO_USER = {
   id: "demo-user",
   // Hosts "Sunday five-a-side" in both the API store and the discovery feed's sample data.
-  name: "Dara L. (demo user)",
-  ownedEventIds: ["sunday-five-a-side", "coffee-and-code"]
+  name: "Dara L. (demo user)"
 };
-
-const businessEvents: BusinessEvent[] = [
-  {
-    id: "biz-padel-social-night",
-    title: "Beginner padel social night",
-    description: "Racquets provided. Mixed-level doubles, then food at the clubhouse.",
-    startsAt: "2026-10-16T18:30:00.000Z",
-    locationName: "Ranelagh Padel Club",
-    category: "sport",
-    attendeeCount: 6,
-    hostType: "business",
-    businessName: "Ranelagh Padel Club (synthetic)",
-    venueAddressArea: "Ranelagh",
-    interest: "padel",
-    priceEur: 5,
-    capacity: 12,
-    createdAt: "2026-10-09T09:00:00.000Z"
-  }
-];
 
 export type BusinessEventInput = {
   businessName?: unknown;
@@ -103,51 +91,55 @@ export function validateBusinessEvent(input: BusinessEventInput, now = new Date(
 }
 
 export function createBusinessEvent(input: BusinessEventInput): BusinessEvent {
-  const title = text(input.title);
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 40);
-  const event: BusinessEvent = {
-    id: `biz-${slug || "event"}-${Date.now().toString(36)}`,
-    title,
-    description: text(input.description),
-    startsAt: new Date(text(input.startsAt)).toISOString(),
-    locationName: text(input.venueName),
-    category: input.category as EventCategory,
-    attendeeCount: 0,
-    hostType: "business",
-    businessName: text(input.businessName),
-    venueAddressArea: text(input.venueAddressArea),
-    interest: input.interest === undefined ? undefined : text(input.interest).toLowerCase(),
-    priceEur: typeof input.priceEur === "number" ? Math.round(input.priceEur * 100) / 100 : 0,
-    capacity: typeof input.capacity === "number" ? input.capacity : 30,
-    createdAt: new Date().toISOString()
-  };
-  businessEvents.unshift(event);
-  return event;
+  const businessName = text(input.businessName);
+  const area = text(input.venueAddressArea);
+  const coordinates = approximateAreaCoordinates(area);
+  return toBusinessEvent(createEvent({
+    title: text(input.title), description: text(input.description), startsAt: text(input.startsAt), locationName: text(input.venueName),
+    category: input.category as EventCategory, interest: input.interest === undefined ? input.category as string : text(input.interest), area,
+    latitude: coordinates.latitude, longitude: coordinates.longitude, priceEur: typeof input.priceEur === "number" ? input.priceEur : 0,
+    capacity: typeof input.capacity === "number" ? input.capacity : 30, hostId: `business:${businessName.toLowerCase()}`,
+    hostName: businessName, hostType: "business", businessName, publicationStatus: "draft"
+  }));
 }
 
 export function listBusinessEvents(): BusinessEvent[] {
-  return businessEvents;
+  return listAllEvents().filter((event) => event.hostType === "business").map(toBusinessEvent);
+}
+
+function approximateAreaCoordinates(area: string): { latitude: number; longitude: number } {
+  const known: Record<string, [number, number]> = {
+    ranelagh: [53.3267, -6.2567], docklands: [53.3467, -6.2382], smithfield: [53.3487, -6.2789],
+    portobello: [53.3364, -6.2683], ballsbridge: [53.3280, -6.2306], drumcondra: [53.3700, -6.2548]
+  };
+  const match = Object.entries(known).find(([name]) => area.toLowerCase().includes(name));
+  return { latitude: match?.[1][0] ?? 53.3498, longitude: match?.[1][1] ?? -6.2603 };
+}
+
+function toBusinessEvent(event: EventRecord): BusinessEvent {
+  return {
+    id: event.id, title: event.title, description: event.description, startsAt: event.startsAt, locationName: event.locationName,
+    category: event.category, attendeeCount: event.attendeeCount, hostType: "business", businessName: event.businessName ?? event.hostName,
+    venueAddressArea: event.area, interest: event.interests[0], priceEur: event.priceEur, capacity: event.capacity, createdAt: event.createdAt,
+    publicationStatus: event.publicationStatus ?? "published"
+  };
 }
 
 /**
  * Public-safe copy of a core event: only the shared OutingEvent fields. Drops attendeeIds,
  * exact coordinates and other API-internal fields before anything is returned by business routes.
  */
-function toPublicEvent(event: OutingEvent & { interests?: string[] }): OutingEvent & { interests?: string[] } {
-  const { id, title, description, startsAt, locationName, category, attendeeCount, interests } = event;
-  return { id, title, description, startsAt, locationName, category, attendeeCount, interests };
+function toPublicEvent(event: EventRecord): HostedEvent {
+  const { id, title, description, startsAt, locationName, category, attendeeCount, interests, hostId, hostType, hostName, businessName, area, priceEur, capacity } = event;
+  return { id, title, description, startsAt, locationName, category, attendeeCount, interests, hostId, hostType, hostName, businessName, venueAddressArea: area, interest: interests[0], priceEur, capacity };
 }
 
 /** Looks up an event in the business store first, then (read-only) in the core event service. */
 export function findAnyEvent(id: string): HostedEvent | undefined {
-  const business = businessEvents.find((event) => event.id === id);
-  if (business) return business;
   const core = getEvent(id);
-  return core && { ...toPublicEvent(core), hostType: "user" };
+  return core && toPublicEvent(core);
 }
 
 export function listDemoUserEvents(): HostedEvent[] {
-  return listEvents()
-    .filter((event) => DEMO_USER.ownedEventIds.includes(event.id))
-    .map((event) => ({ ...toPublicEvent(event), hostType: "user" as const }));
+  return listEventsOwnedBy(DEMO_USER.id).map(toPublicEvent);
 }

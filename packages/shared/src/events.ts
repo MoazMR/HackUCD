@@ -17,6 +17,15 @@ export type EventRecord = OutingEvent & {
   interests: string[];
   isPaidPromotion: boolean;
   attendeeIds: string[];
+  hostId: string;
+  hostType: "user" | "business";
+  hostName: string;
+  businessName?: string;
+  area: string;
+  priceEur: number;
+  capacity: number;
+  createdAt: string;
+  publicationStatus: "draft" | "published";
 };
 
 export type EventRecommendation = {
@@ -24,6 +33,7 @@ export type EventRecommendation = {
   score: number;
   distanceKm: number;
   explanation: string;
+  scoreBreakdown: { interest: number; category: number; distance: number; sponsored: number };
 };
 
 export type ApiProfile = {
@@ -56,5 +66,13 @@ export type EventPlanResponse = {
   plan: EventPlan;
   provider: "openrouter" | "synthetic";
   model?: string;
+  notice?: string;
+};
+
+export type AssistantMessage = { role: "user" | "assistant"; content: string };
+export type AssistantResponse = {
+  reply: string;
+  provider: "openclaw" | "openrouter" | "synthetic";
+  suggestedEventIds: string[];
   notice?: string;
 };

@@ -1,4 +1,4 @@
-import type { ApiProfile, EventPlanRequest, EventPlanResponse, EventRecommendation, EventRecord } from "@social-outings/shared";
+import type { ApiProfile, AssistantMessage, AssistantResponse, EventPlanRequest, EventPlanResponse, EventRecommendation, EventRecord } from "@social-outings/shared";
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, { ...init, headers: { "Content-Type": "application/json", ...init?.headers } });
@@ -12,5 +12,6 @@ export const api = {
   recommendations: (userId = "me") => requestJson<{ recommendations: EventRecommendation[]; appliedRadiusKm: number }>(`/api/recommendations?userId=${encodeURIComponent(userId)}`),
   profile: (userId = "me") => requestJson<{ profile: ApiProfile }>(`/api/profiles/${encodeURIComponent(userId)}`),
   updatePreferences: (interests: string[], travelRadiusKm: number, userId = "me") => requestJson<{ profile: ApiProfile }>(`/api/profiles/${encodeURIComponent(userId)}/preferences`, { method: "PUT", body: JSON.stringify({ interests, travelRadiusKm }) }),
-  planEvent: (input: EventPlanRequest) => requestJson<EventPlanResponse>("/api/event-plans", { method: "POST", body: JSON.stringify(input) })
+  planEvent: (input: EventPlanRequest) => requestJson<EventPlanResponse>("/api/event-plans", { method: "POST", body: JSON.stringify(input) }),
+  askAssistant: (messages: AssistantMessage[], conversationId: string, userId = "me") => requestJson<AssistantResponse>("/api/assistant", { method: "POST", body: JSON.stringify({ messages, conversationId, userId }) })
 };

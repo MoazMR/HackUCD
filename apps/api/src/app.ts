@@ -8,6 +8,8 @@ import { paymentsRouter, stripeWebhookHandler } from "./routes/payments.js";
 import { profilesRouter } from "./routes/profiles.js";
 import { promotionsRouter } from "./routes/promotions.js";
 import { recommendationsRouter } from "./routes/recommendations.js";
+import { analyticsRouter } from "./routes/analytics.js";
+import { assistantRouter } from "./routes/assistant.js";
 
 export function createApp() {
   const app = express();
@@ -25,5 +27,7 @@ export function createApp() {
   app.use("/api/business", businessRouter);
   app.use("/api/payments", paymentsRouter);
   app.use("/api/promotions", promotionsRouter);
+  app.use("/api/analytics", analyticsRouter);
+  app.use("/api/assistant", assistantRouter);
   return app;
 }

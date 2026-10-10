@@ -7,6 +7,7 @@ import type {
   Promotion,
   PromotionPlan
 } from "./types";
+import type { EventAnalytics } from "./types";
 
 export class ApiError extends Error {
   constructor(message: string, readonly status: number, readonly code?: string, readonly fieldErrors?: FieldErrors) {
@@ -38,6 +39,7 @@ export const businessApi = {
   myEvents: () => request<{ events: HostedEvent[] }>("/api/business/my-events").then((d) => d.events),
   orders: () => request<{ orders: MockOrder[] }>("/api/business/orders").then((d) => d.orders),
   promotions: () => request<{ promotions: Promotion[] }>("/api/promotions").then((d) => d.promotions),
+  analytics: (eventId: string) => request<{ analytics: EventAnalytics }>(`/api/analytics/events/${encodeURIComponent(eventId)}`).then((d) => d.analytics),
 
   createBusinessEvent: (draft: BusinessEventDraft) =>
     request<{ event: HostedEvent }>("/api/business/events", {

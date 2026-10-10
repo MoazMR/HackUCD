@@ -7,6 +7,7 @@ import { PromotionPreview } from "./PromotionPreview";
 import type {
   BusinessEventDraft,
   BuyerType,
+  EventAnalytics,
   FieldErrors,
   HostedEvent,
   MockOrder,
@@ -63,6 +64,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string>();
   const [returnState, setReturnState] = useState<ReturnState>();
+  const [analytics, setAnalytics] = useState<EventAnalytics>();
 
   const refreshOrders = useCallback(() => {
     setOrdersLoading(true);
@@ -169,6 +171,11 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
       : myEvents.find((event) => event.id === selectedEventId);
   const selectedIsPromoted = selectedEvent ? promotedIds.has(selectedEvent.id) || Boolean(selectedEvent.promoted) : false;
 
+  useEffect(() => {
+    if (!selectedEventId) { setAnalytics(undefined); return; }
+    businessApi.analytics(selectedEventId).then(setAnalytics).catch(() => setAnalytics(undefined));
+  }, [selectedEventId, returnState]);
+
   async function publishEvent() {
     setFormError(undefined);
     const errors = validateDraft(draft);
@@ -253,7 +260,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
                 {selectedEvent ? (
                   <div className="biz-selected">
                     <p><strong>{selectedEvent.title}</strong> at {selectedEvent.locationName}, {formatDateTime(selectedEvent.startsAt)}</p>
-                    <p className="biz-fineprint">Published. It's live without a boost; boosting is the optional next step.</p>
+                    <p className="biz-fineprint">Draft saved. For business events, payment publishes it and adds the clearly labelled boost.</p>
                     <button type="button" className="biz-button--quiet" onClick={() => setSelectedEventId(undefined)}>Create a different event</button>
                   </div>
                 ) : (
@@ -292,7 +299,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
           </li>
 
           <li className={`biz-step${selectedEvent ? "" : " biz-step--waiting"}`}>
-            <h2>Boost it</h2>
+            <h2>{mode === "business" ? "Publish and boost it" : "Boost it"}</h2>
             {plan ? (
               <div className="biz-boost">
                 <div>
@@ -304,7 +311,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
             ) : (
               <p>Loading price…</p>
             )}
-            {!selectedEvent && <p className="biz-fineprint">{mode === "business" ? "Publish your event first." : "Choose an event first."}</p>}
+            {!selectedEvent && <p className="biz-fineprint">{mode === "business" ? "Save your event draft first." : "Choose an event first."}</p>}
           </li>
 
           <li className={`biz-step${selectedEvent ? "" : " biz-step--waiting"}`}>
@@ -318,7 +325,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
                 onClick={startCheckout}
                 disabled={!selectedEvent || !plan || checkoutBusy || selectedIsPromoted || payments?.stripeConfigured === false}
               >
-                {checkoutBusy ? "Opening checkout…" : plan ? `Pay ${formatPrice(plan.amountCents, plan.currency)} and boost` : "Pay and boost"}
+                {checkoutBusy ? "Opening checkout…" : plan ? `Pay ${formatPrice(plan.amountCents, plan.currency)} and ${mode === "business" ? "publish + boost" : "boost"}` : "Pay and continue"}
               </button>
               {selectedIsPromoted && <span className="biz-fineprint">This event is already promoted.</span>}
             </div>
@@ -328,6 +335,11 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
 
         <aside className="biz-aside">
           <PromotionPreview event={previewEvent} sponsorName={sponsorName} promoted />
+          {selectedEvent && <section className="biz-metrics" aria-label="Promotion results">
+            <h2>Promotion results</h2>
+            <p className="biz-fineprint">Prototype analytics; no personal identities are recorded.</p>
+            <div><span><strong>{analytics?.impressions ?? 0}</strong> impressions</span><span><strong>{analytics?.detailViews ?? 0}</strong> event opens</span><span><strong>{analytics?.joins ?? 0}</strong> joins</span><span><strong>{analytics?.directions ?? 0}</strong> direction taps</span></div>
+          </section>}
         </aside>
       </div>
 
@@ -388,7 +400,7 @@ function ReturnBanner({ state, onDismiss }: { state?: ReturnState; onDismiss: ()
     return (
       <div className="biz-banner biz-banner--neutral" role="status">
         <strong>Checkout cancelled. You weren't charged.</strong>{" "}
-        {state.order ? `“${state.order.eventTitle}” is still live without a boost. You can try again below.` : "Your event is still live without a boost."}
+        {state.order?.buyer.type === "business" ? `“${state.order.eventTitle}” remains a draft until payment. You can try again below.` : state.order ? `“${state.order.eventTitle}” is still live without a boost. You can try again below.` : "No promotion was activated."}
         <button type="button" className="biz-button--quiet" onClick={onDismiss}>Dismiss</button>
       </div>
     );

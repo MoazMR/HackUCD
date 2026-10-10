@@ -1,6 +1,8 @@
 import { PromotedBadge } from "../business/PromotedBadge";
 import { formatDay, formatPrice, formatTime, spotsLeft } from "./format";
 import { CATEGORY_LABELS, type RankedEvent } from "./types";
+import { useEffect } from "react";
+import { trackEvent } from "./eventsClient";
 
 type Props = { ranked: RankedEvent; joined: boolean; compact?: boolean };
 
@@ -10,6 +12,10 @@ export function EventTile({ ranked, joined, compact = false }: Props) {
   const day = formatDay(event.startsAt);
   const left = spotsLeft(event);
   const full = left === 0;
+
+  useEffect(() => {
+    if (event.promotion) trackEvent(event.id, "impression");
+  }, [event.id, event.promotion]);
 
   return (
     <article className={`tp-tile tp-tile--${event.category}${compact ? " tp-tile--compact" : ""}${event.promotion ? " tp-tile--promoted" : ""}`}>

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { DEMO_USER, findAnyEvent, type HostedEvent } from "./businessEvents.js";
 import { getEvent } from "./events.js";
+import { saveRuntimeState, storedCollection } from "./runtimeState.js";
 
 /**
  * Promotion plans, mock orders and active promotions.
@@ -31,9 +32,9 @@ export const PROMOTION_PLANS: PromotionPlan[] = [
     currency: "eur",
     durationDays: 7,
     billing: "one-time",
-    summary: "For venues and businesses filling a specific event.",
+    summary: "Publish a venue event and put it in front of nearby matching customers.",
     includes: [
-      "Placed in the top slots of For You for nearby people whose interests match the event",
+      "Publishes your venue event and places it higher in For You for nearby matching interests",
       "Highlighted hotspot on the Map",
       "Clearly labelled “Promoted” with your business name",
       "Runs 7 days, or until the event starts if that is sooner"
@@ -89,8 +90,8 @@ export type Promotion = {
   event: HostedEvent;
 };
 
-const orders: MockOrder[] = [];
-const promotions: Promotion[] = [];
+const orders: MockOrder[] = storedCollection("orders", []);
+const promotions: Promotion[] = storedCollection("promotions", []);
 
 export class PromotionError extends Error {
   constructor(message: string, readonly status = 400, readonly code = "invalid_request") {
@@ -176,10 +177,10 @@ export function createPendingOrder(input: { planId?: unknown; eventId?: unknown;
   const event = findAnyEvent(eventId);
   if (!event) throw new PromotionError("Event not found.", 404, "event_not_found");
 
-  if (buyer.type === "user" && !DEMO_USER.ownedEventIds.includes(event.id)) {
+  if (buyer.type === "user" && event.hostId !== buyer.id) {
     throw new PromotionError("You can only promote an event you created.", 403, "not_event_host");
   }
-  if (buyer.type === "business" && (event.hostType !== "business" || event.businessName !== buyer.name)) {
+  if (buyer.type === "business" && (event.hostType !== "business" || event.hostId !== buyer.id)) {
     throw new PromotionError("Businesses can only promote their own venue events.", 403, "not_event_host");
   }
   if (new Date(event.startsAt) <= now) {
@@ -201,12 +202,13 @@ export function createPendingOrder(input: { planId?: unknown; eventId?: unknown;
     createdAt: now.toISOString()
   };
   orders.push(order);
+  saveRuntimeState();
   return { order, plan, event };
 }
 
 export function attachCheckoutSession(orderId: string, sessionId: string) {
   const order = findOrder(orderId);
-  if (order) order.stripeCheckoutSessionId = sessionId;
+  if (order) { order.stripeCheckoutSessionId = sessionId; saveRuntimeState(); }
 }
 
 export function closeOrder(orderId: string, status: "cancelled" | "expired" | "failed"): MockOrder | undefined {
@@ -214,6 +216,7 @@ export function closeOrder(orderId: string, status: "cancelled" | "expired" | "f
   if (order && order.status === "pending") {
     order.status = status;
     order.closedAt = new Date().toISOString();
+    saveRuntimeState();
   }
   return order;
 }
@@ -245,6 +248,7 @@ export function activateFromPaidSession(facts: PaidSessionFacts, via: "webhook" 
   if (facts.amountTotal !== order.amountCents || facts.currency?.toLowerCase() !== order.currency) {
     order.status = "failed";
     order.closedAt = now.toISOString();
+    saveRuntimeState();
     throw new PromotionError("Paid amount does not match the plan price; promotion not activated.", 409, "amount_mismatch");
   }
 
@@ -272,7 +276,10 @@ export function activateFromPaidSession(facts: PaidSessionFacts, via: "webhook" 
     event
   };
   promotions.push(promotion);
+  const coreEvent = getEvent(event.id);
+  if (coreEvent?.hostType === "business") coreEvent.publicationStatus = "published";
   syncCorePaidFlag(event.id, now);
+  saveRuntimeState();
   // Clear the flag when the boost ends, even if nobody reads /api/promotions in between.
   const msUntilEnd = Math.min(endsAt.getTime() - now.getTime(), 2 ** 31 - 1);
   setTimeout(() => syncCorePaidFlag(event.id), Math.max(msUntilEnd, 0) + 1000).unref();
