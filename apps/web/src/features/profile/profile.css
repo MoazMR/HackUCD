@@ -315,6 +315,24 @@
 .tp-person { border: 0; box-shadow: 0 0 0 1.5px var(--tp-line); }
 .tp-decision { background: #f1f4f1; }
 
+/* Maps-app look: pale land, white streets with casings, green parks, blue water */
+.tp-map-land { fill: #f6f3ea; }
+.tp-map-blocks rect { fill: #ece7d9; }
+.tp-map-park { fill: #c8ebc1; }
+.tp-map-water { stroke: #a5d4f3; stroke-width: 24; }
+.tp-map-minor path { fill: none; stroke: #ffffff; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.tp-map-main-casing path { fill: none; stroke: #e4dfd0; stroke-width: 15; stroke-linecap: round; }
+.tp-map-main path { fill: none; stroke: #ffffff; stroke-width: 12; stroke-linecap: round; }
+.tp-map-avenue-casing path { fill: none; stroke: #f0d58a; stroke-width: 15; stroke-linecap: round; }
+.tp-map-avenue path { fill: none; stroke: #fdeebd; stroke-width: 12; stroke-linecap: round; }
+.tp-map::after { background: linear-gradient(90deg, #f6f3ea 0%, rgba(246, 243, 234, 0.96) 36%, rgba(246, 243, 234, 0) 60%); }
+.tp-area-drawing svg { background: #f6f3ea; }
+.tp-map .tp-ring { fill: rgba(11, 122, 117, 0.1); stroke-width: 2; }
+.tp-map .tp-blob { fill: rgba(11, 122, 117, 0.42); filter: blur(14px); }
+.tp .tp-map-place { position: absolute; left: 73%; top: 47.2%; transform: translate(-50%, -50%); z-index: 1; font-size: clamp(1.1rem, 2.4vw, 1.9rem); font-weight: 800; letter-spacing: -0.02em; color: #0b5f5b; text-shadow: 0 0 6px #f6f3ea, 0 0 2px #f6f3ea; white-space: nowrap; pointer-events: none; }
+.tp-pin { display: grid; justify-items: center; }
+.tp-pin-label { position: absolute; top: calc(100% + 0.55rem); font-size: 0.75rem; font-weight: 700; color: var(--tp-ink); white-space: nowrap; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff; }
+
 @media (max-width: 860px) {
   .tp-profile-grid { grid-template-columns: minmax(0, 1fr); }
   .tp-sticky { position: static; }
@@ -327,6 +345,8 @@
   .tp-pin .tp-ico { width: 2.1rem; height: 2.1rem; border-width: 2px; }
   .tp-pin::after { width: 0.7rem; height: 0.7rem; bottom: -0.3rem; }
   .tp-pin:nth-child(n + 5) { display: none; }
+  .tp-pin-label { display: none; }
+  .tp .tp-map-place { left: 70%; }
   .tp-hero-card { max-width: none; }
   .tp-panel { padding: 1.1rem; border-radius: 1rem; }
   .tp-panel-narrow { padding: 1.25rem; }
