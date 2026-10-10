@@ -20,6 +20,12 @@ const PATHS: Record<string, ReactNode> = {
   "trad-sessions": <><path d="M9 18V6.5l10-2V16" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="16.5" cy="16" r="2.5" /><path d="M9 10.5l10-2" /></>,
   coffee: <><path d="M4 9.5h13V14a5 5 0 01-5 5H9a5 5 0 01-5-5z" /><path d="M17 10.5h1.2a2.4 2.4 0 010 4.8H17M8 3.5v2.8M12 3.5v2.8" /></>,
   "food-markets": <><path d="M4 10l1.6-5.5h12.8L20 10" /><path d="M4 10a2.7 2.7 0 005.3 0 2.7 2.7 0 005.4 0 2.7 2.7 0 005.3 0" /><path d="M5.5 13.5V20h13v-6.5" /></>,
+  cycling: <><circle cx="6" cy="16" r="3.5" /><circle cx="18" cy="16" r="3.5" /><path d="M6 16l4-7h5l3 7M10 9l3.5 7M9 6h3" /></>,
+  sauna: <><path d="M4 20h16M6 20v-5h12v5" /><path d="M8.5 4c-1.4 2 1.4 3 0 5M12.5 4c-1.4 2 1.4 3 0 5M16.5 4c-1.4 2 1.4 3 0 5" /></>,
+  "cooking-classes": <><path d="M5 11h14v5a3 3 0 01-3 3H8a3 3 0 01-3-3zM3 11h18" /><path d="M9.5 7.5c0-1.5 1.5-1.5 1.5-3M13.5 7.5c0-1.5 1.5-1.5 1.5-3" /></>,
+  "pub-quiz": <><circle cx="12" cy="12" r="9" /><path d="M9.6 9.6a2.5 2.5 0 114 2c-.9.6-1.6 1.1-1.6 2.2M12 16.9h.01" /></>,
+  "arts-crafts": <><path d="M12 3a9 9 0 100 18c1.2 0 2-.9 2-2 0-1.4 1-2 2.2-2H18a3 3 0 003-3c0-6-4-11-9-11z" /><path d="M7.5 12.5h.01M9.5 8.2h.01M14 7.2h.01" /></>,
+  dance: <><circle cx="12" cy="4.5" r="1.8" /><path d="M12 7.5v5.5l-3 7M12 13l4 6M7 9.5l5 1 4-3" /></>,
   film: <><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="M10 9l5.2 3-5.2 3z" /></>
 };
 
