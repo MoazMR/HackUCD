@@ -14,6 +14,7 @@ import type {
   Promotion,
   PromotionPlan
 } from "./types";
+import { Logo } from "../profile/Logo";
 import "./business.css";
 
 type ReturnState =
@@ -213,7 +214,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
   return (
     <div className="biz-shell">
       <header className="biz-topbar">
-        <a className="brand" href={homeHref}>ThirdPlace</a>
+        <a className="brand" href={homeHref}><Logo /></a>
         <span className="biz-topbar__section">Promote an event</span>
         <a className="biz-topbar__back" href={homeHref}>Back to For You</a>
       </header>
