@@ -69,7 +69,7 @@ Business venue events live in `GET /api/business/events` (and each promotion inc
 ## Known limits (prototype)
 
 - The portal is a separate Vite page, so it is served by `npm run dev` but not yet included in `vite build`. For deployment, add it as a build input or route it from the app shell.
-- Core events carry Moaz's static `isPaidPromotion` flag; paid boosts bought here live in `/api/promotions` and are not yet reflected in that flag or in `/api/events?paid=true`.
+- A paid boost on a core event sets its existing `isPaidPromotion` flag (and clears it when the boost ends), so `/api/events?paid=true` includes it. Business venue events live in the business store, so they appear in `/api/business/events` and `/api/promotions`, not `/api/events`.
 
 - No authentication: the "own event" check uses a synthetic demo user (`Aoife`, owns `coffee-and-code`) and the business name typed in the form. Replace with the real host id once `Event` carries one.
 - In-memory storage; no refunds; one active promotion per event.

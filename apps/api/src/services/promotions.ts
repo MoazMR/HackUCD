@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { DEMO_USER, findAnyEvent, type HostedEvent } from "./businessEvents.js";
+import { getEvent } from "./events.js";
 
 /**
  * Promotion plans, mock orders and active promotions.
@@ -105,7 +106,33 @@ export function isActive(promotion: Promotion, now = new Date()): boolean {
   return new Date(promotion.startsAt) <= now && now < new Date(promotion.endsAt);
 }
 
+/**
+ * Keeps the core event's existing `isPaidPromotion` field in step with purchased boosts, so
+ * `/api/events?paid=true` includes them. Only resets flags this service set, never seeded ones.
+ * Uses the same in-memory record update pattern as joinEvent; no core route or type changes.
+ */
+const flagsSetByPromotions = new Set<string>();
+
+function syncCorePaidFlag(eventId: string, now = new Date()) {
+  const core = getEvent(eventId);
+  if (!core) return; // business venue events live in the business store, not the core one
+  const active = promotions.some((promotion) => promotion.eventId === eventId && isActive(promotion, now));
+  if (active && !core.isPaidPromotion) {
+    core.isPaidPromotion = true;
+    flagsSetByPromotions.add(eventId);
+  } else if (!active && flagsSetByPromotions.has(eventId)) {
+    core.isPaidPromotion = false;
+    flagsSetByPromotions.delete(eventId);
+  }
+}
+
+/** Clears flags for promotions that have ended. Called on reads and by the expiry timer. */
+export function syncExpiredPaidFlags(now = new Date()) {
+  for (const eventId of [...flagsSetByPromotions]) syncCorePaidFlag(eventId, now);
+}
+
 export function listActivePromotions(now = new Date()): Promotion[] {
+  syncExpiredPaidFlags(now);
   return promotions.filter((promotion) => isActive(promotion, now));
 }
 
@@ -245,5 +272,9 @@ export function activateFromPaidSession(facts: PaidSessionFacts, via: "webhook" 
     event
   };
   promotions.push(promotion);
+  syncCorePaidFlag(event.id, now);
+  // Clear the flag when the boost ends, even if nobody reads /api/promotions in between.
+  const msUntilEnd = Math.min(endsAt.getTime() - now.getTime(), 2 ** 31 - 1);
+  setTimeout(() => syncCorePaidFlag(event.id), Math.max(msUntilEnd, 0) + 1000).unref();
   return { order, promotion, alreadyActive: false };
 }

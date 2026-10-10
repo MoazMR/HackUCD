@@ -14,7 +14,8 @@ import Stripe from "stripe";
 import { businessRouter } from "../src/routes/business.js";
 import { paymentsRouter, stripeWebhookHandler } from "../src/routes/payments.js";
 import { promotionsRouter } from "../src/routes/promotions.js";
-import { attachCheckoutSession, createPendingOrder } from "../src/services/promotions.js";
+import { listEvents } from "../src/services/events.js";
+import { attachCheckoutSession, createPendingOrder, syncExpiredPaidFlags } from "../src/services/promotions.js";
 
 delete process.env.STRIPE_SECRET_KEY;
 delete process.env.STRIPE_WEBHOOK_SECRET;
@@ -168,6 +169,13 @@ try {
   const userPromo = r.body.promotions.find((x: { eventId: string }) => x.eventId === "coffee-and-code");
   check("user self-promotion activates (€2.99)", userPromo?.tier === "user");
   check("promotion snapshots hide attendee ids and exact coordinates", !r.body.promotions.some((x: { event: Record<string, unknown> }) => leaksPrivate(x.event)));
+
+  console.log("Core paid flag");
+  check("bought boost sets isPaidPromotion on the core event", listEvents({ paid: true }).some((e) => e.id === "coffee-and-code"));
+  check("seeded paid event keeps its flag", listEvents({ paid: true }).some((e) => e.id === "sunday-five-a-side"));
+  syncExpiredPaidFlags(new Date(Date.now() + 30 * 24 * 3600 * 1000));
+  check("flag clears when the boost ends", !listEvents({ paid: true }).some((e) => e.id === "coffee-and-code"));
+  check("seeded flag untouched after expiry sweep", listEvents({ paid: true }).some((e) => e.id === "sunday-five-a-side"));
 } finally {
   server.close();
   console.log(`\n${passed} passed, ${failed} failed`);
