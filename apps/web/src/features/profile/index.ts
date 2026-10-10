@@ -7,3 +7,4 @@ export { VerificationFlow } from "./VerificationFlow";
 export { toPublicProfile, trustBreakdown } from "./trust";
 export { sampleMyEvents } from "./sampleData";
 export type { Profile, PublicProfile, MyEvent, Attendee, VerificationStatus, AgeRange, PrivacySettings } from "./types";
+export { Logo } from "./Logo";

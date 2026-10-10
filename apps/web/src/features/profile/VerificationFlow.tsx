@@ -54,30 +54,30 @@ export function VerificationFlow() {
   const canStart = status === "not_started" || status === "failed";
 
   return (
-    <div className="tp-verify" data-status={status}>
-      <div className="tp-status" role="status" aria-live="polite">
-        <span className="tp-status-mark" aria-hidden="true" />
+    <div className="pf-verify" data-status={status}>
+      <div className="pf-status" role="status" aria-live="polite">
+        <span className="pf-status-mark" aria-hidden="true" />
         <div>
           <h3>{copy.title}</h3>
           <p>{copy.body}</p>
         </div>
       </div>
-      {error && <p className="tp-error" role="alert">{error}</p>}
+      {error && <p className="pf-error" role="alert">{error}</p>}
 
       {status === "pending" && (
-        <button type="button" className="tp-button tp-button-quiet" onClick={resolve} disabled={busy}>
+        <button type="button" className="pf-button pf-button-quiet" onClick={resolve} disabled={busy}>
           {busy ? "Checking…" : "Check for a result"}
         </button>
       )}
 
       {canStart && !open && (
-        <button type="button" className="tp-button" onClick={() => { setOpen(true); setError(undefined); }}>
+        <button type="button" className="pf-button" onClick={() => { setOpen(true); setError(undefined); }}>
           {status === "failed" ? "Try the ID check again" : "Start ID check"}
         </button>
       )}
 
       {canStart && open && (
-        <div className="tp-consent">
+        <div className="pf-consent">
           <h4>Before you start</h4>
           <ul>
             <li>This is a prototype. <strong>It never asks for, stores or displays ID images or ID numbers.</strong> You will not be asked to upload anything.</li>
@@ -85,30 +85,30 @@ export function VerificationFlow() {
             <li>The only thing saved is the result: passed, in progress or did not pass.</li>
             <li>The check is optional and you can keep using ThirdPlace without it.</li>
           </ul>
-          <div className="tp-field">
-            <label className="tp-label" htmlFor="tp-id-type">Which Irish ID would you use?</label>
-            <select id="tp-id-type" value={idType} onChange={(event) => setIdType(event.target.value)}>
+          <div className="pf-field">
+            <label className="pf-label" htmlFor="pf-id-type">Which Irish ID would you use?</label>
+            <select id="pf-id-type" value={idType} onChange={(event) => setIdType(event.target.value)}>
               {ID_TYPES.map((type) => <option key={type}>{type}</option>)}
             </select>
-            <p className="tp-hint">Used for this step only. It isn't saved.</p>
+            <p className="pf-hint">Used for this step only. It isn't saved.</p>
           </div>
-          <label className="tp-check">
+          <label className="pf-check">
             <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
             <span>I agree to a mock ID check and to ThirdPlace saving only its result.</span>
           </label>
-          <div className="tp-actions">
-            <button type="button" className="tp-button tp-button-quiet" onClick={() => { setOpen(false); setError(undefined); }}>Cancel</button>
-            <button type="button" className="tp-button" onClick={start}>Agree and start check</button>
+          <div className="pf-actions">
+            <button type="button" className="pf-button pf-button-quiet" onClick={() => { setOpen(false); setError(undefined); }}>Cancel</button>
+            <button type="button" className="pf-button" onClick={start}>Agree and start check</button>
           </div>
         </div>
       )}
 
       {(canStart || status === "pending") && (
-        <fieldset className="tp-prototype">
+        <fieldset className="pf-prototype">
           <legend>Prototype control: result the mock provider returns</legend>
           {(["verified", "failed", "pending"] as MockOutcome[]).map((value) => (
-            <label key={value} className="tp-check">
-              <input type="radio" name="tp-mock-outcome" checked={outcome === value} onChange={() => setOutcome(value)} />
+            <label key={value} className="pf-check">
+              <input type="radio" name="pf-mock-outcome" checked={outcome === value} onChange={() => setOutcome(value)} />
               <span>{value === "verified" ? "Passes" : value === "failed" ? "Does not pass" : "Stays in progress"}</span>
             </label>
           ))}
@@ -116,7 +116,7 @@ export function VerificationFlow() {
       )}
 
       {status === "verified" && (
-        <button type="button" className="tp-button tp-button-text" onClick={() => save("not_started")}>Remove my ID check result</button>
+        <button type="button" className="pf-button pf-button-text" onClick={() => save("not_started")}>Remove my ID check result</button>
       )}
     </div>
   );
