@@ -71,8 +71,8 @@ const radius = document.getElementById("radius");
 radius.addEventListener("input", () => { document.getElementById("radiusValue").textContent = `${radius.value} km`; });
 
 const eventData = {
-  poker: { title: "Low-stakes poker night", symbol: "♠", className: "poker-art" },
-  football: { title: "Friendly five-a-side", symbol: "⚽", className: "football-art" }
+  poker: { title: "Low-stakes poker night", hint: "Poker selected" },
+  football: { title: "Five-a-side", hint: "Football selected" }
 };
 
 document.querySelectorAll("[data-event]").forEach((card) => {
@@ -80,11 +80,7 @@ document.querySelectorAll("[data-event]").forEach((card) => {
     selectedEvent = card.dataset.event;
     document.querySelectorAll("[data-event]").forEach((item) => item.classList.toggle("active", item === card));
     const data = eventData[selectedEvent];
-    document.getElementById("eventHint").textContent = `${data.title.split(" ")[0]} selected`;
-    const hero = document.querySelector(".event-hero");
-    hero.classList.remove("poker-art", "football-art");
-    hero.classList.add(data.className);
-    hero.querySelector(":scope > span").textContent = data.symbol;
+    document.getElementById("eventHint").textContent = data.hint;
     document.getElementById("detailTitle").textContent = data.title;
     resetJoin();
   });
@@ -94,12 +90,12 @@ const joinButton = document.getElementById("joinButton");
 function resetJoin() {
   joinButton.classList.remove("joined");
   joinButton.textContent = "Join this event";
-  document.getElementById("joinStatus").textContent = "You’ll unlock the public event group when you join.";
+  document.getElementById("joinStatus").textContent = "Joining unlocks the public group chat.";
 }
 joinButton.addEventListener("click", () => {
   const joined = joinButton.classList.toggle("joined");
-  joinButton.textContent = joined ? "✓ Joined — open public group" : "Join this event";
-  document.getElementById("joinStatus").textContent = joined ? "You’re in. The public event group is now available." : "You’ll unlock the public event group when you join.";
+  joinButton.textContent = joined ? "✓ Joined" : "Join this event";
+  document.getElementById("joinStatus").textContent = joined ? "You’re in. The group chat is now open." : "Joining unlocks the public group chat.";
 });
 
 document.getElementById("chatForm").addEventListener("submit", (event) => {
@@ -117,5 +113,71 @@ document.getElementById("chatForm").addEventListener("submit", (event) => {
   document.querySelector(".messages").append(message);
   input.value = "";
 });
+
+
+/* ---- live slides: call the running ThirdPlace API (npm run dev). Nothing here is faked. ---- */
+const params = new URLSearchParams(location.search);
+const API = (params.get("api") || "http://localhost:3001").replace(/\/$/, "");
+const WEB = (params.get("web") || "http://localhost:5173").replace(/\/$/, "");
+document.getElementById("portalLink").href = `${WEB}/src/features/business/portal.html`;
+
+function el(tag, text, className) { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; }
+async function api(path, options) {
+  const response = await fetch(`${API}${path}`, { ...options, headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(20000) });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
+  return data;
+}
+const notRunning = `Can’t reach the API at ${API}. Start it with npm run dev.`;
+
+const aiForm = document.getElementById("aiForm");
+aiForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const out = document.getElementById("aiOut");
+  const button = document.getElementById("aiButton");
+  button.disabled = true; button.textContent = "Generating…";
+  out.replaceChildren(el("p", "Asking the model…", "muted"));
+  try {
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+    const data = await api("/api/event-plans", { method: "POST", body: JSON.stringify({
+      goal: document.getElementById("aiGoal").value, area: document.getElementById("aiArea").value,
+      category: document.getElementById("aiCategory").value, date: tomorrow }) });
+    const live = data.provider === "openrouter";
+    out.replaceChildren(
+      el("span", live ? `Generated with OpenRouter · ${data.model}` : "Placeholder plan (no OpenRouter key set)", live ? "badge" : "badge warn"),
+      el("h4", data.plan.title), el("p", data.plan.description),
+      Object.assign(el("ul"), {}), el("p", `About ${data.plan.suggestedDurationMinutes} minutes. ${data.plan.rationale}`, "muted"));
+    const list = out.querySelector("ul");
+    data.plan.checklist.forEach((item) => list.append(el("li", item)));
+  } catch (error) {
+    out.replaceChildren(el("p", error.name === "TypeError" ? notRunning : error.message, "err"));
+  } finally { button.disabled = false; button.textContent = "Generate a plan"; }
+});
+
+async function refreshStripe() {
+  const status = document.getElementById("stripeStatus");
+  const out = document.getElementById("orderOut");
+  try {
+    const [pay, orders] = await Promise.all([api("/api/payments/status"), api("/api/business/orders")]);
+    status.textContent = pay.stripeConfigured ? "Test mode connected" : "Key not set";
+    if (!orders.orders.length) { out.replaceChildren(el("p", "No orders yet. Make a test purchase in the business portal.", "muted")); return; }
+    const table = el("table", undefined, "orders");
+    const head = table.createTHead().insertRow();
+    ["Event", "Amount", "Status"].forEach((label) => head.append(el("th", label)));
+    const body = table.createTBody();
+    orders.orders.slice().reverse().slice(0, 5).forEach((order) => {
+      const row = body.insertRow();
+      row.insertCell().textContent = order.eventTitle;
+      row.insertCell().textContent = `€${(order.amountCents / 100).toFixed(2)}`;
+      row.insertCell().textContent = order.status === "paid" ? "Paid · Promoted" : order.status;
+    });
+    out.replaceChildren(table);
+  } catch (error) {
+    status.textContent = "API not running";
+    out.replaceChildren(el("p", error.name === "TypeError" ? notRunning : error.message, "err"));
+  }
+}
+document.getElementById("orderRefresh").addEventListener("click", refreshStripe);
+refreshStripe();
 
 showSlide(current, true);
