@@ -9,6 +9,8 @@ Location-based social outings: discover nearby events, create one, and join peop
 3. Run `npm run dev`.
 4. Open `http://localhost:5173`. The API runs at `http://localhost:3001`.
 
+The event-planning assistant works immediately with clearly labelled synthetic output. To use OpenRouter, copy `apps/api/.env.example` to an untracked `.env`, set `OPENROUTER_API_KEY`, and choose an `OPENROUTER_MODEL`. Environment files and API keys must never be committed. The browser sends event details to the ThirdPlace API only; the OpenRouter key stays on the server.
+
 ## Product scope
 
 ThirdPlace helps people safely discover and create local events. People browse a map and feed, set interests and travel radius, create or join events, and chat only in the event's public group space. Businesses can create and pay to promote events; users can optionally pay to promote an event.

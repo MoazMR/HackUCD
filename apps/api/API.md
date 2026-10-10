@@ -22,3 +22,10 @@ All endpoints use synthetic in-memory data and reset when the server restarts. C
 - `GET` and `POST /api/profiles/:id/verification` expose a mock provider status (`unverified`, `pending`, `verified`, or `failed`). The boundary accepts no ID image, number, scan, or document data, and none is persisted or logged.
 
 There are intentionally no direct-message routes or private-message models in this prototype.
+
+## Event planning assistant
+
+- `POST /api/event-plans` accepts a goal, approximate area, category, date, optional group size, and optional budget.
+- With `OPENROUTER_API_KEY` and a currently available `OPENROUTER_MODEL` set on the API server, the service calls OpenRouter and validates the structured response.
+- Without a key it returns a clearly labelled synthetic plan so the local demo remains usable.
+- The key is never returned to the browser or logged. The route rejects oversized or invalid inputs and does not accept profile data, exact locations, contact details, identity documents, or private messages.
