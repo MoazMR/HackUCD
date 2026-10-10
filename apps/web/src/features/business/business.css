@@ -54,6 +54,7 @@
 .biz-step h2 { font-size: 1.25rem; margin: .2rem 0 1rem; }
 
 .biz-form__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem 1rem; }
+.biz-form__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
 .biz-field { display: grid; gap: .3rem; margin-bottom: .2rem; align-content: start; }
 .biz-field label { font-weight: 650; font-size: .92rem; }
 .biz-field input, .biz-field select, .biz-field textarea {

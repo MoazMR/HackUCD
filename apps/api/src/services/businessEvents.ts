@@ -11,19 +11,30 @@ import { getEvent, listEvents } from "./events.js";
 export type BusinessEvent = OutingEvent & {
   hostType: "business";
   businessName: string;
+  /** Public neighbourhood name, e.g. "Ranelagh". The portal offers the feed's area list. */
   venueAddressArea: string;
+  /** Single interest the event is about, e.g. "poker"; used by the feed's interest matching. */
+  interest?: string;
+  priceEur: number;
+  capacity: number;
   createdAt: string;
 };
 
-export type HostedEvent = OutingEvent & { hostType?: "business" | "user"; businessName?: string };
+export type HostedEvent = OutingEvent & {
+  hostType?: "business" | "user";
+  businessName?: string;
+  /** Core events only: the API's interest tags (public). */
+  interests?: string[];
+};
 
 export const EVENT_CATEGORIES: EventCategory[] = ["food", "sport", "music", "social", "other"];
 
 /** Placeholder identity until the shared Event model gains a host/creator id. */
 export const DEMO_USER = {
   id: "demo-user",
-  name: "Aoife (demo user)",
-  ownedEventIds: ["coffee-and-code"]
+  // Hosts "Sunday five-a-side" in both the API store and the discovery feed's sample data.
+  name: "Dara L. (demo user)",
+  ownedEventIds: ["sunday-five-a-side", "coffee-and-code"]
 };
 
 const businessEvents: BusinessEvent[] = [
@@ -37,7 +48,10 @@ const businessEvents: BusinessEvent[] = [
     attendeeCount: 6,
     hostType: "business",
     businessName: "Ranelagh Padel Club (synthetic)",
-    venueAddressArea: "Ranelagh, Dublin 6",
+    venueAddressArea: "Ranelagh",
+    interest: "padel",
+    priceEur: 5,
+    capacity: 12,
     createdAt: "2026-10-09T09:00:00.000Z"
   }
 ];
@@ -50,6 +64,9 @@ export type BusinessEventInput = {
   venueName?: unknown;
   venueAddressArea?: unknown;
   category?: unknown;
+  interest?: unknown;
+  priceEur?: unknown;
+  capacity?: unknown;
 };
 
 export type FieldErrors = Partial<Record<keyof BusinessEventInput, string>>;
@@ -73,6 +90,9 @@ export function validateBusinessEvent(input: BusinessEventInput, now = new Date(
   if (venueName.length < 2 || venueName.length > 80) errors.venueName = "Business events must happen at a named venue.";
   if (area.length < 2 || area.length > 80) errors.venueAddressArea = "Add the area, e.g. 'Ranelagh, Dublin 6'. Only the area is shown publicly.";
   if (!EVENT_CATEGORIES.includes(input.category as EventCategory)) errors.category = "Choose a category.";
+  if (input.interest !== undefined && (text(input.interest).length < 2 || text(input.interest).length > 30)) errors.interest = "Choose an interest.";
+  if (input.priceEur !== undefined && !(typeof input.priceEur === "number" && input.priceEur >= 0 && input.priceEur <= 500)) errors.priceEur = "Price must be between €0 and €500.";
+  if (input.capacity !== undefined && !(Number.isInteger(input.capacity) && (input.capacity as number) >= 2 && (input.capacity as number) <= 500)) errors.capacity = "Capacity must be a whole number from 2 to 500.";
 
   const start = new Date(startsAt);
   if (!startsAt || Number.isNaN(start.getTime())) errors.startsAt = "Choose a valid start date and time.";
@@ -96,6 +116,9 @@ export function createBusinessEvent(input: BusinessEventInput): BusinessEvent {
     hostType: "business",
     businessName: text(input.businessName),
     venueAddressArea: text(input.venueAddressArea),
+    interest: input.interest === undefined ? undefined : text(input.interest).toLowerCase(),
+    priceEur: typeof input.priceEur === "number" ? Math.round(input.priceEur * 100) / 100 : 0,
+    capacity: typeof input.capacity === "number" ? input.capacity : 30,
     createdAt: new Date().toISOString()
   };
   businessEvents.unshift(event);
@@ -110,9 +133,9 @@ export function listBusinessEvents(): BusinessEvent[] {
  * Public-safe copy of a core event: only the shared OutingEvent fields. Drops attendeeIds,
  * exact coordinates and other API-internal fields before anything is returned by business routes.
  */
-function toPublicEvent(event: OutingEvent): OutingEvent {
-  const { id, title, description, startsAt, locationName, category, attendeeCount } = event;
-  return { id, title, description, startsAt, locationName, category, attendeeCount };
+function toPublicEvent(event: OutingEvent & { interests?: string[] }): OutingEvent & { interests?: string[] } {
+  const { id, title, description, startsAt, locationName, category, attendeeCount, interests } = event;
+  return { id, title, description, startsAt, locationName, category, attendeeCount, interests };
 }
 
 /** Looks up an event in the business store first, then (read-only) in the core event service. */

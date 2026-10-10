@@ -19,6 +19,8 @@ export type DiscoveryEvent = OutingEvent & {
   hostName: string;
   /** True for data generated in the browser rather than served by the API. */
   synthetic: boolean;
+  /** Set when someone paid to promote this event (see features/business). Always shown as "Promoted". */
+  promotion?: { sponsorName: string; endsAt: string; tier: "business" | "user" };
 };
 
 export type ChatMessage = {

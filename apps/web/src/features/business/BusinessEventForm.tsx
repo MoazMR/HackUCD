@@ -1,4 +1,6 @@
 import type { EventCategory } from "@social-outings/shared";
+import { AREAS } from "../events/geo";
+import { INTERESTS } from "../events/types";
 import type { BusinessEventDraft, FieldErrors } from "./types";
 
 const CATEGORIES: { value: EventCategory; label: string }[] = [
@@ -16,7 +18,10 @@ export const EMPTY_DRAFT: BusinessEventDraft = {
   startsAt: "",
   venueName: "",
   venueAddressArea: "",
-  category: ""
+  category: "",
+  interest: "",
+  priceEur: "0",
+  capacity: "20"
 };
 
 /** Synthetic sample so a demo can be filled in one click. */
@@ -25,13 +30,16 @@ export function sampleDraft(): BusinessEventDraft {
   start.setHours(19, 0, 0, 0);
   const local = new Date(start.getTime() - start.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   return {
-    businessName: "The Tenter Board Game Café",
+    businessName: "Smithfield Games Café",
     title: "Thursday poker and board games night",
     description: "Friendly no-money poker tables and new board games. Beginners welcome; staff teach the rules.",
     startsAt: local,
-    venueName: "The Tenter Board Game Café",
-    venueAddressArea: "The Liberties, Dublin 8",
-    category: "social"
+    venueName: "Smithfield Games Café",
+    venueAddressArea: "Smithfield",
+    category: "social",
+    interest: "poker",
+    priceEur: "5",
+    capacity: "24"
   };
 }
 
@@ -41,8 +49,13 @@ export function validateDraft(draft: BusinessEventDraft): FieldErrors {
   if (draft.title.trim().length < 3) errors.title = "Give the event a title (at least 3 characters).";
   if (draft.title.trim().length > 80) errors.title = "Keep the title under 80 characters.";
   if (draft.venueName.trim().length < 2) errors.venueName = "Business events must happen at a named venue.";
-  if (draft.venueAddressArea.trim().length < 2) errors.venueAddressArea = "Add the area, e.g. 'Ranelagh, Dublin 6'.";
+  if (!draft.venueAddressArea) errors.venueAddressArea = "Choose the neighbourhood.";
   if (!draft.category) errors.category = "Choose a category.";
+  if (!draft.interest) errors.interest = "Choose what the event is about.";
+  const price = Number(draft.priceEur || 0);
+  if (!Number.isFinite(price) || price < 0 || price > 500) errors.priceEur = "Enter a price from €0 (free) to €500.";
+  const capacity = Number(draft.capacity);
+  if (!Number.isInteger(capacity) || capacity < 2 || capacity > 500) errors.capacity = "Enter a whole number from 2 to 500.";
   if (draft.description.length > 500) errors.description = "Keep the description under 500 characters.";
   if (!draft.startsAt) errors.startsAt = "Choose a start date and time.";
   else if (new Date(draft.startsAt).getTime() <= Date.now()) errors.startsAt = "The event must start in the future.";
@@ -94,8 +107,11 @@ export function BusinessEventForm({ draft, errors, saving, onChange, onSubmit, o
         {field("venueName", "Venue",
           <input id="biz-venueName" value={draft.venueName} onChange={set("venueName")} aria-invalid={Boolean(errors.venueName)} aria-describedby={describedBy("venueName")} />)}
         {field("venueAddressArea", "Area",
-          <input id="biz-venueAddressArea" value={draft.venueAddressArea} onChange={set("venueAddressArea")} aria-invalid={Boolean(errors.venueAddressArea)} aria-describedby={describedBy("venueAddressArea")} />,
-          "Area only, e.g. 'Ranelagh, Dublin 6'.")}
+          <select id="biz-venueAddressArea" value={draft.venueAddressArea} onChange={set("venueAddressArea")} aria-invalid={Boolean(errors.venueAddressArea)} aria-describedby={describedBy("venueAddressArea")}>
+            <option value="">Choose…</option>
+            {AREAS.map((area) => <option key={area.name} value={area.name}>{area.name}</option>)}
+          </select>,
+          "Only the neighbourhood is shown publicly.")}
         {field("startsAt", "Starts",
           <input id="biz-startsAt" type="datetime-local" value={draft.startsAt} onChange={set("startsAt")} aria-invalid={Boolean(errors.startsAt)} aria-describedby={describedBy("startsAt")} />)}
         {field("category", "Category",
@@ -103,6 +119,19 @@ export function BusinessEventForm({ draft, errors, saving, onChange, onSubmit, o
             <option value="">Choose…</option>
             {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>)}
+        {field("interest", "What it's about",
+          <select id="biz-interest" value={draft.interest} onChange={set("interest")} aria-invalid={Boolean(errors.interest)} aria-describedby={describedBy("interest")}>
+            <option value="">Choose…</option>
+            {INTERESTS.map((interest) => <option key={interest} value={interest}>{interest[0].toUpperCase() + interest.slice(1)}</option>)}
+          </select>,
+          "Promotion reaches people who chose this interest.")}
+        <div className="biz-form__pair">
+          {field("priceEur", "Price (€)",
+            <input id="biz-priceEur" type="number" min={0} max={500} step="0.5" inputMode="decimal" value={draft.priceEur} onChange={set("priceEur")} aria-invalid={Boolean(errors.priceEur)} aria-describedby={describedBy("priceEur")} />,
+            "0 means free.")}
+          {field("capacity", "Spaces",
+            <input id="biz-capacity" type="number" min={2} max={500} step={1} inputMode="numeric" value={draft.capacity} onChange={set("capacity")} aria-invalid={Boolean(errors.capacity)} aria-describedby={describedBy("capacity")} />)}
+        </div>
       </div>
       {field("description", "Description",
         <textarea id="biz-description" rows={3} value={draft.description} onChange={set("description")} maxLength={500} aria-invalid={Boolean(errors.description)} aria-describedby={describedBy("description")} />,
