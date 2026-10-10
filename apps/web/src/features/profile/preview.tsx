@@ -56,11 +56,11 @@ function Preview() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="#/profile">ThirdPlace</a>
-        <nav aria-label="Preview navigation" hidden={!profile.onboarded}>
+        {profile.onboarded && <nav aria-label="Preview navigation">
           <a href="#/my-events" aria-current={route.startsWith("/my-events") ? "page" : undefined}>My Events</a>
           <a href="#/profile" aria-current={route === "/profile" ? "page" : undefined}>Profile</a>
           <a href="#/profile" onClick={() => reset()}>Restart onboarding</a>
-        </nav>
+        </nav>}
       </header>
       {screen}
     </main>
