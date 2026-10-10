@@ -6,15 +6,19 @@ import { EndorsementScreen, MyEventsView, ProfileProvider, ProfileView, sampleMy
 import { ProfileApiSync } from "./integration/ProfileApiSync";
 
 type MainView = "for-you" | "map" | "my-events" | "profile";
-type View = MainView | "plan";
+/** Discovery sub-routes handled inside Kate's DiscoverEvents (#/event/:id, #/create, #/search). */
+type DiscoveryRoute = "event" | "create" | "search";
+type View = MainView | "plan" | DiscoveryRoute;
 const mainViews: Array<{ id: MainView; label: string }> = [
   { id: "for-you", label: "For You" }, { id: "map", label: "Map" },
   { id: "my-events", label: "My Events" }, { id: "profile", label: "Profile" }
 ];
+const discoveryRoutes: DiscoveryRoute[] = ["event", "create", "search"];
 
+/** Accepts both "#map" (shell nav) and "#/map" / "#/event/:id" (discovery links). */
 function viewFromHash(): View {
-  const value = window.location.hash.slice(1) as View;
-  return [...mainViews.map((item) => item.id), "plan"].includes(value) ? value : "for-you";
+  const first = window.location.hash.replace(/^#\/?/, "").split("/")[0] as View;
+  return [...mainViews.map((item) => item.id), "plan", ...discoveryRoutes].includes(first) ? first : "for-you";
 }
 
 export function App() {
@@ -50,14 +54,17 @@ function AppContent() {
       <header className="topbar">
         <button className="brand" type="button" onClick={() => setView("for-you")}>ThirdPlace</button>
         <nav aria-label="Primary navigation">{mainViews.map((item) => <button type="button" key={item.id} className="nav-link" aria-current={view === item.id ? "page" : undefined} onClick={() => setView(item.id)}>{item.label}</button>)}</nav>
-        <button type="button" className="create-action" onClick={() => setView("plan")}>Plan an event</button>
+        <div className="topbar-actions">
+          <button type="button" className="nav-link" onClick={() => setView("plan")}>Plan an event</button>
+          <a className="create-action" href="#/create">Create event</a>
+        </div>
       </header>
       <ProfileApiSync />
       <main>
         {notice && <p className="integration-notice" role="status">{notice}</p>}
         {endorsementEvent ? <EndorsementScreen event={endorsementEvent} onDone={() => setEndorsementEventId(undefined)} />
           : view === "for-you" ? <><section className="hero"><p className="eyebrow">Your city, your people</p><h1>Find something good to do nearby.</h1><p>Recommendations use your interests and travel radius.</p></section><DiscoverEvents /></>
-          : view === "map" ? <section className="integration-placeholder" aria-labelledby="map-heading"><p className="eyebrow">Map</p><h1 id="map-heading">Nearby event map</h1><p>Kate's interactive hotspots will mount in this shared navigation slot. The accessible event list remains available below.</p><DiscoverEvents /></section>
+          : view === "map" || discoveryRoutes.includes(view as DiscoveryRoute) ? <DiscoverEvents />
           : view === "my-events" ? <MyEventsView events={events} onOpenChat={() => setNotice("Public event-group chat opens from Kate's event detail flow once it is merged.")} onOpenEvent={() => setNotice("Event details open here once Kate's event flow is merged.")} onEndorse={setEndorsementEventId} onFindEvents={() => setView("for-you")} />
           : view === "profile" ? <ProfileView />
           : <EventPlanner onBack={() => setView("for-you")} />}
