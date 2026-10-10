@@ -51,34 +51,31 @@ Activation is idempotent: if the webhook and the success return both arrive, the
 
 Orders and promotions are kept in memory (mock orders) and reset when the API restarts.
 
-## For the feed and map (Kate)
+## In the feed and map
 
-```tsx
-import { PromotedBadge, usePromotions } from "../business";
+Wired up in `features/business/promotedFeed.ts`, called from Kate's `events/eventsClient.ts`:
 
-const { byEventId } = usePromotions();
-const promotion = byEventId.get(event.id);
-{promotion && <PromotedBadge sponsorName={promotion.sponsorName} />}          // event card
-{promotion && <PromotedBadge variant="pin" sponsorName={promotion.sponsorName} />} // map hotspot
-```
+- A promoted event already in the feed gets a **Promoted** badge (`PromotedBadge`) on its card and on its map hotspot, with "Promoted by <sponsor> (paid placement)" in the card details.
+- A promoted business venue event is added to the feed at its neighbourhood (the portal's Area list is the feed's `AREAS`), with its interest, price and capacity from the portal form.
+- Ranking: interest matches first, then promoted, then nearest. Promotion never bypasses the radius, date, filter or interest rules, so a padel-only user never sees a promoted poker night.
+- Fails soft: if `/api/promotions` is down, the feed renders normally without labels.
 
-`usePromotions` fails soft: if the endpoint is down the feed renders normally without labels.
-Promotion changes position, not audience. Apply the user's interest and radius filters first, then lift matching promoted events.
-Business venue events live in `GET /api/business/events` (and each promotion includes an `event` snapshot) until they are merged into the core event store.
+`usePromotions` is still exported for any other view that needs the active list.
 
 ## Known limits (prototype)
 
 - The portal is a separate Vite page, so it is served by `npm run dev` but not yet included in `vite build`. For deployment, add it as a build input or route it from the app shell.
 - A paid boost on a core event sets its existing `isPaidPromotion` flag (and clears it when the boost ends), so `/api/events?paid=true` includes it. Business venue events live in the business store, so they appear in `/api/business/events` and `/api/promotions`, not `/api/events`.
 
-- No authentication: the "own event" check uses a synthetic demo user (`Aoife`, owns `coffee-and-code`) and the business name typed in the form. Replace with the real host id once `Event` carries one.
+- A promoted core API event that isn't in the feed's sample data (e.g. `coffee-and-code`) isn't shown in the feed until it reads `/api/events`; `sunday-five-a-side` exists in both, so use it for the user-promotion demo.
+- No authentication: the "own event" check uses a synthetic demo user (`Dara L.`, owns `sunday-five-a-side` and `coffee-and-code`) and the business name typed in the form. Replace with the real host id once `Event` carries one.
 - In-memory storage; no refunds; one active promotion per event.
 
 ## Tests
 
 ```bash
 npm run typecheck
-cd apps/api && npx tsx scripts/payments-smoke.ts   # 35 offline checks: normal, boundary and failure requests + signed webhook
+cd apps/api && npx tsx scripts/payments-smoke.ts   # 41 offline checks: normal, boundary and failure requests + signed webhook
 ```
 
 Screenshots of each state are in `screenshots/`.

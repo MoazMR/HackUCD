@@ -1,3 +1,4 @@
+import { withPromotions } from "../business/promotedFeed";
 import { buildSyntheticEvents } from "./syntheticData";
 import type { DiscoveryEvent } from "./types";
 
@@ -15,5 +16,6 @@ export async function loadEvents(): Promise<DiscoveryEvent[]> {
   await new Promise((resolve) => setTimeout(resolve, 450));
   if (simulate === "error") throw new Error("Simulated failure");
   if (simulate === "empty") return [];
-  return buildSyntheticEvents();
+  // Paid promotions come from the API and are labelled "Promoted"; fails soft if the API is down.
+  return withPromotions(buildSyntheticEvents());
 }

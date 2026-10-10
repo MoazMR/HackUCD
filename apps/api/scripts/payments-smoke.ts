@@ -32,6 +32,7 @@ const server = app.listen(0);
 const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
 let passed = 0;
+let r2: { status: number; body: any };
 let failed = 0;
 function check(name: string, condition: boolean, detail?: unknown) {
   if (condition) {
@@ -88,8 +89,11 @@ try {
   check("past start time -> 422", r.status === 422 && Boolean(r.body.fieldErrors?.startsAt));
   r = await call("/api/business/events", { method: "POST", json: { businessName: "Test Café", title: "Quiz", venueName: "Test Café", venueAddressArea: "Dublin 8", category: "knitting", startsAt: future(2) } });
   check("unknown category -> 422", r.status === 422 && Boolean(r.body.fieldErrors?.category));
-  r = await call("/api/business/events", { method: "POST", json: { businessName: "Test Café", title: "Thursday quiz night", venueName: "Test Café", venueAddressArea: "Dublin 8", category: "social", startsAt: future(2), description: "Teams of four." } });
+  r = await call("/api/business/events", { method: "POST", json: { businessName: "Test Café", title: "Thursday quiz night", venueName: "Test Café", venueAddressArea: "Dublin 8", category: "social", startsAt: future(2), description: "Teams of four.", interest: "Board games", priceEur: 4, capacity: 24 } });
   const bizEvent = r.body.event;
+  check("venue event keeps interest, price and capacity", bizEvent?.interest === "board games" && bizEvent?.priceEur === 4 && bizEvent?.capacity === 24, bizEvent);
+  r2 = await call("/api/business/events", { method: "POST", json: { businessName: "Test Café", title: "Quiz", venueName: "Test Café", venueAddressArea: "Smithfield", category: "social", startsAt: future(2), priceEur: -1, capacity: 1.5 } });
+  check("bad price and capacity -> 422", r2.status === 422 && Boolean(r2.body.fieldErrors?.priceEur && r2.body.fieldErrors?.capacity), r2.body);
   check("valid venue event -> 201", r.status === 201 && bizEvent?.hostType === "business" && bizEvent?.locationName === "Test Café", r.body);
 
   console.log("Checkout request validation");
@@ -98,7 +102,7 @@ try {
   check("unknown plan -> 400", r.status === 400 && r.body.code === "unknown_plan");
   r = await checkout({ planId: "venue-boost-7d", eventId: "coffee-and-code", buyer: { type: "user" } });
   check("user buying business plan -> 400 plan_buyer_mismatch", r.status === 400 && r.body.code === "plan_buyer_mismatch");
-  r = await checkout({ planId: "community-boost-3d", eventId: "sunday-five-a-side", buyer: { type: "user" } });
+  r = await checkout({ planId: "community-boost-3d", eventId: "docklands-padel", buyer: { type: "user" } });
   check("user promoting someone else's event -> 403", r.status === 403 && r.body.code === "not_event_host");
   r = await checkout({ planId: "venue-boost-7d", eventId: bizEvent.id, buyer: { type: "business", name: "Rival Bar" } });
   check("business promoting another business's event -> 403", r.status === 403 && r.body.code === "not_event_host");
@@ -157,7 +161,7 @@ try {
   r = await call("/api/payments/cancel", { method: "POST", json: { orderId: "ord_missing" } });
   check("cancel unknown order -> 404", r.status === 404);
   r = await call("/api/business/my-events");
-  check("demo user's own events listed, not promoted", r.body.events.length === 1 && r.body.events[0].promoted === false);
+  check("demo user's own events listed, not promoted", r.body.events.length === 2 && r.body.events.every((e: { promoted: boolean }) => e.promoted === false));
 
   console.log("Privacy");
   const leaksPrivate = (event: Record<string, unknown>) => "attendeeIds" in event || "coordinates" in event;

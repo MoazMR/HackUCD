@@ -42,7 +42,12 @@ export const businessApi = {
   createBusinessEvent: (draft: BusinessEventDraft) =>
     request<{ event: HostedEvent }>("/api/business/events", {
       method: "POST",
-      body: JSON.stringify({ ...draft, startsAt: draft.startsAt ? new Date(draft.startsAt).toISOString() : "" })
+      body: JSON.stringify({
+        ...draft,
+        startsAt: draft.startsAt ? new Date(draft.startsAt).toISOString() : "",
+        priceEur: Number(draft.priceEur || 0),
+        capacity: Number(draft.capacity)
+      })
     }).then((d) => d.event),
 
   startCheckout: (body: { planId: PromotionPlan["id"]; eventId: string; buyer: { type: "business"; name: string } | { type: "user" } }) =>

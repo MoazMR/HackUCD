@@ -208,7 +208,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
     : mode === "business"
       ? { title: draft.title, description: draft.description, locationName: draft.venueName, category: draft.category, startsAt: draft.startsAt }
       : { title: "", description: "", locationName: "", category: "" };
-  const sponsorName = mode === "business" ? selectedEvent?.businessName ?? businessName : "Aoife (demo user)";
+  const sponsorName = mode === "business" ? selectedEvent?.businessName ?? businessName : "Dara L. (demo user)";
 
   return (
     <div className="biz-shell">
@@ -281,7 +281,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
               </>
             ) : (
               <>
-                <p className="biz-fineprint">Signed in as Aoife (demo user). You can only promote events you created.</p>
+                <p className="biz-fineprint">Signed in as Dara L. (demo user). You can only promote events you created.</p>
                 {myEvents.length === 0 ? (
                   <p className="biz-empty">You haven't created any events yet. Create one from For You first; it's free.</p>
                 ) : (

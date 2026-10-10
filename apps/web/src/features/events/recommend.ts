@@ -82,7 +82,8 @@ export function describeActiveFilters(filters: DiscoveryFilters): string[] {
  *  3. With NO explicit search (no keywords, type, date, time or area), keep only events
  *     matching the user's interests, so someone into poker/football/padel/tennis never
  *     sees knitting. Once the user searches or filters, interests are not required.
- *  4. Rank interest matches first, then nearest, then soonest.
+ *  4. Rank interest matches first, then paid promotions (labelled "Promoted"), then nearest,
+ *     then soonest. Promotion changes position only: it never bypasses steps 1–3.
  */
 export function rankEvents(
   events: DiscoveryEvent[],
@@ -113,6 +114,7 @@ export function rankEvents(
     .sort(
       (a, b) =>
         Number(b.interestMatch) - Number(a.interestMatch) ||
+        Number(Boolean(b.event.promotion)) - Number(Boolean(a.event.promotion)) ||
         a.distanceKm - b.distanceKm ||
         a.event.startsAt.localeCompare(b.event.startsAt)
     )

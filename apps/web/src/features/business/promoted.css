@@ -28,3 +28,8 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Promoted placements in the discovery feed and map (features/discovery). Marigold = paid. */
+.tp-tile.tp-tile--promoted { border-color: #e6c463; box-shadow: 0 0 0 2px rgba(243, 197, 82, .35); }
+.tp .tp-hotspot--promoted .tp-hotspot__count { border-color: #f3c552; box-shadow: 0 0 0 3px #17201d, 0 4px 10px rgba(0, 0, 0, .25); }
+.tp-hotspot__promo { line-height: 1; }
