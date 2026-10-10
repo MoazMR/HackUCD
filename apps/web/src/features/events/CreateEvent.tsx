@@ -22,6 +22,7 @@ export function validateDraft(draft: NewEventDraft, now: Date = new Date()): Err
   if (draft.title.trim().length < 3) errors.title = "Give your event a title (at least 3 characters).";
   if (draft.title.trim().length > 80) errors.title = "Keep the title under 80 characters.";
   if (draft.description.trim().length < 10) errors.description = "Add a short description (at least 10 characters).";
+  if (draft.description.trim().length > 500) errors.description = "Keep the description under 500 characters.";
   if (!draft.locationName.trim()) errors.locationName = "Add a venue name, like “Herbert Park Courts”.";
   const start = new Date(draft.startsAt);
   if (!draft.startsAt || Number.isNaN(start.getTime())) errors.startsAt = "Choose a date and time.";
@@ -87,7 +88,7 @@ export function CreateEvent({ onCreate, onCreated, backHref }: Props) {
     <div className="tp-create">
       <a className="tp-back" href={backHref}>← Back to events</a>
       <h2 className="tp-detail__title">Create Event</h2>
-      <p className="tp-muted">Share a plan and let people nearby join. You'll be added as the host and can chat with everyone who joins.</p>
+      <p className="tp-muted">Creating an event is free. Share a plan and let people nearby join. You'll be added as the host and can chat with everyone who joins.</p>
 
       <form className="tp-form" onSubmit={submit} noValidate>
         <div className="tp-field">
@@ -97,7 +98,7 @@ export function CreateEvent({ onCreate, onCreated, backHref }: Props) {
         </div>
         <div className="tp-field">
           <label htmlFor={`${uid}-description`}>What's the plan?</label>
-          <textarea {...field("description")} rows={3} value={draft.description} onChange={(e) => set("description", e.target.value)} placeholder="Level, what to bring, what to expect" />
+          <textarea {...field("description")} rows={3} maxLength={500} value={draft.description} onChange={(e) => set("description", e.target.value)} placeholder="Level, what to bring, what to expect" />
           {fieldError("description")}
         </div>
         <div className="tp-form__row">

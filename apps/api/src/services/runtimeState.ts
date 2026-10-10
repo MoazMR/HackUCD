@@ -3,8 +3,9 @@ import { basename, dirname, resolve } from "node:path";
 
 type RuntimeState = Record<string, unknown[]>;
 
-const memoryOnly = process.env.THIRDPLACE_DATA_FILE === ":memory:"
-  || process.argv.some((value) => /(?:integration\.test|payments-smoke)/.test(value));
+const configuredPath = process.env.THIRDPLACE_DATA_FILE;
+const memoryOnly = configuredPath === ":memory:"
+  || (!configuredPath && process.argv.some((value) => /(?:\.test\.mjs|payments-smoke)/.test(value)));
 
 const defaultPath = basename(process.cwd()).toLowerCase() === "api"
   ? resolve(process.cwd(), ".data", "runtime.json")
@@ -18,7 +19,7 @@ function load(): RuntimeState {
   if (memoryOnly || !existsSync(statePath)) return (loaded = {});
   try {
     const parsed = JSON.parse(readFileSync(statePath, "utf8"));
-    return (loaded = parsed && typeof parsed === "object" ? parsed as RuntimeState : {});
+    return (loaded = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed as RuntimeState : {});
   } catch {
     console.warn("[storage] Runtime data could not be read; starting with seed data.");
     return (loaded = {});

@@ -2,16 +2,17 @@
 export type Area = { name: string; lat: number; lng: number };
 
 export const AREAS: Area[] = [
-  { name: "Belfield", lat: 53.3067, lng: -6.2233 },
+  { name: "Belfield", lat: 53.308, lng: -6.224 },
   { name: "Donnybrook", lat: 53.322, lng: -6.232 },
-  { name: "Ranelagh", lat: 53.3262, lng: -6.2562 },
+  { name: "Ranelagh", lat: 53.326, lng: -6.256 },
   { name: "Rathmines", lat: 53.322, lng: -6.265 },
   { name: "Portobello", lat: 53.331, lng: -6.266 },
   { name: "Ballsbridge", lat: 53.329, lng: -6.231 },
   { name: "Dublin city centre", lat: 53.347, lng: -6.26 },
+  { name: "Docklands", lat: 53.3467, lng: -6.2382 },
   { name: "Smithfield", lat: 53.3498, lng: -6.2778 },
   { name: "Stoneybatter", lat: 53.352, lng: -6.285 },
-  { name: "Phibsborough", lat: 53.359, lng: -6.274 },
+  { name: "Phibsborough", lat: 53.36, lng: -6.273 },
   { name: "Drumcondra", lat: 53.37, lng: -6.255 },
   { name: "Clontarf", lat: 53.365, lng: -6.2 },
   { name: "Dundrum", lat: 53.289, lng: -6.243 },
@@ -37,7 +38,9 @@ export function setUserOrigin(area: { name: string; lat: number; lng: number }):
 }
 
 export function findArea(name: string): Area | undefined {
-  return AREAS.find((area) => area.name === name);
+  const normalized = name.trim().toLowerCase();
+  const canonical = normalized === "city centre" ? "dublin city centre" : normalized;
+  return AREAS.find((area) => area.name.toLowerCase() === canonical);
 }
 
 const EARTH_RADIUS_KM = 6371;

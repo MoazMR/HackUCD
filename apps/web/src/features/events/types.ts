@@ -9,6 +9,13 @@ import type { OutingEvent } from "@social-outings/shared";
 export type DiscoveryEvent = OutingEvent & {
   /** The single interest this event is about, e.g. "football". Used for recommendations. */
   interest: string;
+  /** All public interest tags, used by the shared API/browser ranking contract. */
+  interests?: string[];
+  isPaidPromotion?: boolean;
+  hostType?: "user" | "business";
+  /** Viewer-specific membership from /api/events/mine, never another person’s identity. */
+  hosting?: boolean;
+  joinedByViewer?: boolean;
   /** Neighbourhood, e.g. "Ranelagh". Public and approximate. */
   area: string;
   lat: number;
@@ -20,7 +27,7 @@ export type DiscoveryEvent = OutingEvent & {
   /** True for data generated in the browser rather than served by the API. */
   synthetic: boolean;
   /** Set when someone paid to promote this event (see features/business). Always shown as "Promoted". */
-  promotion?: { sponsorName: string; endsAt: string; tier: "business" | "user" };
+  promotion?: { sponsorName: string; endsAt?: string; tier: "business" | "user" };
 };
 
 export type ChatMessage = {
@@ -55,6 +62,8 @@ export type RankedEvent = {
   distanceKm: number;
   /** Human-readable explanation, e.g. "Matches football · 2.1 km away". */
   reason: string;
+  score: number;
+  scoreBreakdown: { interest: number; category: number; distance: number; sponsored: number };
 };
 
 export type NewEventDraft = {

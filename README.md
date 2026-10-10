@@ -4,20 +4,33 @@ Location-based social outings: discover nearby events, create one, and join peop
 
 ## Start locally
 
-1. Install [Node.js 20 or newer](https://nodejs.org/).
-2. Run `npm install` from the repository root.
+1. Install [Node.js 24](https://nodejs.org/), matching the verification toolchain.
+2. Run `npm ci --include=dev` from the repository root.
 3. Run `npm run dev`.
 4. Open `http://localhost:5173`. The API runs at `http://localhost:3001`.
 
-The event-planning assistant works immediately with clearly labelled synthetic output. To use OpenRouter, copy `apps/api/.env.example` to an untracked `.env`, set `OPENROUTER_API_KEY`, and choose an `OPENROUTER_MODEL`. Environment files and API keys must never be committed. The browser sends event details to the ThirdPlace API only; the OpenRouter key stays on the server.
+No external credentials are needed for the local prototype. **Plan an event** works immediately with clearly labelled synthetic output. To use OpenRouter, copy `apps/api/.env.example` to the git-ignored `apps/api/.env`, set `OPENROUTER_API_KEY`, and choose an `OPENROUTER_MODEL`. Leave unused settings blank, including the Stripe example key. Environment files and API keys must never be committed. The browser calls the ThirdPlace API; provider keys stay on the server.
 
-The conversational **Ask ThirdPlace** guide can use an OpenClaw Gateway. Set `OPENCLAW_GATEWAY_URL` and `OPENCLAW_GATEWAY_TOKEN`; the API calls the Gateway's OpenAI-compatible `/v1/chat/completions` endpoint with model `openclaw/default`. If OpenClaw is unavailable it falls back to configured OpenRouter, then to transparent rule-based recommendations. Mood text is used only for the current request and is not written to the profile or runtime data.
+The conversational **Ask ThirdPlace** guide can use an OpenClaw Gateway. Set `OPENCLAW_GATEWAY_URL` and `OPENCLAW_GATEWAY_TOKEN`; the API calls the Gateway's OpenAI-compatible `/v1/chat/completions` endpoint with model `openclaw/default`. Provider order is OpenClaw → configured OpenRouter → transparent rule-based fallback. The guide uses eligible upcoming events from the shared catalogue, discloses sponsored suggestions, and can help draft an event. It cannot publish, pay, diagnose mood, request exact addresses or identity documents, or create private messages. Mood text is request context only and is not stored in profiles, analytics, or runtime data. A configured provider receives that request context; its own retention policy is separate.
 
-Prototype-created events, promotion orders, active promotions, and aggregate promotion metrics are stored in `apps/api/.data/runtime.json` by default (git-ignored). This makes Stripe returns recoverable across API restarts. Set `THIRDPLACE_DATA_FILE=:memory:` for a disposable run. A production deployment should replace this small JSON boundary with a transactional database.
+The API-backed catalogue stores user and business events together, with stable demo ownership. Profiles, events, promotion orders, promotions, and aggregate event metrics persist to `apps/api/.data/runtime.json` by default (git-ignored), so payment returns and promotion state can recover across API restarts. Set `THIRDPLACE_DATA_FILE=:memory:` for a disposable run. Hosting must provide a durable disk for restart persistence; this single-process JSON boundary is a prototype, not a transactional payments database. Public event responses omit attendee IDs and expose neighbourhood coordinates only.
+
+## Verify locally
+
+```bash
+git diff --check
+npm run typecheck
+npm test
+npm run build
+```
+
+`npm test` includes API integration tests, assistant provider/fallback tests, and an offline payment smoke test using locally signed webhook fixtures. Tests bind temporary localhost ports and use disposable storage; they need no OpenClaw, OpenRouter, or Stripe credentials. Real hosted Stripe Checkout and live AI responses are separate optional checks with configured sandbox/provider accounts. See [verification evidence and screenshots](docs/COMMERCIAL-AI-VERIFICATION.md), [the business guide](apps/web/src/features/business/README.md), and [judging prep](docs/JUDGING-PREP.md).
 
 ## Product scope
 
-ThirdPlace helps people safely discover and create local events. People browse a map and feed, set interests and travel radius, create or join events, and chat only in the event's public group space. Businesses can create and pay to promote events; users can optionally pay to promote an event.
+ThirdPlace helps people discover and create local events. People browse a map and feed, set interests and travel radius, create or join events, and chat only in the event's public group space. Browsing, joining, and ordinary-user creation are free. A business event remains a draft until verified Stripe sandbox payment publishes and boosts it; cancelling checkout leaves it a draft. A user-owned published event can receive an optional Community Boost.
+
+User and business recommendations follow the same eligibility and scoring rules. Past events, unrelated events, and events outside the travel radius are excluded from recommendations; explicit search may include unrelated matches within the remaining filters. Sponsorship adds a small disclosed score only after eligibility. Feed and map paid labels come from verified sandbox promotions; sample data is synthetic and unsupported seeded paid flags are removed. Aggregate analytics count event impressions, detail opens, joins, and direction taps without storing user identity or mood text.
 
 For the hackathon, the complete demo journey is: **onboard with preferences -> For You feed -> Map or event details -> join public group chat -> attend -> leave an endorsement -> create or promote an event.** The four main user views are **For You**, **Map**, **My Events**, and **Profile**. Read `docs/DESIGN.md` before building navigation.
 
@@ -85,7 +98,7 @@ Use synthetic data and document assumptions. Ensure no direct-message route or p
 ```text
 You are Cahal's coding agent for the ThirdPlace repository. First read README.md and docs/TEAM-OWNERSHIP.md. Before editing, checkout the already-created branch feature/cahal-business-stripe and run git pull origin main. Do not work on main and do not edit files outside Cahal's assigned folders without asking.
 
-Build a clearly separate business experience in apps/web/src/features/business and its related backend endpoints under apps/api/src/routes and apps/api/src/services. Businesses can create venue-based events and choose a paid promotion/boost; ordinary users can optionally promote one of their own events. Clearly label paid/promoted events in the map/feed. Add Stripe sandbox Checkout through a server-side route, using environment variables only and no secret keys in the client or repository. After the sandbox success callback/webhook, record a mock order and activate the promotion in the product. Include a pricing screen that says what the payment buys, price, and currency.
+Build a clearly separate business experience in apps/web/src/features/business and its related backend endpoints under apps/api/src/routes and apps/api/src/services. Businesses save venue-based events as drafts; verified Stripe sandbox payment publishes and boosts them, while cancellation leaves them drafts. Ordinary users create events free and may optionally promote one of their own published events. Clearly label promoted events and distinguish synthetic demo events in the map/feed. Use server-side Stripe sandbox Checkout with environment variables only and no secret keys in the client or repository. Verify payment through a signed webhook or server-side Checkout Session retrieval before recording a paid order and activating promotion. Include a pricing screen that says what the payment buys, price, and currency.
 
 Keep payments optional: regular users can browse, join, and create events without paying. Coordinate API shapes with Moaz using docs/API-CONTRACT.md rather than editing his core event route without agreement. Add setup instructions for required Stripe test variables, run npm run typecheck, test cancellation and successful sandbox return locally, commit, push, and open a PR into main with screenshots and a short test summary. Merge your own PR into main once it is ready.
 ```

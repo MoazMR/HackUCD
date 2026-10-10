@@ -8,7 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && node --test test/integration.test.mjs && tsx scripts/payments-smoke.ts"
+    "test": "npm run build && THIRDPLACE_DATA_FILE=:memory: node --test test/*.test.mjs && THIRDPLACE_DATA_FILE=:memory: tsx scripts/payments-smoke.ts"
   },
   "dependencies": {
     "@social-outings/shared": "*",

@@ -13,6 +13,8 @@ A project without a demonstrated OpenRouter feature scores zero for AI usage. Wi
 3. Restart with `npm run dev`, open **Plan an event**, generate a plan, and check the result says **Generated with OpenRouter**.
 4. Run it four or five times with different goals before judging and note anything odd in the table below.
 
+Also demonstrate **Ask ThirdPlace** with a mood request, an event recommendation, and event-creation guidance. OpenClaw is optional: configure `OPENCLAW_GATEWAY_URL` and server-only `OPENCLAW_GATEWAY_TOKEN` to try it first; configured OpenRouter is the next provider, followed by an explicitly labelled rule-based fallback. The guide uses the eligible catalogue and discloses promoted suggestions. It has no publishing, payment, diagnostic, identity-document, or private-message tools. ThirdPlace does not persist conversation/mood text; configured providers receive the request context under their own retention policies.
+
 | Prompt | What came back | Problem spotted | What we did about it |
 | --- | --- | --- | --- |
 | | | | |
@@ -31,9 +33,12 @@ A project without a demonstrated OpenRouter feature scores zero for AI usage. Wi
 
 1. In the Stripe dashboard, switch to test mode and copy the secret key (`sk_test_...`). The API refuses live keys.
 2. Put it in `apps/api/.env` as `STRIPE_SECRET_KEY` and restart.
-3. Open **For businesses**, create a venue event, choose a promotion and pay with a Stripe test card (`4242 4242 4242 4242`, any future date, any CVC).
-4. Confirm you return to the portal, an order is listed and the event shows as **Promoted** in For You.
-5. Also try cancelling at checkout once, so you can show both paths.
+3. Open **For businesses**, save a future venue-event draft, and confirm it is absent from the public feed. Choose Venue Boost and pay with a Stripe test card (`4242 4242 4242 4242`, any future date, any CVC).
+4. Confirm the verified success return or signed webhook records a paid sandbox order, publishes the event, and shows **Promoted** with the sponsor name in For You and Map. A browser success query alone cannot activate it.
+5. Cancel a checkout and confirm the business event remains a draft. Ordinary-user creation is free; Community Boost is optional for the event owner.
+6. Check impressions, opens, joins, direction taps, and cost-per-join in aggregate analytics. These are prototype event counters, not evidence of unique people or guaranteed attendance.
+
+The automatic payment smoke uses mocked Stripe SDK operations and locally signed webhook fixtures, so it is offline. Hosted test Checkout is a separate manual check that needs a Stripe sandbox account. Run `npm run typecheck`, `npm test`, and `npm run build` before the demo; do not claim a live integration was exercised solely because fixture tests passed.
 
 ## 3. Stay curious: stories that are true
 
@@ -65,5 +70,5 @@ Write down one direct quote per person and count how many said yes to question 3
 - **Done:** new logo in the header; cream, plum, blue, red and yellow across the shell, planner, Profile, My Events and onboarding.
 - **Done:** For You and Map use the profile's area, travel radius and interests.
 - **Done:** events you join or create appear in My Events, and its buttons open the event page and group chat.
-- **In progress:** Kate's restyle of discovery and event screens (PR #13).
-- **Known limits to say out loud:** data is synthetic and kept in the browser and server memory, there are no real accounts, the ID check is a mock, past events in My Events are samples, and the site is not deployed.
+- **Check before presenting:** the current discovery/event screens, business draft/payment states, Ask ThirdPlace provider labels, promoted feed/map labels, and deployed URL if available.
+- **Known limits to say out loud:** seeded data is synthetic, accounts and ID verification are demos, and the API's git-ignored JSON storage supports one process. Profiles, events, sandbox orders, promotions, and aggregate counters survive an API restart when the same file remains available; ephemeral hosting does not guarantee durability. `THIRDPLACE_DATA_FILE=:memory:` is disposable mode. Payments are sandbox-only, and live AI/provider availability needs a configured manual check.

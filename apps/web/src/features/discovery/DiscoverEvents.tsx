@@ -5,7 +5,6 @@ import { rankEvents } from "../events/recommend";
 import {
   DEFAULT_INTERESTS,
   DEFAULT_RADIUS_KM,
-  RADIUS_OPTIONS_KM,
   type DiscoveryFilters
 } from "../events/types";
 import { useEventsStore, type EventsStore } from "../events/useEventsStore";
@@ -31,11 +30,6 @@ function loadInterests(): string[] {
 
 /** Interests and travel radius handed in by the app shell from the person's profile. */
 export type DiscoveryPreferences = { interests: string[]; radiusKm: number };
-
-/** Snap any radius to the nearest option the radius picker offers. */
-function nearestRadiusOption(radiusKm: number): number {
-  return RADIUS_OPTIONS_KM.reduce((best, option) => (Math.abs(option - radiusKm) < Math.abs(best - radiusKm) ? option : best));
-}
 
 const initialFilters = (interests: string[] = loadInterests(), radiusKm: number = DEFAULT_RADIUS_KM): DiscoveryFilters => ({
   query: "",
@@ -68,7 +62,7 @@ function DiscoverEventsView({ store, preferences }: { store: EventsStore; prefer
   const route = useHashRoute();
   const [filters, setFilters] = useState<DiscoveryFilters>(() =>
     preferences && preferences.interests.length > 0
-      ? initialFilters(preferences.interests, nearestRadiusOption(preferences.radiusKm))
+      ? initialFilters(preferences.interests, preferences.radiusKm)
       : initialFilters()
   );
   const [listView, setListView] = useState<"for-you" | "map">("for-you");
@@ -87,6 +81,10 @@ function DiscoverEventsView({ store, preferences }: { store: EventsStore; prefer
     }
   }, [filters.interests]);
 
+  useEffect(() => {
+    if (preferences) setFilters((current) => ({ ...current, interests: preferences.interests, radiusKm: preferences.radiusKm }));
+  }, [preferences]);
+
   // Move focus to the new view's heading area on navigation (keyboard + screen-reader friendly).
   // Compare against the previous route (not a "first render" flag) so React StrictMode's
   // double-invoked effects in dev can't scroll the page down on first load.
@@ -104,7 +102,7 @@ function DiscoverEventsView({ store, preferences }: { store: EventsStore; prefer
   }, [route]);
 
   const ranked = useMemo(() => rankEvents(store.events, filters), [store.events, filters]);
-  const clearFilters = () => setFilters(initialFilters(filters.interests, preferences ? nearestRadiusOption(preferences.radiusKm) : DEFAULT_RADIUS_KM));
+  const clearFilters = () => setFilters(initialFilters(filters.interests, preferences ? preferences.radiusKm : DEFAULT_RADIUS_KM));
   const backHref = `#/${listView}`;
   const onList = route.name === "for-you" || route.name === "map";
 
@@ -126,7 +124,8 @@ function DiscoverEventsView({ store, preferences }: { store: EventsStore; prefer
       </div>
 
       {onList && <InterestBar filters={filters} onChange={setFilters} onClear={clearFilters} />}
-      {onList && <p className="tp-sample">Sample events · clearly synthetic demo data</p>}
+      {onList && <p className="tp-sample">Prototype catalogue · seeded examples use synthetic hosts and venues</p>}
+      {store.actionError && <p className="tp-error" role="alert">{store.actionError}</p>}
 
       {route.name === "for-you" && (
         <Loaded store={store}>

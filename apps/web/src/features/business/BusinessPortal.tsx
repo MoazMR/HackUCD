@@ -19,9 +19,10 @@ import { Logo } from "../profile/Logo";
 import "./business.css";
 
 type ReturnState =
-  | { kind: "verifying" }
+  | { kind: "verifying"; cancellation?: boolean }
   | { kind: "active"; order: MockOrder; promotion: Promotion }
   | { kind: "pending" }
+  | { kind: "ended"; order: MockOrder }
   | { kind: "cancelled"; order?: MockOrder }
   | { kind: "error"; message: string };
 
@@ -42,6 +43,12 @@ function storeMode(mode: BuyerType) {
 }
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function clearCheckoutReturn() {
+  const url = new URL(window.location.href);
+  for (const key of ["checkout", "session_id", "order"]) url.searchParams.delete(key);
+  window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+}
 
 export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
   const [mode, setMode] = useState<BuyerType>(readStoredMode);
@@ -101,21 +108,42 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
     const params = new URLSearchParams(window.location.search);
     const outcome = params.get("checkout");
     if (!outcome) return;
-    window.history.replaceState(null, "", window.location.pathname);
 
     if (outcome === "cancelled") {
       const orderId = params.get("order");
-      setReturnState({ kind: "cancelled" });
       if (orderId) {
+        setReturnState({ kind: "verifying", cancellation: true });
         businessApi
           .cancel(orderId)
-          .then(({ order }) => {
-            setReturnState({ kind: "cancelled", order });
+          .then(async ({ order }) => {
             if (order.buyer.type !== readStoredMode()) changeMode(order.buyer.type);
             setSelectedEventId(order.eventId);
+            // Payment can win a race with the cancel return. Use the verified order,
+            // rather than claiming that a completed sandbox payment was cancelled.
+            if (order.status === "paid" && order.stripeCheckoutSessionId) {
+              const result = await businessApi.confirm(order.stripeCheckoutSessionId);
+              if (result.status === "active" && result.order && result.promotion) {
+                clearCheckoutReturn();
+                setReturnState({ kind: "active", order: result.order, promotion: result.promotion });
+                return;
+              }
+              if (result.status === "expired" && result.order?.status === "paid") {
+                clearCheckoutReturn();
+                setReturnState({ kind: "ended", order: result.order });
+                return;
+              }
+            }
+            if (order.status === "cancelled" || order.status === "expired") {
+              clearCheckoutReturn();
+              setReturnState({ kind: "cancelled", order });
+            }
+            else setReturnState({ kind: "error", message: "Cancellation could not be confirmed. Check the order status before trying another checkout." });
           })
-          .catch(() => setReturnState({ kind: "cancelled" }))
-          .finally(refreshOrders);
+          .catch((error: Error) => setReturnState({ kind: "error", message: error.message }))
+          .finally(() => Promise.all([refreshOrders(), refreshEvents()]));
+      } else {
+        clearCheckoutReturn();
+        setReturnState({ kind: "cancelled" });
       }
       return;
     }
@@ -129,21 +157,32 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
           try {
             const result = await businessApi.confirm(sessionId);
             if (result.status === "active" && result.order && result.promotion) {
+              clearCheckoutReturn();
               setReturnState({ kind: "active", order: result.order, promotion: result.promotion });
               if (result.order.buyer.type !== readStoredMode()) changeMode(result.order.buyer.type);
+              setSelectedEventId(result.order.eventId);
               await Promise.all([refreshOrders(), refreshEvents()]);
               return;
             }
             if (result.status === "expired") {
-              setReturnState({ kind: "error", message: "This checkout expired before payment completed. You were not charged." });
+              clearCheckoutReturn();
+              if (result.order?.status === "paid") {
+                setReturnState({ kind: "ended", order: result.order });
+                if (result.order.buyer.type !== readStoredMode()) changeMode(result.order.buyer.type);
+                setSelectedEventId(result.order.eventId);
+                await Promise.all([refreshOrders(), refreshEvents()]);
+                return;
+              }
+              setReturnState({ kind: "error", message: "This checkout expired before payment completed. You were not charged. No new boost was activated. Saved drafts stay unpublished; existing published events stay published." });
               return;
             }
           } catch (error) {
             setReturnState({ kind: "error", message: (error as Error).message });
             return;
           }
-          await wait(1500);
+          if (attempt < 5) await wait(1500);
         }
+        // Keep the session in the return URL so a refresh can retry confirmation.
         setReturnState({ kind: "pending" });
       })();
     }
@@ -164,7 +203,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
     () => businessEvents.filter((event) => businessName && event.businessName?.toLowerCase() === businessName.toLowerCase()),
     [businessEvents, businessName]
   );
-  const promotedIds = useMemo(() => new Set(orders.filter((o) => o.status === "paid").map((o) => o.eventId)), [orders]);
+  const promotedIds = useMemo(() => new Set([...businessEvents, ...myEvents].filter((event) => event.isPaidPromotion || event.promoted).map((event) => event.id)), [businessEvents, myEvents]);
 
   const selectedEvent: HostedEvent | undefined =
     mode === "business"
@@ -177,7 +216,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
     businessApi.analytics(selectedEventId).then(setAnalytics).catch(() => setAnalytics(undefined));
   }, [selectedEventId, returnState]);
 
-  async function publishEvent() {
+  async function saveBusinessDraft() {
     setFormError(undefined);
     const errors = validateDraft(draft);
     setFieldErrors(errors);
@@ -226,12 +265,13 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
         <a className="biz-topbar__back" href={homeHref}>Back to For You</a>
       </header>
 
-      <ReturnBanner state={returnState} onDismiss={() => setReturnState(undefined)} />
+      <ReturnBanner state={returnState} mode={mode} publicationStatus={selectedEvent?.publicationStatus} onDismiss={() => setReturnState(undefined)} />
 
       <section className="biz-hero">
         <h1>Get your event in front of the right people nearby.</h1>
         <p>
-          Promotion is optional. Browsing, joining and creating events on ThirdPlace stay free for everyone.
+          Browsing, joining and creating ordinary-user events are free; Community Boost is optional.
+          Business events stay drafts until payment publishes and boosts them.
         </p>
         <div className="biz-mode" role="radiogroup" aria-label="Who is promoting">
           <button type="button" role="radio" aria-checked={mode === "business"} className="biz-mode__option" onClick={() => changeMode("business")}>
@@ -261,7 +301,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
                 {selectedEvent ? (
                   <div className="biz-selected">
                     <p><strong>{selectedEvent.title}</strong> at {selectedEvent.locationName}, {formatDateTime(selectedEvent.startsAt)}</p>
-                    <p className="biz-fineprint">Draft saved. For business events, payment publishes it and adds the clearly labelled boost.</p>
+                    <p className="biz-fineprint">{selectedEvent.publicationStatus === "draft" ? "Draft saved. It is hidden from public discovery until payment publishes it and adds the clearly labelled boost." : "This business event is published. A paid boost helps nearby people with matching interests find it."}</p>
                     <button type="button" className="biz-button--quiet" onClick={() => setSelectedEventId(undefined)}>Create a different event</button>
                   </div>
                 ) : (
@@ -271,7 +311,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
                       errors={fieldErrors}
                       saving={saving}
                       onChange={setDraft}
-                      onSubmit={publishEvent}
+                      onSubmit={saveBusinessDraft}
                       onFillSample={() => {
                         setDraft(sampleDraft());
                         setFieldErrors({});
@@ -280,7 +320,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
                     {formError && <p role="alert" className="biz-inline-error">{formError}</p>}
                     {ownBusinessEvents.length > 0 && (
                       <div className="biz-existing">
-                        <p>Or boost one of {businessName}'s existing events:</p>
+                        <p>Or choose one of {businessName}'s saved drafts or published events:</p>
                         <EventChoices events={ownBusinessEvents} promotedIds={promotedIds} selectedId={selectedEventId} onSelect={setSelectedEventId} />
                       </div>
                     )}
@@ -300,7 +340,7 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
           </li>
 
           <li className={`biz-step${selectedEvent ? "" : " biz-step--waiting"}`}>
-            <h2>{mode === "business" ? "Publish and boost it" : "Boost it"}</h2>
+            <h2>{mode === "business" && selectedEvent?.publicationStatus !== "published" ? "Publish and boost it" : "Boost it"}</h2>
             {plan ? (
               <div className="biz-boost">
                 <div>
@@ -338,8 +378,9 @@ export function BusinessPortal({ homeHref = "/" }: { homeHref?: string }) {
           <PromotionPreview event={previewEvent} sponsorName={sponsorName} promoted />
           {selectedEvent && <section className="biz-metrics" aria-label="Promotion results">
             <h2>Promotion results</h2>
-            <p className="biz-fineprint">Prototype analytics; no personal identities are recorded.</p>
+            <p className="biz-fineprint">Anonymous aggregate actions. Event impressions and opens count once per browser tab session.</p>
             <div><span><strong>{analytics?.impressions ?? 0}</strong> impressions</span><span><strong>{analytics?.detailViews ?? 0}</strong> event opens</span><span><strong>{analytics?.joins ?? 0}</strong> joins</span><span><strong>{analytics?.directions ?? 0}</strong> direction taps</span></div>
+            <p className="biz-fineprint">{analytics?.costPerJoinCents != null ? `${formatPrice(analytics.costPerJoinCents, analytics.currency)} per join during paid boosts (${formatPrice(analytics.paidAmountCents, analytics.currency)} sandbox spend, ${analytics.paidJoins} joins).` : "Cost per join appears after a join during a paid boost."}</p>
           </section>}
         </aside>
       </div>
@@ -376,6 +417,7 @@ function EventChoices({
           >
             <strong>{event.title}</strong>
             <span>{event.locationName}, {formatDateTime(event.startsAt)}</span>
+            <span className="biz-fineprint">{event.publicationStatus === "draft" ? "Draft · hidden until payment" : "Published"}</span>
             {promoted && <span className="biz-choice__flag">Already promoted</span>}
           </button>
         );
@@ -384,15 +426,15 @@ function EventChoices({
   );
 }
 
-function ReturnBanner({ state, onDismiss }: { state?: ReturnState; onDismiss: () => void }) {
+function ReturnBanner({ state, mode, publicationStatus, onDismiss }: { state?: ReturnState; mode: BuyerType; publicationStatus?: HostedEvent["publicationStatus"]; onDismiss: () => void }) {
   if (!state) return null;
   if (state.kind === "verifying") {
-    return <div className="biz-banner" role="status">Confirming your payment with Stripe…</div>;
+    return <div className="biz-banner" role="status">{state.cancellation ? "Checking cancellation with Stripe…" : "Confirming your payment with Stripe…"}</div>;
   }
   if (state.kind === "pending") {
     return (
       <div className="biz-banner biz-banner--warn" role="status">
-        Stripe hasn't confirmed the payment yet. Refresh in a minute; your boost starts as soon as it's confirmed.
+        Stripe hasn't confirmed the payment yet. Refresh in a minute; {mode === "business" ? publicationStatus === "published" ? "your business event remains published while waiting for this new boost." : publicationStatus === "draft" ? "your business event remains a draft until payment publishes and boosts it." : "business drafts stay unpublished until payment; previously published events stay published while waiting for a boost." : "your optional boost starts as soon as payment is confirmed."}
         <button type="button" className="biz-button--quiet" onClick={onDismiss}>Dismiss</button>
       </div>
     );
@@ -401,7 +443,7 @@ function ReturnBanner({ state, onDismiss }: { state?: ReturnState; onDismiss: ()
     return (
       <div className="biz-banner biz-banner--neutral" role="status">
         <strong>Checkout cancelled. You weren't charged.</strong>{" "}
-        {state.order?.buyer.type === "business" ? `“${state.order.eventTitle}” remains a draft until payment. You can try again below.` : state.order ? `“${state.order.eventTitle}” is still live without a boost. You can try again below.` : "No promotion was activated."}
+        {state.order?.buyer.type === "business" ? `“${state.order.eventTitle}” ${publicationStatus === "published" ? "remains published without this new boost" : "remains a draft until payment"}. You can try again below.` : state.order ? `“${state.order.eventTitle}” remains published without this optional boost. You can try again below.` : mode === "business" ? "Your business event remains a draft until payment. No promotion was activated." : "Your event remains published. No optional boost was activated."}
         <button type="button" className="biz-button--quiet" onClick={onDismiss}>Dismiss</button>
       </div>
     );
@@ -414,9 +456,18 @@ function ReturnBanner({ state, onDismiss }: { state?: ReturnState; onDismiss: ()
       </div>
     );
   }
+  if (state.kind === "ended") {
+    return (
+      <div className="biz-banner biz-banner--neutral" role="status">
+        Payment was confirmed for “{state.order.eventTitle}”. The boost has ended; the event remains published.
+        Paid {formatPrice(state.order.amountCents, state.order.currency)} in Stripe sandbox.
+        <button type="button" className="biz-button--quiet" onClick={onDismiss}>Dismiss</button>
+      </div>
+    );
+  }
   return (
     <div className="biz-banner biz-banner--success" role="status">
-      <strong>Payment confirmed. “{state.promotion.event.title}” is now promoted.</strong>{" "}
+      <strong>Payment confirmed. “{state.promotion.event.title}” is now {state.order.buyer.type === "business" ? "published and promoted" : "promoted"}.</strong>{" "}
       It shows as Promoted in For You and on the Map until {formatDateTime(state.promotion.endsAt)}.
       Paid {formatPrice(state.order.amountCents, state.order.currency)} (order <code>{state.order.id}</code>).
       <button type="button" className="biz-button--quiet" onClick={onDismiss}>Dismiss</button>

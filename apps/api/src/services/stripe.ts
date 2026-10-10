@@ -10,6 +10,19 @@ const DEFAULT_WEB_BASE_URL = "http://localhost:5173";
 const DEFAULT_PORTAL_PATH = "/src/features/business/portal.html";
 
 let client: Stripe | undefined;
+let clientKey: string | undefined;
+type CheckoutSessions = Pick<Stripe["checkout"]["sessions"], "create" | "retrieve" | "expire">;
+let testCheckoutSessions: CheckoutSessions | undefined;
+
+/** Inject only the network boundary in local tests; key validation and webhook signatures stay real. */
+export function setCheckoutSessionsForTesting(sessions?: CheckoutSessions): void {
+  testCheckoutSessions = sessions;
+}
+
+export function getCheckoutSessions(): CheckoutSessions {
+  const stripe = getStripe();
+  return testCheckoutSessions ?? stripe.checkout.sessions;
+}
 
 /** Hackathon rule: Stripe sandbox only. Live keys are refused, not just discouraged. */
 function readTestSecretKey(): string {
@@ -26,7 +39,12 @@ function readTestSecretKey(): string {
 }
 
 export function getStripe(): Stripe {
-  client ??= new Stripe(readTestSecretKey());
+  // Revalidate every use: a cached test client must not hide a later missing/live key.
+  const key = readTestSecretKey();
+  if (!client || clientKey !== key) {
+    client = new Stripe(key, { timeout: 10_000, maxNetworkRetries: 1 });
+    clientKey = key;
+  }
   return client;
 }
 

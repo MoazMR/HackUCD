@@ -4,6 +4,8 @@ import { formatKm, formatPrice, formatWhen, spotsLeft } from "./format";
 import { CATEGORY_LABELS, type ChatMessage, type DiscoveryEvent } from "./types";
 import { useEffect } from "react";
 import { trackEvent } from "./eventsClient";
+import { trackEventOnce } from "./analytics";
+import { PromotedBadge } from "../business/PromotedBadge";
 
 type Props = {
   event: DiscoveryEvent | undefined;
@@ -17,8 +19,8 @@ type Props = {
 
 export function EventDetail({ event, joined, messages, onJoin, onLeave, onPost, backHref }: Props) {
   useEffect(() => {
-    if (event?.promotion) trackEvent(event.id, "detail_view");
-  }, [event?.id, event?.promotion]);
+    if (event?.promotion) trackEventOnce(event.id, "detail_view");
+  }, [event?.id, Boolean(event?.promotion)]);
   if (!event) {
     return (
       <section className="tp-state" role="alert">
@@ -40,6 +42,7 @@ export function EventDetail({ event, joined, messages, onJoin, onLeave, onPost, 
       <div className="tp-detail__grid">
         <article className="tp-detail__main" aria-labelledby="event-title">
           <p className="tp-tile__meta">
+            {event.promotion && <PromotedBadge sponsorName={event.promotion.sponsorName || undefined} />}
             <span className="tp-tag">{CATEGORY_LABELS[event.category]}</span>
             <span className="tp-tag tp-tag--soft">{event.interest}</span>
             {event.synthetic && <span className="tp-tag tp-tag--sample">Sample event</span>}
@@ -56,7 +59,9 @@ export function EventDetail({ event, joined, messages, onJoin, onLeave, onPost, 
           </div>
 
           <div className="tp-detail__actions">
-            {joined ? (
+            {event.hosting ? (
+              <p className="tp-going" role="status">You're hosting this event</p>
+            ) : joined ? (
               <>
                 <p className="tp-going" role="status">You're going 🎉</p>
                 <button type="button" className="tp-btn tp-btn--ghost" onClick={() => onLeave(event.id)}>Leave event</button>
@@ -81,7 +86,7 @@ export function EventDetail({ event, joined, messages, onJoin, onLeave, onPost, 
         <GroupChat
           eventTitle={event.title}
           messages={messages}
-          canPost={joined}
+          canPost={joined || Boolean(event.hosting)}
           onPost={(text) => onPost(event.id, text)}
         />
       </div>

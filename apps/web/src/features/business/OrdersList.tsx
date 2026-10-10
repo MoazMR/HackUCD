@@ -3,17 +3,17 @@ import type { MockOrder, OrderStatus } from "./types";
 
 const STATUS_TEXT: Record<OrderStatus, string> = {
   pending: "Awaiting payment",
-  paid: "Paid, promotion active",
+  paid: "Paid, boost purchased",
   cancelled: "Cancelled, not charged",
   expired: "Checkout expired, not charged",
-  failed: "Failed, not charged"
+  failed: "Payment could not be verified"
 };
 
 export function OrdersList({ orders, loading, error }: { orders: MockOrder[]; loading: boolean; error?: string }) {
   return (
     <section className="biz-orders" aria-labelledby="orders-heading">
       <h2 id="orders-heading">Orders</h2>
-      <p className="biz-fineprint">Mock order log for this demo session (sandbox payments, stored in memory until the API restarts).</p>
+      <p className="biz-fineprint">Prototype order history for Stripe sandbox payments. Orders are saved across API restarts; no real money moves.</p>
       {loading && <p>Loading orders…</p>}
       {error && <p role="alert" className="biz-inline-error">{error}</p>}
       {!loading && !error && orders.length === 0 && <p className="biz-empty">No orders yet. Boost an event above to create one.</p>}

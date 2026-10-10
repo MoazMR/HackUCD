@@ -28,8 +28,13 @@ export type EventRecord = OutingEvent & {
   publicationStatus: "draft" | "published";
 };
 
+/** Public catalogue shape: no attendance identities or internal owner identifier. */
+export type PublicEventRecord = Omit<EventRecord, "attendeeIds" | "hostId">;
+
+export type EventMembership = { event: PublicEventRecord; role: "hosting" | "going" };
+
 export type EventRecommendation = {
-  event: EventRecord;
+  event: PublicEventRecord;
   score: number;
   distanceKm: number;
   explanation: string;

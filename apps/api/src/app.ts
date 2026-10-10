@@ -1,5 +1,5 @@
 import cors from "cors";
-import express from "express";
+import express, { type ErrorRequestHandler } from "express";
 import { businessRouter } from "./routes/business.js";
 import { eventPlansRouter } from "./routes/eventPlans.js";
 import { eventsRouter } from "./routes/events.js";
@@ -29,5 +29,18 @@ export function createApp() {
   app.use("/api/promotions", promotionsRouter);
   app.use("/api/analytics", analyticsRouter);
   app.use("/api/assistant", assistantRouter);
+  const requestError: ErrorRequestHandler = (error, _request, response, _next) => {
+    if (error?.status === 413) {
+      response.status(413).json({ error: "Request body is too large." });
+      return;
+    }
+    if (error?.status === 400) {
+      response.status(400).json({ error: "Invalid request body." });
+      return;
+    }
+    console.error("[api] Unexpected request failure");
+    response.status(500).json({ error: "The request could not be completed." });
+  };
+  app.use(requestError);
   return app;
 }
