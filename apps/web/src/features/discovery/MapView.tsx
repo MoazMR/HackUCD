@@ -46,6 +46,19 @@ export function MapView({ ranked, joined, filters, onReset }: Props) {
             <path className="tp-map__river" d={`M 0 ${MAP_HEIGHT * 0.5} C ${MAP_WIDTH * 0.2} ${MAP_HEIGHT * 0.42}, ${MAP_WIDTH * 0.3} ${MAP_HEIGHT * 0.5}, ${MAP_WIDTH * 0.45} ${MAP_HEIGHT * 0.46} S ${MAP_WIDTH * 0.7} ${MAP_HEIGHT * 0.5}, ${MAP_WIDTH * 0.8} ${MAP_HEIGHT * 0.5}`} />
             <ellipse className="tp-map__park" cx={MAP_WIDTH * 0.57} cy={MAP_HEIGHT * 0.47} rx={MAP_WIDTH * 0.07} ry={MAP_HEIGHT * 0.05} />
             <ellipse className="tp-map__park" cx={MAP_WIDTH * 0.52} cy={MAP_HEIGHT * 0.74} rx={MAP_WIDTH * 0.09} ry={MAP_HEIGHT * 0.07} />
+            {/* white streets and a yellow avenue, as on the Profile map */}
+            <g className="tp-map__streets">
+              <path d={`M 0 ${MAP_HEIGHT * 0.2} L ${MAP_WIDTH * 0.8} ${MAP_HEIGHT * 0.26}`} />
+              <path d={`M 0 ${MAP_HEIGHT * 0.34} L ${MAP_WIDTH * 0.78} ${MAP_HEIGHT * 0.38}`} />
+              <path d={`M 0 ${MAP_HEIGHT * 0.66} L ${MAP_WIDTH * 0.8} ${MAP_HEIGHT * 0.6}`} />
+              <path d={`M 0 ${MAP_HEIGHT * 0.84} L ${MAP_WIDTH * 0.78} ${MAP_HEIGHT * 0.88}`} />
+              <path d={`M ${MAP_WIDTH * 0.14} 0 L ${MAP_WIDTH * 0.2} ${MAP_HEIGHT}`} />
+              <path d={`M ${MAP_WIDTH * 0.32} 0 L ${MAP_WIDTH * 0.36} ${MAP_HEIGHT}`} />
+              <path d={`M ${MAP_WIDTH * 0.5} 0 L ${MAP_WIDTH * 0.46} ${MAP_HEIGHT}`} />
+              <path d={`M ${MAP_WIDTH * 0.66} 0 L ${MAP_WIDTH * 0.7} ${MAP_HEIGHT}`} />
+            </g>
+            <path className="tp-map__avenue-casing" d={`M 0 ${MAP_HEIGHT * 0.12} L ${MAP_WIDTH * 0.8} ${MAP_HEIGHT * 0.94}`} />
+            <path className="tp-map__avenue" d={`M 0 ${MAP_HEIGHT * 0.12} L ${MAP_WIDTH * 0.8} ${MAP_HEIGHT * 0.94}`} />
             <circle className="tp-map__radius" cx={me.x} cy={me.y} r={filters.radiusKm * MAP_PX_PER_KM} />
           </svg>
 
