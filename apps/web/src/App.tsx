@@ -4,7 +4,7 @@ export function App() {
   return (
     <main className="page-shell">
       <header className="topbar">
-        <a className="brand" href="/">Outings</a>
+        <a className="brand" href="/">ThirdPlace</a>
         <nav aria-label="Primary navigation">
           <a href="#discover">Discover</a>
           <a href="#create">Create an outing</a>

@@ -1,6 +1,6 @@
 # Web design direction
 
-Build a distinctive Social Outings web experience inspired by the clarity, confidence, and locality of Manna, Once Upon, and Deliveroo. Do not copy their branding, copy, layouts, imagery, or proprietary assets.
+Build a distinctive ThirdPlace web experience inspired by the clarity, confidence, and locality of Manna, Once Upon, and Deliveroo. Do not copy their branding, copy, layouts, imagery, or proprietary assets.
 
 ## Principles
 
