@@ -27,6 +27,7 @@ All web UI must follow [docs/DESIGN.md](docs/DESIGN.md): a distinct ThirdPlace d
 - `apps/api`: the backend HTTP API.
 - `packages/shared`: types and validation shared by both apps.
 - `docs`: product decisions, API contracts, and onboarding notes.
+- `presentation`: a dependency-free interactive HTML pitch deck; see `presentation/README.md`.
 
 ## Mandatory Git workflow
 
